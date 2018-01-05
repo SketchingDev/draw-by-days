@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: htmlhead"></head>
+
+<body>
+  <div class="mdl-layout mdl-js-layout">
+
+    <header th:replace="fragments :: nav"></header>
+
+    <main class="mdl-layout__content">
+      <div class="page-content">
+        <div class="mdl-grid">
+
+          <div class="mdl-layout-spacer"></div>
+          <div>
+            <img id="subject-image" th:if="${image}" th:src="${image.path}" />
+            <p th:unless="${image}" th:text="#{error.image.none}"></p>
+          </div>
+          <div class="mdl-layout-spacer"></div>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+</body>
+</html>

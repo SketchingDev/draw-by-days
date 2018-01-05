@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="htmlhead">
+  <title th:if="${title}" th:text="${title} + ' - ' + #{site.name}"></title>
+  <title th:unless="${title}" th:text="#{site.name}"></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"></link>
+  <link rel="stylesheet" th:href="@{/css/main.css}"></link>
+
+  <script defer="defer" src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+
+<header th:fragment="nav" class="mdl-layout__header mdl-layout__header--scroll">
+  <div class="mdl-layout__header-row">
+    <span class="mdl-layout-title" th:text="#{site.name}"></span>
+
+    <div class="mdl-layout-spacer"></div>
+    <nav class="mdl-navigation">
+      <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
+         th:href="@{/}"
+         th:text="#{menu.image}"></a>
+    </nav>
+  </div>
+</header>
+
+</html>
