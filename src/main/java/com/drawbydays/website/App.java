@@ -1,4 +1,4 @@
-package com.dailydraw.website;
+package com.drawbydays.website;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

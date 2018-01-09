@@ -1,6 +1,6 @@
-package com.dailydraw.website.controller;
+package com.drawbydays.website.controller;
 
-import com.dailydraw.website.storage.ImageRepository;
+import com.drawbydays.website.storage.ImageRepository;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

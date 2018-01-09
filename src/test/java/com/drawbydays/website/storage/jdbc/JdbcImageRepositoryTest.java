@@ -1,4 +1,4 @@
-package com.dailydraw.website.storage.jdbc;
+package com.drawbydays.website.storage.jdbc;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;

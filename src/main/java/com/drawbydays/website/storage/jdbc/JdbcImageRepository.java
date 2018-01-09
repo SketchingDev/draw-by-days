@@ -1,7 +1,7 @@
-package com.dailydraw.website.storage.jdbc;
+package com.drawbydays.website.storage.jdbc;
 
-import com.dailydraw.website.storage.Image;
-import com.dailydraw.website.storage.ImageRepository;
+import com.drawbydays.website.storage.Image;
+import com.drawbydays.website.storage.ImageRepository;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;

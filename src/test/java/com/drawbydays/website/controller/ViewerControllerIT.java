@@ -1,4 +1,4 @@
-package com.dailydraw.website.controller;
+package com.drawbydays.website.controller;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

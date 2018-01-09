@@ -1,4 +1,4 @@
-package com.dailydraw.website.storage;
+package com.drawbydays.website.storage;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-# Daily Draw [![Build Status](https://travis-ci.org/SketchingDev/daily-draw.svg?branch=development)](https://travis-ci.org/SketchingDev/daily-draw)
+# Draw by Days [![Build Status](https://travis-ci.org/SketchingDev/Draw-by-Days.svg?branch=development)](https://travis-ci.org/SketchingDev/Draw-by-Days)
 
 ## Useful reading
 

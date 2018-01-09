@@ -1,4 +1,4 @@
-package com.dailydraw.website.controller;
+package com.drawbydays.website.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyObject;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.dailydraw.website.storage.Image;
-import com.dailydraw.website.storage.ImageRepository;
+import com.drawbydays.website.storage.Image;
+import com.drawbydays.website.storage.ImageRepository;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;

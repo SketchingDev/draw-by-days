@@ -10,8 +10,8 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: dailydraw-website
-        image: sketchingdev/dailydraw-website:latest
+      - name: drawbydays-website
+        image: sketchingdev/drawbydays-website:latest
         ports:
         - containerPort: 80
         env:
