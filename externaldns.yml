@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      containers:
+      - name: external-dns
+        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
+        args:
+        - --source=service
+        - --domain-filter=drawbydays.com
+        - --provider=azure
+        - --azure-resource-group=externaldns
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
