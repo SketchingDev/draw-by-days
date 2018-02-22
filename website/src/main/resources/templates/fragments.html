@@ -15,7 +15,7 @@
   <script defer="defer" src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 </head>
 
-<header th:fragment="nav" class="mdl-layout__header mdl-layout__header--scroll">
+<header th:fragment="nav(nextImageId)" class="mdl-layout__header mdl-layout__header--scroll">
   <div class="mdl-layout__header-row">
     <span class="mdl-layout-title" th:text="#{site.name}"></span>
 
@@ -23,8 +23,8 @@
     <nav class="mdl-navigation">
       <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
          th:id="refresh"
-         th:href="@{/}"
-         th:text="#{menu.image}"></a>
+         th:href="${nextImageId} ? @{/(id=${nextImageId})} : @{/}"
+         th:text="#{menu.next}"></a>
     </nav>
   </div>
 </header>

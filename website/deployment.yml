@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: drawbydays-website
-        image: sketchingdev/drawbydays-website:latest
+        image: sketchingdev/drawbydays-website:0.0.1-SNAPSHOT
         ports:
         - containerPort: 80
         env:

@@ -1,61 +1,122 @@
 package com.drawbydays.website.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.drawbydays.website.storage.Image;
-import com.drawbydays.website.storage.ImageRepository;
-import java.util.Optional;
+import com.drawbydays.website.ImageService;
+import com.drawbydays.website.NextImageService;
+import com.drawbydays.website.model.Image;
+import com.drawbydays.website.model.ImageSequenceModel;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Map;
+import java.util.Optional;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ViewerControllerTest {
 
-  @Mock
-  private ImageRepository imageRepository;
+  private static final long IMAGE_ID = 0L;
+
+  private static final String MODEL_KEY = "imageSequence";
 
   @Mock
-  private Model model;
+  private ImageService imageService;
 
-  @Test(expected = NullPointerException.class)
-  public void exceptionThrownIfInstantiatedWithNull() {
-    new ViewerController(null);
+  @Mock
+  private NextImageService nextImageService;
+
+  private ViewerController controller;
+
+  @Before
+  public void setup() {
+    controller = new ViewerController(imageService, nextImageService);
   }
 
   @Test
-  public void viewNamedViewReturned() {
-    when(imageRepository.getRandomImage()).thenReturn(Optional.empty());
-    final ViewerController controller = new ViewerController(imageRepository);
+  public void view_calls_imageService_findFirstImage() {
+    when(imageService.findFistImage()).thenReturn(Optional.empty());
 
-    assertEquals("viewer", controller.viewer(mock(Model.class)));
+    controller.view();
+
+    verify(imageService).findFistImage();
   }
 
   @Test
-  public void modelAddAttributeCalledWithImageIfRepositoryReturnsImage() {
-    final Optional<Image> optionalImage = Optional.of(mock(Image.class));
-    when(imageRepository.getRandomImage()).thenReturn(optionalImage);
+  public void view_id_calls_imageService_findImageById_with_id_parameter() {
+    when(imageService.findImageById(anyLong())).thenReturn(Optional.empty());
 
-    new ViewerController(imageRepository).viewer(model);
+    controller.view(IMAGE_ID);
 
-    verify(model).addAttribute(anyString(), eq(optionalImage.get()));
+    verify(imageService).findImageById(eq(IMAGE_ID));
   }
 
   @Test
-  public void modelAddAttributeNotCalledIfRepositoryReturnsNothing() {
-    when(imageRepository.getRandomImage()).thenReturn(Optional.empty());
+  public void view_returns_imageSequence_with_null_currentImage_and_null_nextImage_if_no_data() {
+    when(imageService.findFistImage()).thenReturn(Optional.empty());
 
-    new ViewerController(imageRepository).viewer(model);
+    final ModelAndView modelAndView = controller.view();
 
-    verify(model, never()).addAttribute(anyString(), anyObject());
+    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
+    assertNull(model.getCurrentImage());
+    assertNull(model.getNextImage());
+  }
+
+  @Test
+  public void view_returns_imageSequence_with_currentImage_if_imageService_returns_image() {
+    final Image image = mock(Image.class);
+    when(imageService.findFistImage()).thenReturn(Optional.of(image));
+    when(nextImageService.findNextImage(any())).thenReturn(Optional.empty());
+
+    final ModelAndView modelAndView = controller.view();
+
+    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
+    assertSame(image, model.getCurrentImage());
+    assertNull(model.getNextImage());
+  }
+
+  @Test
+  public void view_returns_imageSequence_with_null_nextImage_if_nextImage_returns_image_but_imageService_does_not() {
+    final Image image = mock(Image.class);
+    when(imageService.findFistImage()).thenReturn(Optional.empty());
+    when(nextImageService.findNextImage(any())).thenReturn(Optional.of(image));
+
+    final ModelAndView modelAndView = controller.view();
+
+    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
+    assertNull(model.getNextImage());
+  }
+
+  @Test
+  public void view_returns_imageSequence_with_nextImage_if_imageService_and_nextImage_return_images() {
+    final Image image = mock(Image.class);
+    final Image nextImage = mock(Image.class);
+    when(imageService.findFistImage()).thenReturn(Optional.of(image));
+    when(nextImageService.findNextImage(any())).thenReturn(Optional.of(nextImage));
+
+    final ModelAndView modelAndView = controller.view();
+
+    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
+    assertSame(image, model.getCurrentImage());
+    assertSame(nextImage, model.getNextImage());
+  }
+
+  private ImageSequenceModel extractImageSequenceModel(final ModelAndView modelAndView) {
+    final Map<String, Object> model = modelAndView.getModel();
+    assertTrue(model.containsKey(MODEL_KEY));
+
+    final Object imageSequence = model.get(MODEL_KEY);
+    assertThat(imageSequence, instanceOf(ImageSequenceModel.class));
+
+    return (ImageSequenceModel) imageSequence;
   }
 }
