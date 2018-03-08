@@ -4,11 +4,13 @@ import com.drawbydays.website.ImageService;
 import com.drawbydays.website.NextImageService;
 import com.drawbydays.website.model.Image;
 import com.drawbydays.website.model.ImageSequenceModel;
+import com.drawbydays.website.model.ViewImageModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
@@ -55,7 +57,10 @@ public class ViewerControllerTest {
   public void view_id_calls_imageService_findImageById_with_id_parameter() {
     when(imageService.findImageById(anyLong())).thenReturn(Optional.empty());
 
-    controller.view(IMAGE_ID);
+    final ViewImageModel viewImageModel = mock(ViewImageModel.class);
+    when(viewImageModel.getId()).thenReturn(IMAGE_ID);
+
+    controller.view(viewImageModel, mock(Errors.class));
 
     verify(imageService).findImageById(eq(IMAGE_ID));
   }
@@ -108,6 +113,18 @@ public class ViewerControllerTest {
     final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
     assertSame(image, model.getCurrentImage());
     assertSame(nextImage, model.getNextImage());
+  }
+
+  @Test
+  public void view_returns_imageSequence_with_null_nextImage_and_null_currentImage_if_parameter_invalid() {
+    final Errors errors = mock(Errors.class);
+    when(errors.hasErrors()).thenReturn(true);
+
+    final ModelAndView modelAndView = controller.view(null, errors);
+
+    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
+    assertNull(model.getCurrentImage());
+    assertNull(model.getNextImage());
   }
 
   private ImageSequenceModel extractImageSequenceModel(final ModelAndView modelAndView) {

@@ -4,12 +4,15 @@ import com.drawbydays.website.ImageService;
 import com.drawbydays.website.NextImageService;
 import com.drawbydays.website.model.Image;
 import com.drawbydays.website.model.ImageSequenceModel;
+import com.drawbydays.website.model.ViewImageModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/")
@@ -38,12 +41,14 @@ public class ViewerController {
   }
 
   @GetMapping(params = "id")
-  public ModelAndView view(@RequestParam final long id) {
-    final ImageSequenceModel model = new ImageSequenceModel();
+  public ModelAndView view(@Valid final ViewImageModel model, final Errors errors) {
+    final ImageSequenceModel imageSequenceModel = new ImageSequenceModel();
 
-    imageService.findImageById(id).ifPresent(image -> populateModel(model, image));
+    if (!errors.hasErrors()) {
+      imageService.findImageById(model.getId()).ifPresent(image -> populateModel(imageSequenceModel, image));
+    }
 
-    return new ModelAndView(VIEW_NAME, MODEL_NAME, model);
+    return new ModelAndView(VIEW_NAME, MODEL_NAME, imageSequenceModel);
   }
 
   private void populateModel(final ImageSequenceModel model, final Image image) {

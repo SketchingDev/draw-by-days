@@ -24,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ViewerController.class)
 public class ViewerControllerIT {
 
+  private static final String INVALID_ID = "999999999999999999999999999";
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -34,21 +36,29 @@ public class ViewerControllerIT {
   private NextImageService nextImageService;
 
   @Test
-  public void model_contains_images_attribute_when_images_available() throws Exception {
+  public void model_contains_imageSequence_attribute_when_images_available() throws Exception {
     when(imageService.findFistImage()).thenReturn(Optional.of(mock(Image.class)));
     when(nextImageService.findNextImage(any())).thenReturn(Optional.of(mock(Image.class)));
 
     mockMvc.perform(get("/"))
-        .andExpect(status().isOk())
-        .andExpect(model().attributeExists("imageSequence"));
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("imageSequence"));
   }
 
   @Test
-  public void model_contains_images_attribute_when_images_not_available() throws Exception {
+  public void model_contains_imageSequence_attribute_when_images_not_available() throws Exception {
     when(imageService.findFistImage()).thenReturn(Optional.empty());
     when(nextImageService.findNextImage(any())).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("imageSequence"));
+  }
+
+  @Test
+  public void model_contains_imageSequence_attribute_when_id_param_invalid() throws Exception {
+    mockMvc.perform(get("/")
+            .param("id", INVALID_ID))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("imageSequence"));
   }
