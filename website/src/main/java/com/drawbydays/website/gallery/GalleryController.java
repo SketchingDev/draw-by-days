@@ -1,13 +1,11 @@
-package com.drawbydays.website.controller;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.ImageService;
-import com.drawbydays.website.NextImageService;
-import com.drawbydays.website.model.Image;
-import com.drawbydays.website.model.ImageSequenceModel;
-import com.drawbydays.website.model.ViewImageModel;
+import com.drawbydays.website.gallery.model.DisplayImage;
+import com.drawbydays.website.gallery.model.ImageSequence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import com.drawbydays.website.gallery.model.Image;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,42 +14,42 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/")
-public class ViewerController {
+public class GalleryController {
 
   private static final String MODEL_NAME = "imageSequence";
-  private static final String VIEW_NAME = "viewer";
+  private static final String PRACTISE_VIEW = "gallery/displayImage";
 
   private final ImageService imageService;
 
   private final NextImageService nextImageService;
 
   @Autowired
-  public ViewerController(final ImageService imageService, final NextImageService nextImageService) {
+  public GalleryController(final ImageService imageService, final NextImageService nextImageService) {
     this.imageService = imageService;
     this.nextImageService = nextImageService;
   }
 
   @GetMapping
   public ModelAndView view() {
-    final ImageSequenceModel model = new ImageSequenceModel();
+    final ImageSequence model = new ImageSequence();
 
     imageService.findFistImage().ifPresent(image -> populateModel(model, image));
 
-    return new ModelAndView(VIEW_NAME, MODEL_NAME, model);
+    return new ModelAndView(PRACTISE_VIEW, MODEL_NAME, model);
   }
 
   @GetMapping(params = "id")
-  public ModelAndView view(@Valid final ViewImageModel model, final Errors errors) {
-    final ImageSequenceModel imageSequenceModel = new ImageSequenceModel();
+  public ModelAndView view(@Valid final DisplayImage model, final Errors errors) {
+    final ImageSequence imageSequenceModel = new ImageSequence();
 
     if (!errors.hasErrors()) {
       imageService.findImageById(model.getId()).ifPresent(image -> populateModel(imageSequenceModel, image));
     }
 
-    return new ModelAndView(VIEW_NAME, MODEL_NAME, imageSequenceModel);
+    return new ModelAndView(PRACTISE_VIEW, MODEL_NAME, imageSequenceModel);
   }
 
-  private void populateModel(final ImageSequenceModel model, final Image image) {
+  private void populateModel(final ImageSequence model, final Image image) {
     model.setCurrentImage(image);
 
     nextImageService

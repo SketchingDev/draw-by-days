@@ -1,6 +1,6 @@
-package com.drawbydays.website.configuration;
+package com.drawbydays.website.populate;
 
-import com.drawbydays.website.storage.ImageEntity;
+import com.drawbydays.website.gallery.ImageEntity;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @ConfigurationProperties(prefix="app")
 public class AppProperties {
 
-  private List<ImageEntity> images = new ArrayList<>();
+  private final List<ImageEntity> images = new ArrayList<>();
 
   public void setImage(final ImageEntity image) {
     images.add(image);

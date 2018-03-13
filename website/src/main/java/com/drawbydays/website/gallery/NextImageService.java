@@ -1,8 +1,6 @@
-package com.drawbydays.website;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.model.Image;
-import com.drawbydays.website.storage.ImageEntity;
-import com.drawbydays.website.storage.ImageRepository;
+import com.drawbydays.website.gallery.model.Image;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,7 @@ public class NextImageService {
   private final Converter<ImageEntity, Image> converter;
 
   @Autowired
-  public NextImageService(final ImageRepository imageRepository, final Converter<ImageEntity, Image> converter) {
+  NextImageService(final ImageRepository imageRepository, final Converter<ImageEntity, Image> converter) {
     this.imageRepository = Objects.requireNonNull(imageRepository);
     this.converter = Objects.requireNonNull(converter);
   }

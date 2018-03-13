@@ -1,4 +1,4 @@
-package com.drawbydays.website.storage;
+package com.drawbydays.website.gallery;
 
 import javax.persistence.Id;
 import javax.persistence.Entity;

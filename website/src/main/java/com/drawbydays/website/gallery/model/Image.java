@@ -1,4 +1,4 @@
-package com.drawbydays.website.model;
+package com.drawbydays.website.gallery.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -9,6 +9,7 @@ public class Image {
 
   private URI uri;
 
+  // TODO Make primitive
   public Image(final Long id, final URI uri) {
     this.id = Objects.requireNonNull(id);
     this.uri = Objects.requireNonNull(uri);

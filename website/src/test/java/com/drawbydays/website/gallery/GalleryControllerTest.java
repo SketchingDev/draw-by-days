@@ -1,7 +1,7 @@
-package com.drawbydays.website.controller;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.storage.ImageEntity;
-import com.drawbydays.website.storage.ImageRepository;
+import com.drawbydays.website.gallery.ImageEntity;
+import com.drawbydays.website.gallery.ImageRepository;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class ViewerControllerTest {
+public class GalleryControllerTest {
   private static final URI IMAGE_1_URI = URI.create("./images/1.png");
   private static final URI IMAGE_2_URI = URI.create("./images/2.png");
 

@@ -1,6 +1,6 @@
-package com.drawbydays.website.configuration;
+package com.drawbydays.website.populate;
 
-import com.drawbydays.website.storage.ImageEntity;
+import com.drawbydays.website.gallery.ImageEntity;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

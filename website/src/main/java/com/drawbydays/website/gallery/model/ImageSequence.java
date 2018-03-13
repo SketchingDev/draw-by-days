@@ -1,19 +1,19 @@
-package com.drawbydays.website.model;
+package com.drawbydays.website.gallery.model;
 
-public class ImageSequenceModel {
+public class ImageSequence {
 
   private Image currentImage;
 
   private Image nextImage;
 
-  public ImageSequenceModel() {
+  public ImageSequence() {
   }
 
-  public ImageSequenceModel(final Image currentImage) {
+  public ImageSequence(final Image currentImage) {
     this.currentImage = currentImage;
   }
 
-  public ImageSequenceModel(final Image currentImage, final Image nextImage) {
+  public ImageSequence(final Image currentImage, final Image nextImage) {
     this.currentImage = currentImage;
     this.nextImage = nextImage;
   }

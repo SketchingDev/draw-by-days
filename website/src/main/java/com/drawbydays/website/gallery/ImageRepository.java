@@ -1,7 +1,6 @@
-package com.drawbydays.website.storage;
+package com.drawbydays.website.gallery;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Optional;
 

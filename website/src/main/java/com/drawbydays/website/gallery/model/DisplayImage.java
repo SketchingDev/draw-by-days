@@ -1,10 +1,10 @@
-package com.drawbydays.website.model;
+package com.drawbydays.website.gallery.model;
 
-public class ViewImageModel {
+public class DisplayImage {
 
   private long id;
 
-  public ViewImageModel() {
+  public DisplayImage() {
   }
 
   public long getId() {

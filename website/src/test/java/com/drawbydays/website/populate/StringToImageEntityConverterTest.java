@@ -1,6 +1,7 @@
-package com.drawbydays.website.configuration;
+package com.drawbydays.website.populate;
 
-import com.drawbydays.website.storage.ImageEntity;
+import com.drawbydays.website.gallery.ImageEntity;
+import com.drawbydays.website.populate.StringToImageEntityConverter;
 import org.junit.Before;
 import org.junit.Test;
 

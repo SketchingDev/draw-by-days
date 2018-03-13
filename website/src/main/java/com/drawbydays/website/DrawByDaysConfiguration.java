@@ -1,9 +1,5 @@
-package com.drawbydays.website.configuration;
+package com.drawbydays.website;
 
-import com.drawbydays.website.storage.ImageRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +10,7 @@ import java.util.Locale;
 
 @Configuration
 @ComponentScan("com.drawbydays.website")
-public class AppConfig {
+public class DrawByDaysConfiguration {
 
   @Bean
   public LocaleResolver localeResolver() {

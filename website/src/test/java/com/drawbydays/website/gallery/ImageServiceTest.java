@@ -1,8 +1,6 @@
-package com.drawbydays.website;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.model.Image;
-import com.drawbydays.website.storage.ImageEntity;
-import com.drawbydays.website.storage.ImageRepository;
+import com.drawbydays.website.gallery.model.Image;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,6 @@
-package com.drawbydays.website;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.model.Image;
-import com.drawbydays.website.storage.ImageEntity;
+import com.drawbydays.website.gallery.model.Image;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component;
 public final class ImageEntityToImageConverter implements Converter<ImageEntity, Image> {
 
   @Override
-  public Image convert(ImageEntity imageEntity) {
+  public Image convert(final ImageEntity imageEntity) {
     return new Image(
             imageEntity.getId(),
             imageEntity.getUri()

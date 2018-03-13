@@ -1,7 +1,7 @@
-package com.drawbydays.website;
+package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.storage.ImageEntity;
-import com.drawbydays.website.storage.ImageRepository;
+import com.drawbydays.website.gallery.ImageEntity;
+import com.drawbydays.website.gallery.ImageRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
