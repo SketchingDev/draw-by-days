@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ImageRepositoryIT {
+public class ImageRepositoryTest {
 
   private static final URI DUMMY_TEST_URI_ONE = URI.create("test_uri1");
   private static final URI DUMMY_TEST_URI_TWO = URI.create("test_uri2");
