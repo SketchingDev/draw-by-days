@@ -1,139 +1,137 @@
 package com.drawbydays.website.controller;
 
-import com.drawbydays.website.ImageService;
-import com.drawbydays.website.NextImageService;
-import com.drawbydays.website.model.Image;
-import com.drawbydays.website.model.ImageSequenceModel;
-import com.drawbydays.website.model.ViewImageModel;
-import org.junit.Before;
+import com.drawbydays.website.storage.ImageEntity;
+import com.drawbydays.website.storage.ImageRepository;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.validation.Errors;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
-import java.util.Optional;
+import java.net.URI;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class ViewerControllerTest {
+  private static final URI IMAGE_1_URI = URI.create("./images/1.png");
+  private static final URI IMAGE_2_URI = URI.create("./images/2.png");
 
-  private static final long IMAGE_ID = 0L;
+  @Autowired
+  private MockMvc mockMvc;
 
-  private static final String MODEL_KEY = "imageSequence";
+  @Autowired
+  private ImageRepository repository;
 
-  @Mock
-  private ImageService imageService;
+  @Test
+  @DirtiesContext
+  public void two_images_in_storage_results_in_response_currentImage_is_image1_and_nextImage_is_image2() throws Exception {
+    repository.save(new ImageEntity(IMAGE_1_URI));
+    repository.save(new ImageEntity(IMAGE_2_URI));
 
-  @Mock
-  private NextImageService nextImageService;
-
-  private ViewerController controller;
-
-  @Before
-  public void setup() {
-    controller = new ViewerController(imageService, nextImageService);
+    mockMvc.perform(get("/"))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          propertyContainsUri("currentImage", IMAGE_1_URI),
+          propertyContainsUri("nextImage", IMAGE_2_URI)
+        )
+      ));
   }
 
   @Test
-  public void view_calls_imageService_findFirstImage() {
-    when(imageService.findFistImage()).thenReturn(Optional.empty());
-
-    controller.view();
-
-    verify(imageService).findFistImage();
+  public void no_images_in_storage_results_in_response_currentImage_is_null_and_nextImage_is_null() throws Exception {
+    mockMvc.perform(get("/"))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          hasProperty("currentImage", nullValue()),
+          hasProperty("nextImage", nullValue())
+        )
+      ));
   }
 
   @Test
-  public void view_id_calls_imageService_findImageById_with_id_parameter() {
-    when(imageService.findImageById(anyLong())).thenReturn(Optional.empty());
+  @DirtiesContext
+  public void invalid_id_results_in_response_currentImage_is_null_and_nextImage_is_null() throws Exception {
+    repository.save(new ImageEntity(IMAGE_1_URI));
+    repository.save(new ImageEntity(IMAGE_2_URI));
 
-    final ViewImageModel viewImageModel = mock(ViewImageModel.class);
-    when(viewImageModel.getId()).thenReturn(IMAGE_ID);
-
-    controller.view(viewImageModel, mock(Errors.class));
-
-    verify(imageService).findImageById(eq(IMAGE_ID));
+    mockMvc.perform(get("/")
+      .param("id", "INVALID ID"))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          hasProperty("currentImage", nullValue()),
+          hasProperty("nextImage", nullValue())
+        )
+      ));
   }
 
   @Test
-  public void view_returns_imageSequence_with_null_currentImage_and_null_nextImage_if_no_data() {
-    when(imageService.findFistImage()).thenReturn(Optional.empty());
+  @DirtiesContext
+  public void one_image_in_storage_results_in_response_currentImage_is_image1_and_nextImage_is_image1() throws Exception {
+    repository.save(new ImageEntity(IMAGE_1_URI));
 
-    final ModelAndView modelAndView = controller.view();
-
-    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
-    assertNull(model.getCurrentImage());
-    assertNull(model.getNextImage());
+    mockMvc.perform(get("/"))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          propertyContainsUri("currentImage", IMAGE_1_URI),
+          propertyContainsUri("nextImage", IMAGE_1_URI)
+        )
+      ));
   }
 
   @Test
-  public void view_returns_imageSequence_with_currentImage_if_imageService_returns_image() {
-    final Image image = mock(Image.class);
-    when(imageService.findFistImage()).thenReturn(Optional.of(image));
-    when(nextImageService.findNextImage(any())).thenReturn(Optional.empty());
+  @DirtiesContext
+  public void two_images_in_storage_and_id_of_1_results_in_response_currentImage_is_image1_and_nextImage_is_image2() throws Exception {
+    final long id = repository.save(new ImageEntity(IMAGE_1_URI)).getId();
+    repository.save(new ImageEntity(IMAGE_2_URI));
 
-    final ModelAndView modelAndView = controller.view();
-
-    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
-    assertSame(image, model.getCurrentImage());
-    assertNull(model.getNextImage());
+    mockMvc.perform(get("/")
+      .param("id", String.valueOf(id)))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          propertyContainsUri("currentImage", IMAGE_1_URI),
+          propertyContainsUri("nextImage", IMAGE_2_URI)
+        )
+      ));
   }
 
   @Test
-  public void view_returns_imageSequence_with_null_nextImage_if_nextImage_returns_image_but_imageService_does_not() {
-    final Image image = mock(Image.class);
-    when(imageService.findFistImage()).thenReturn(Optional.empty());
-    when(nextImageService.findNextImage(any())).thenReturn(Optional.of(image));
+  @DirtiesContext
+  public void two_images_in_storage_and_id_of_2_results_in_response_currentImage_is_image2_and_nextImage_is_image1() throws Exception {
+    repository.save(new ImageEntity(IMAGE_1_URI));
+    final long id = repository.save(new ImageEntity(IMAGE_2_URI)).getId();
 
-    final ModelAndView modelAndView = controller.view();
-
-    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
-    assertNull(model.getNextImage());
+    mockMvc.perform(get("/")
+      .param("id", String.valueOf(id)))
+      .andExpect(status().isOk())
+      .andExpect(model().attribute("imageSequence",
+        allOf(
+          propertyContainsUri("currentImage", IMAGE_2_URI),
+          propertyContainsUri("nextImage", IMAGE_1_URI)
+        )
+      ));
   }
 
-  @Test
-  public void view_returns_imageSequence_with_nextImage_if_imageService_and_nextImage_return_images() {
-    final Image image = mock(Image.class);
-    final Image nextImage = mock(Image.class);
-    when(imageService.findFistImage()).thenReturn(Optional.of(image));
-    when(nextImageService.findNextImage(any())).thenReturn(Optional.of(nextImage));
-
-    final ModelAndView modelAndView = controller.view();
-
-    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
-    assertSame(image, model.getCurrentImage());
-    assertSame(nextImage, model.getNextImage());
-  }
-
-  @Test
-  public void view_returns_imageSequence_with_null_nextImage_and_null_currentImage_if_parameter_invalid() {
-    final Errors errors = mock(Errors.class);
-    when(errors.hasErrors()).thenReturn(true);
-
-    final ModelAndView modelAndView = controller.view(null, errors);
-
-    final ImageSequenceModel model = extractImageSequenceModel(modelAndView);
-    assertNull(model.getCurrentImage());
-    assertNull(model.getNextImage());
-  }
-
-  private ImageSequenceModel extractImageSequenceModel(final ModelAndView modelAndView) {
-    final Map<String, Object> model = modelAndView.getModel();
-    assertTrue(model.containsKey(MODEL_KEY));
-
-    final Object imageSequence = model.get(MODEL_KEY);
-    assertThat(imageSequence, instanceOf(ImageSequenceModel.class));
-
-    return (ImageSequenceModel) imageSequence;
+  private static <T> Matcher<T> propertyContainsUri(final String propertyName, final URI uri) {
+    return hasProperty(propertyName, hasProperty("uri", is(uri)));
   }
 }
