@@ -1,22 +1,21 @@
 package com.drawbydays.website.populate;
 
-import com.drawbydays.website.gallery.ImageEntity;
-import com.drawbydays.website.populate.StringToImageEntityConverter;
+import com.drawbydays.website.gallery.Image;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class StringToImageEntityConverterTest {
+public class StringToImageConverterTest {
 
   private static final String VALID_URI = "http://drawbydays.com/";
   private static final String INVALID_URI = "^";
 
-  private StringToImageEntityConverter converter;
+  private StringToImageConverter converter;
 
   @Before
   public void setup() {
-    converter = new StringToImageEntityConverter();
+    converter = new StringToImageConverter();
   }
 
   @Test(expected = NullPointerException.class)
@@ -31,15 +30,15 @@ public class StringToImageEntityConverterTest {
 
   @Test
   public void valid_uri_converts_to_image_entity_with_uri() {
-    final ImageEntity imageEntity = converter.convert(VALID_URI);
+    final Image image = converter.convert(VALID_URI);
 
-    assertEquals(VALID_URI, imageEntity.getUri().toString());
+    assertEquals(VALID_URI, image.getUri().toString());
   }
 
   @Test
   public void valid_uri_converts_to_image_entity_with_null_id() {
-    final ImageEntity imageEntity = converter.convert(VALID_URI);
+    final Image image = converter.convert(VALID_URI);
 
-    assertEquals(VALID_URI, imageEntity.getUri().toString());
+    assertEquals(VALID_URI, image.getUri().toString());
   }
 }

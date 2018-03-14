@@ -1,6 +1,6 @@
 package com.drawbydays.website.populate;
 
-import com.drawbydays.website.gallery.ImageEntity;
+import com.drawbydays.website.gallery.Image;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import java.net.URI;
 
 @Component
 @ConfigurationPropertiesBinding
-public final class StringToImageEntityConverter implements Converter<String, ImageEntity> {
+public final class StringToImageConverter implements Converter<String, Image> {
 
   @Override
-  public ImageEntity convert(final String uri) {
-    return new ImageEntity(URI.create(uri));
+  public Image convert(final String uri) {
+    return new Image(URI.create(uri));
   }
 }

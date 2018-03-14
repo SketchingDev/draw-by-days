@@ -1,59 +1,56 @@
 package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.gallery.model.DisplayImage;
-import com.drawbydays.website.gallery.model.ImageSequence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import com.drawbydays.website.gallery.model.Image;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/")
 public class GalleryController {
 
-  private static final String MODEL_NAME = "imageSequence";
-  private static final String PRACTISE_VIEW = "gallery/displayImage";
+  private static final String GALLERY_DISPLAY_IMAGE = "gallery/displayImage";
 
-  private final ImageService imageService;
-
-  private final NextImageService nextImageService;
+  private final ImageRepository imageRepository;
 
   @Autowired
-  public GalleryController(final ImageService imageService, final NextImageService nextImageService) {
-    this.imageService = imageService;
-    this.nextImageService = nextImageService;
+  public GalleryController(final ImageRepository imageRepository) {
+    this.imageRepository = imageRepository;
   }
 
   @GetMapping
-  public ModelAndView view() {
-    final ImageSequence model = new ImageSequence();
+  public String view(final Map<String, Object> model) {
 
-    imageService.findFistImage().ifPresent(image -> populateModel(model, image));
+    imageRepository.findFirstByOrderByIdAsc()
+            .ifPresent(image -> populateModel(model, image));
 
-    return new ModelAndView(PRACTISE_VIEW, MODEL_NAME, model);
+    return GALLERY_DISPLAY_IMAGE;
   }
 
   @GetMapping(params = "id")
-  public ModelAndView view(@Valid final DisplayImage model, final Errors errors) {
-    final ImageSequence imageSequenceModel = new ImageSequence();
+  public String view(@RequestParam final long id, final Map<String, Object> model) {
 
-    if (!errors.hasErrors()) {
-      imageService.findImageById(model.getId()).ifPresent(image -> populateModel(imageSequenceModel, image));
-    }
+      imageRepository.findById(id)
+              .ifPresent(image -> populateModel(model, image));
 
-    return new ModelAndView(PRACTISE_VIEW, MODEL_NAME, imageSequenceModel);
+    return GALLERY_DISPLAY_IMAGE;
   }
 
-  private void populateModel(final ImageSequence model, final Image image) {
-    model.setCurrentImage(image);
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public String invalidId() {
+    return GALLERY_DISPLAY_IMAGE;
+  }
 
-    nextImageService
-            .findNextImage(image)
-            .ifPresent(model::setNextImage);
+  private void populateModel(final Map<String, Object> model, final Image image) {
+    model.put("image", image);
+
+    imageRepository.findNextElseFirstByOrderByIdAsc(image.getId())
+            .ifPresent(nextImage -> model.put("nextImage", nextImage));
   }
 }

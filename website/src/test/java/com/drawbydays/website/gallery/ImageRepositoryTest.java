@@ -1,7 +1,5 @@
 package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.gallery.ImageEntity;
-import com.drawbydays.website.gallery.ImageRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,41 +34,41 @@ public class ImageRepositoryTest {
 
   @Test
   public void findNextElseFirstByOrderByIdAsc_returns_one_item_when_one_item_in_storage() {
-    final ImageEntity imageEntity = new ImageEntity(DUMMY_TEST_URI_ONE);
+    final Image image = new Image(DUMMY_TEST_URI_ONE);
 
-    entityManager.persist(imageEntity);
+    entityManager.persist(image);
 
-    final Optional<ImageEntity> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(imageEntity.getId());
+    final Optional<Image> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(image.getId());
 
     assertTrue(actualImageEntity.isPresent());
-    assertEquals(imageEntity, actualImageEntity.get());
+    assertEquals(image, actualImageEntity.get());
   }
 
   @Test
   public void findNextElseFirstByOrderByIdAsc_returns_next_item() {
-    final ImageEntity imageEntityOne = new ImageEntity(DUMMY_TEST_URI_ONE);
-    final ImageEntity imageEntityTwo = new ImageEntity(DUMMY_TEST_URI_TWO);
+    final Image imageOne = new Image(DUMMY_TEST_URI_ONE);
+    final Image imageTwo = new Image(DUMMY_TEST_URI_TWO);
 
-    entityManager.persist(imageEntityOne);
-    entityManager.persist(imageEntityTwo);
+    entityManager.persist(imageOne);
+    entityManager.persist(imageTwo);
 
-    final Optional<ImageEntity> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(imageEntityOne.getId());
+    final Optional<Image> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(imageOne.getId());
 
     assertTrue(actualImageEntity.isPresent());
-    assertEquals(imageEntityTwo, actualImageEntity.get());
+    assertEquals(imageTwo, actualImageEntity.get());
   }
 
   @Test
   public void findNextElseFirstByOrderByIdAsc_returns_first_item_when_last_image_provided() {
-    final ImageEntity imageEntityOne = new ImageEntity(DUMMY_TEST_URI_ONE);
-    final ImageEntity imageEntityTwo = new ImageEntity(DUMMY_TEST_URI_TWO);
+    final Image imageOne = new Image(DUMMY_TEST_URI_ONE);
+    final Image imageTwo = new Image(DUMMY_TEST_URI_TWO);
 
-    entityManager.persist(imageEntityOne);
-    entityManager.persist(imageEntityTwo);
+    entityManager.persist(imageOne);
+    entityManager.persist(imageTwo);
 
-    final Optional<ImageEntity> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(imageEntityTwo.getId());
+    final Optional<Image> actualImageEntity = repository.findNextElseFirstByOrderByIdAsc(imageTwo.getId());
 
     assertTrue(actualImageEntity.isPresent());
-    assertEquals(imageEntityOne, actualImageEntity.get());
+    assertEquals(imageOne, actualImageEntity.get());
   }
 }

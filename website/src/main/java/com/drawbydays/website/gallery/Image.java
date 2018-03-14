@@ -7,22 +7,22 @@ import javax.persistence.GenerationType;
 import java.net.URI;
 
 @Entity
-public class ImageEntity {
+public class Image {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+  private long id;
 
   private URI uri;
 
-  protected ImageEntity() {
+  protected Image() {
   }
 
-  public ImageEntity(final URI uri) {
+  public Image(final URI uri) {
     this.uri = uri;
   }
 
-  public void setId(final Long id) {
+  public void setId(final long id) {
     this.id = id;
   }
 
@@ -30,7 +30,7 @@ public class ImageEntity {
     this.uri = uri;
   }
 
-  public Long getId() {
+  public long getId() {
     return this.id;
   }
 

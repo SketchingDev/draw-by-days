@@ -1,8 +1,5 @@
 package com.drawbydays.website.gallery;
 
-import com.drawbydays.website.gallery.ImageEntity;
-import com.drawbydays.website.gallery.ImageRepository;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import java.net.URI;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,99 +35,71 @@ public class GalleryControllerTest {
 
   @Test
   @DirtiesContext
-  public void two_images_in_storage_results_in_response_currentImage_is_image1_and_nextImage_is_image2() throws Exception {
-    repository.save(new ImageEntity(IMAGE_1_URI));
-    repository.save(new ImageEntity(IMAGE_2_URI));
+  public void two_images_in_storage_results_in_response_image_is_image1_and_nextImage_is_image2() throws Exception {
+    repository.save(new Image(IMAGE_1_URI));
+    repository.save(new Image(IMAGE_2_URI));
 
     mockMvc.perform(get("/"))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          propertyContainsUri("currentImage", IMAGE_1_URI),
-          propertyContainsUri("nextImage", IMAGE_2_URI)
-        )
-      ));
+      .andExpect(model().attribute("image", hasProperty("uri", is(IMAGE_1_URI))))
+      .andExpect(model().attribute("nextImage", hasProperty("uri", is(IMAGE_2_URI))));
   }
 
   @Test
-  public void no_images_in_storage_results_in_response_currentImage_is_null_and_nextImage_is_null() throws Exception {
+  public void no_images_in_storage_results_in_response_image_is_null_and_nextImage_is_null() throws Exception {
     mockMvc.perform(get("/"))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          hasProperty("currentImage", nullValue()),
-          hasProperty("nextImage", nullValue())
-        )
-      ));
+      .andExpect(model().attribute("image", nullValue()))
+      .andExpect(model().attribute("nextImage", nullValue()));
   }
 
   @Test
   @DirtiesContext
-  public void invalid_id_results_in_response_currentImage_is_null_and_nextImage_is_null() throws Exception {
-    repository.save(new ImageEntity(IMAGE_1_URI));
-    repository.save(new ImageEntity(IMAGE_2_URI));
+  public void invalid_id_results_in_response_image_is_null_and_nextImage_is_null() throws Exception {
+    repository.save(new Image(IMAGE_1_URI));
+    repository.save(new Image(IMAGE_2_URI));
 
     mockMvc.perform(get("/")
       .param("id", "INVALID ID"))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          hasProperty("currentImage", nullValue()),
-          hasProperty("nextImage", nullValue())
-        )
-      ));
+      .andExpect(model().attribute("image", nullValue()))
+      .andExpect(model().attribute("nextImage", nullValue()));
   }
 
   @Test
   @DirtiesContext
-  public void one_image_in_storage_results_in_response_currentImage_is_image1_and_nextImage_is_image1() throws Exception {
-    repository.save(new ImageEntity(IMAGE_1_URI));
+  public void one_image_in_storage_results_in_response_image_is_image1_and_nextImage_is_image1() throws Exception {
+    repository.save(new Image(IMAGE_1_URI));
 
     mockMvc.perform(get("/"))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          propertyContainsUri("currentImage", IMAGE_1_URI),
-          propertyContainsUri("nextImage", IMAGE_1_URI)
-        )
-      ));
+      .andExpect(model().attribute("image", hasProperty("uri", is(IMAGE_1_URI))))
+      .andExpect(model().attribute("nextImage", hasProperty("uri", is(IMAGE_1_URI))));
   }
 
   @Test
   @DirtiesContext
-  public void two_images_in_storage_and_id_of_1_results_in_response_currentImage_is_image1_and_nextImage_is_image2() throws Exception {
-    final long id = repository.save(new ImageEntity(IMAGE_1_URI)).getId();
-    repository.save(new ImageEntity(IMAGE_2_URI));
+  public void two_images_in_storage_and_id_of_1_results_in_response_image_is_image1_and_nextImage_is_image2() throws Exception {
+    final long id = repository.save(new Image(IMAGE_1_URI)).getId();
+    repository.save(new Image(IMAGE_2_URI));
 
     mockMvc.perform(get("/")
       .param("id", String.valueOf(id)))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          propertyContainsUri("currentImage", IMAGE_1_URI),
-          propertyContainsUri("nextImage", IMAGE_2_URI)
-        )
-      ));
+            .andExpect(model().attribute("image", hasProperty("uri", is(IMAGE_1_URI))))
+            .andExpect(model().attribute("nextImage", hasProperty("uri", is(IMAGE_2_URI))));
   }
 
   @Test
   @DirtiesContext
-  public void two_images_in_storage_and_id_of_2_results_in_response_currentImage_is_image2_and_nextImage_is_image1() throws Exception {
-    repository.save(new ImageEntity(IMAGE_1_URI));
-    final long id = repository.save(new ImageEntity(IMAGE_2_URI)).getId();
+  public void two_images_in_storage_and_id_of_2_results_in_response_image_is_image2_and_nextImage_is_image1() throws Exception {
+    repository.save(new Image(IMAGE_1_URI));
+    final long id = repository.save(new Image(IMAGE_2_URI)).getId();
 
     mockMvc.perform(get("/")
       .param("id", String.valueOf(id)))
       .andExpect(status().isOk())
-      .andExpect(model().attribute("imageSequence",
-        allOf(
-          propertyContainsUri("currentImage", IMAGE_2_URI),
-          propertyContainsUri("nextImage", IMAGE_1_URI)
-        )
-      ));
-  }
-
-  private static <T> Matcher<T> propertyContainsUri(final String propertyName, final URI uri) {
-    return hasProperty(propertyName, hasProperty("uri", is(uri)));
+      .andExpect(model().attribute("image", hasProperty("uri", is(IMAGE_2_URI))))
+      .andExpect(model().attribute("nextImage", hasProperty("uri", is(IMAGE_1_URI))));
   }
 }

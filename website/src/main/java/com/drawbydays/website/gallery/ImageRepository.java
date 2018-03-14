@@ -1,20 +1,22 @@
 package com.drawbydays.website.gallery;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 
-public interface ImageRepository extends CrudRepository<ImageEntity, Long> {
+public interface ImageRepository extends Repository<Image, Long> {
 
-  Optional<ImageEntity> findById(Long id);
-  Optional<ImageEntity> findFirstByOrderByIdAsc();
-  Iterable<ImageEntity> findAllByOrderByIdAsc();
+  Optional<Image> findById(Long id);
+  Optional<Image> findFirstByOrderByIdAsc();
+  Iterable<Image> findAllByOrderByIdAsc();
+  Image save(Image owner);
+  Iterable<Image> save(Iterable<Image> entities);
 
-  default Optional<ImageEntity> findNextElseFirstByOrderByIdAsc(Long id) {
-    final Iterable<ImageEntity> images = this.findAllByOrderByIdAsc();
+  default Optional<Image> findNextElseFirstByOrderByIdAsc(Long id) {
+    final Iterable<Image> images = this.findAllByOrderByIdAsc();
 
-    ImageEntity firstImage = null;
-    for (final ImageEntity image : images) {
+    Image firstImage = null;
+    for (final Image image : images) {
       if (firstImage == null) {
         firstImage = image;
       }

@@ -6,7 +6,7 @@
 <body>
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-    <header th:replace="fragments :: nav(${imageSequence.nextImage?.id})"></header>
+    <header th:replace="fragments :: nav(${nextImage?.id})"></header>
 
     <main class="mdl-layout__content">
       <div class="page-content">
@@ -14,8 +14,8 @@
 
           <div class="mdl-layout-spacer"></div>
           <div>
-            <img id="subject-image" th:if="${imageSequence.currentImage}" th:src="${imageSequence.currentImage.uri}" />
-            <p th:unless="${imageSequence.currentImage}" th:text="#{error.image.none}"></p>
+            <img id="subject-image" th:if="${image}" th:src="${image.uri}" />
+            <p th:unless="${image}" th:text="#{error.image.none}"></p>
           </div>
           <div class="mdl-layout-spacer"></div>
 
