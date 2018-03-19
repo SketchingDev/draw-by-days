@@ -4,6 +4,13 @@ Provides a front-end website through which people can practise their artistry wi
 
 ![Screenshot of website](./docs/website-screenshot.png)
 
+## Technologies
+
+* [Spring MVC][spring-mvc] website using Thymeleaf templating engine
+* [Spring Data][spring-data] JPA abstractions to the [Hibernate ORM][hibernate] on top of an in-memory [H2][h2] instance
+* [Docker][docker] containerisation of executable JAR  
+* [Kubernetes][kubernetes] deployment to [Azure Container Services][azure-container-services]
+
 ## Deployment
 
 Deployment of the service is managed by [Kubernetes][kubernetes] using the YAML definitions:
@@ -33,6 +40,12 @@ $ kubectl apply -f deployment.yml
 ```
 
 
+[spring-mvc]:https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html
+[spring-data]:https://projects.spring.io/spring-data/
+[hibernate]:http://hibernate.org/
+[h2]:http://www.h2database.com
+[docker]:https://www.docker.com/
+[azure-container-services]:https://azure.microsoft.com/en-gb/services/container-service/
 [kubernetes]:https://kubernetes.io/
 [kubernetes-deployment]:https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 [docker-image]:https://hub.docker.com/r/sketchingdev/drawbydays-website/
