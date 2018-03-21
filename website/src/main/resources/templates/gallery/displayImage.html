@@ -15,7 +15,7 @@
           <div class="mdl-layout-spacer"></div>
           <div>
             <img id="subject-image" th:if="${image}" th:src="${image.uri}" />
-            <p th:unless="${image}" th:text="#{error.image.none}"></p>
+            <p th:unless="${image}" th:text="#{error.no-image}"></p>
           </div>
           <div class="mdl-layout-spacer"></div>
 
