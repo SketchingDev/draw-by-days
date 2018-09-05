@@ -3,6 +3,4 @@ language: java
 jdk:
   - oraclejdk8
 
-install: mvn -f website/pom.xml install -Ddockerfile.skip -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-script: mvn -f website/pom.xml verify -Ddockerfile.skip
 
