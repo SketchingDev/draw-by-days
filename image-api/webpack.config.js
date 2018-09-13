@@ -17,7 +17,7 @@ module.exports = {
   },
   plugins: [
     new ZipPlugin({
-      filename: "image-api.zip"
+      filename: "retrieve-image-lambda.zip"
     })
   ]
 }

@@ -1,3 +1,3 @@
 output "url" {
-  value = "${aws_api_gateway_deployment.process_api_deployment.invoke_url}"
+  value = "${aws_api_gateway_deployment.gateway_deployment.invoke_url}"
 }

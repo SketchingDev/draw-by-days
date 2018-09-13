@@ -2,5 +2,5 @@ module "image_api" {
   source = "../../lambda_api_gateway"
 
   name = "ImageAPI"
-  function_file_path = "${var.function_file}"
+  lambda_file_path = "${var.lambda_file_path}"
 }

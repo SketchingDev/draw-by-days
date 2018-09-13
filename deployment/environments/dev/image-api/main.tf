@@ -5,5 +5,5 @@ provider "aws" {
 module "image_api" {
     source = "../../../modules/services/image_api"
 
-    function_file = "../../../../image-api/dist/image-api.zip"
+    lambda_file_path = "../../../../image-api/dist/retrieve-image-lambda.zip"
 }
