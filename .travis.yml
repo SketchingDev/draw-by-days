@@ -2,7 +2,9 @@ language: node_js
 
 node_js: "8"
 
-install: yarn lerna bootstrap
+install:
+  - yarn
+  - yarn lerna bootstrap
 
 script:
   - yarn lerna run test
