@@ -1,8 +1,21 @@
 {
   "name": "image-api",
   "version": "1.0.0",
-  "license": "MIT",
+  "private": true,
+  "config": {},
   "deployment_path": "../deployment/environments/dev/image-api",
+  "scripts": {
+    "lint": "tslint {src,test}/**/*.ts",
+    "pretest": "yarn lint",
+    "test": "jest src",
+    "test:integration": "IMAGE_API_URL=$(cd $npm_package_deployment_path && terraform output image_api_url) jest test --runInBand",
+    "pretest:integration": "yarn build:prod && yarn deploy",
+    "build:dev": "webpack --mode development",
+    "build:prod": "webpack",
+    "deploy": "cd $npm_package_deployment_path && terraform apply -auto-approve -input=false",
+    "deploy:dry-run": "cd $npm_package_deployment_path && terraform plan -input=false",
+    "destroy": "cd $npm_package_deployment_path && terraform destroy -auto-approve -input=false"
+  },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.11",
     "@types/jest": "^23.3.1",
@@ -19,18 +32,6 @@
     "webpack-cli": "^3.1.0",
     "webpack-config": "^7.5.0",
     "zip-webpack-plugin": "^3.0.0"
-  },
-  "scripts": {
-    "lint": "tslint {src,test}/**/*.ts",
-    "pretest": "yarn lint",
-    "test": "jest src",
-    "test:integration": "IMAGE_API_URL=$(cd $npm_package_deployment_path && terraform output image_api_url) jest test --runInBand",
-    "pretest:integration": "yarn build:prod && yarn deploy",
-    "build:dev": "webpack --mode development",
-    "build:prod": "webpack",
-    "deploy": "cd $npm_package_deployment_path && terraform apply -auto-approve -input=false",
-    "deploy:dry-run": "cd $npm_package_deployment_path && terraform plan -input=false",
-    "destroy": "cd $npm_package_deployment_path && terraform destroy -auto-approve -input=false"
   },
   "dependencies": {
     "aws-sdk": "^2.296.0"

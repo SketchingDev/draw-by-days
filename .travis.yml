@@ -2,13 +2,11 @@ language: node_js
 
 node_js: "8"
 
-install: yarn
+install:
+  - yarn install
 
 script:
-  - cd website
-  - yarn
-  - yarn build
+  - cd image-api && yarn test
 
 cache:
   - yarn
-

@@ -1,10 +1,9 @@
 {
   "name": "draw-by-days",
-  "version": "1.0.0",
+  "private": true,
   "license": "MIT",
-  "scripts": {
-    "build:image-api": "cd image-api && yarn build:prod"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+  "homepage": "http://drawbydays.com",
+  "repository": "git@github.com:SketchingDev/Draw-by-Days.git",
+  "author": "SketchingDev <SketchingDev@users.noreply.github.com>",
+  "workspaces": ["image-api", "website"]
 }
