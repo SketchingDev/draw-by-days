@@ -1,9 +1,7 @@
 {
-  "name": "draw-by-days",
+  "name": "root",
   "private": true,
-  "license": "MIT",
-  "homepage": "http://drawbydays.com",
-  "repository": "git@github.com:SketchingDev/Draw-by-Days.git",
-  "author": "SketchingDev <SketchingDev@users.noreply.github.com>",
-  "workspaces": ["image-api", "website"]
+  "devDependencies": {
+    "lerna": "^3.3.2"
+  }
 }

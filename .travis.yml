@@ -2,11 +2,10 @@ language: node_js
 
 node_js: "8"
 
-install:
-  - yarn install
+install: yarn lerna bootstrap
 
 script:
-  - cd image-api && yarn test
+  - yarn lerna run test
+  - yarn lerna run build:dev
 
-cache:
-  - yarn
+cache: yarn
