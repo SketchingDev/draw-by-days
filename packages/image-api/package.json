@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "config": {
-    "deployment_path": "../deployment/environments/dev/image-api"
+    "deployment_path": "../../deployment/environments/dev/image-api"
   },
   "scripts": {
     "lint": "tslint {src,test}/**/*.ts",
@@ -13,7 +13,7 @@
     "build:dev": "webpack --mode development",
     "build:prod": "webpack",
     "deploy": "cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
-    "deploy:dry-run": "cd $npm_package_config_deployment_path && terraform plan -input=false",
+    "deploy:dry-run": "cd $npm_package_config_deployment_path && terraform plan",
     "destroy": "cd $npm_package_config_deployment_path && terraform destroy -auto-approve -input=false"
   },
   "devDependencies": {
