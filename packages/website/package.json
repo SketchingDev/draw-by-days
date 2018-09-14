@@ -2,25 +2,23 @@
   "name": "website",
   "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "@types/react": "^16.4.13",
-    "@types/react-dom": "^16.0.7",
-    "awesome-typescript-loader": "^5.2.0",
-    "html-webpack-plugin": "^3.2.0",
-    "source-map-loader": "^0.2.4",
-    "ts-loader": "^5.0.0",
-    "typescript": "^3.0.3",
-    "webpack": "^4.17.2",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.7"
-  },
+  "main": "src/index.tsx",
   "dependencies": {
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2"
+    "@material-ui/core": "latest",
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-scripts-ts": "latest"
+  },
+  "devDependencies": {
+    "@types/jest": "*",
+    "@types/node": "*",
+    "typescript": "latest"
   },
   "scripts": {
-    "build:dev": "webpack --mode development",
-    "build:prod": "webpack",
-    "start": "webpack-dev-server"
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom"
   }
 }
