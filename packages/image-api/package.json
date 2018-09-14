@@ -6,12 +6,11 @@
     "deployment_path": "../../deployment/environments/dev/image-api"
   },
   "scripts": {
-    "lint": "tslint {src,test}/**/*.ts",
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "test": "jest src",
+    "pretest:integration": "yarn build && yarn deploy",
     "test:integration": "IMAGE_API_URL=$(cd $npm_package_config_deployment_path && terraform output image_api_url) jest test --runInBand",
-    "pretest:integration": "yarn build:prod && yarn deploy",
-    "build:dev": "webpack --mode development",
-    "build:prod": "webpack",
+    "build": "webpack",
     "deploy": "cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
     "deploy:dry-run": "cd $npm_package_config_deployment_path && terraform plan",
     "destroy": "cd $npm_package_config_deployment_path && terraform destroy -auto-approve -input=false"

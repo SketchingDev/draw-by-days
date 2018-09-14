@@ -9,6 +9,6 @@ install:
 script:
   - yarn lerna run lint
   - yarn lerna run test
-  - yarn lerna run build:dev
+  - yarn lerna run build
 
 cache: yarn
