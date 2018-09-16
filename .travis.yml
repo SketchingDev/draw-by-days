@@ -3,12 +3,12 @@ language: node_js
 node_js: "8"
 
 install:
-  - yarn
-  - yarn lerna bootstrap
+  - yarn install
+  - yarn bootstrap
 
 script:
-  - yarn lerna run lint
-  - yarn lerna run test
-  - yarn lerna run build
+  - yarn lint
+  - yarn test
+  - yarn build
 
 cache: yarn
