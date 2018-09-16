@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "main": "src/index.tsx",
+  "homepage" : "http://draw-by-days.s3-website-us-east-1.amazonaws.com",
   "dependencies": {
     "@material-ui/core": "latest",
     "@types/react": "*",
@@ -14,11 +15,13 @@
   "devDependencies": {
     "@types/jest": "*",
     "@types/node": "*",
+    "s3-deploy": "^1.1.1",
     "typescript": "latest"
   },
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts{,x}'",
     "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build"
+    "build": "react-scripts-ts build",
+    "deploy": "s3-deploy './build/**' --cwd './build/' --region us-east-1 --bucket draw-by-days"
   }
 }
