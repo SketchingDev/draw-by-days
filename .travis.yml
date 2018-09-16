@@ -9,6 +9,7 @@ install:
 script:
   - yarn lint
   - yarn test
-  - yarn build
+  # --stream causes more output so CI doesn't timeout
+  - yarn build --stream
 
 cache: yarn
