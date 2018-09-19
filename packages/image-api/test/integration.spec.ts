@@ -11,7 +11,7 @@ describe("Integration test Process API", () => {
     expect(data.date).toBeDefined();
     expect(data).toMatchObject({
       image: {
-          description: "W3C image",
+          description: "Hello World",
           path: "https://www.w3.org/People/mimasa/test/imgformat/img/w3c_home.jpg",
       },
     });

@@ -1,14 +1,11 @@
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import AppBar from "@material-ui/core/AppBar";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import createStyles from "@material-ui/core/styles/createStyles";
 import withStyles, { WithStyles } from "@material-ui/core/styles/withStyles";
+import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import * as React from "react";
+import { DailyImage } from "../components/dailyImage";
 import withRoot from "../withRoot";
 
 const styles = (theme: Theme) =>
@@ -25,47 +22,23 @@ interface IState {
 
 class Index extends React.Component<WithStyles<typeof styles>, IState> {
 
-  public state = {
-    open: false,
-  };
+  private todaysDate = new Date();
 
   public render() {
     return (
       <div className={this.props.classes.root}>
-        <Dialog open={this.state.open} onClose={this.handleClose}>
-          <DialogTitle>Super Secret Password</DialogTitle>
-          <DialogContent>
-            <DialogContentText>1-2-3-4-5</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button color="primary" onClick={this.handleClose}>
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Typography variant="display1" gutterBottom={true}>
-          Material-UI
-        </Typography>
-        <Typography variant="subheading" gutterBottom={true}>
-          example project
-        </Typography>
-        <Button variant="raised" color="secondary" onClick={this.handleClick}>
-          Super Secret Password
-        </Button>
+      <React.Fragment>
+        <AppBar position="absolute" color="default">
+          <Toolbar>
+            <Typography variant="title" color="inherit" noWrap={true}>
+              Draw by days
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <DailyImage date={this.todaysDate} />
+      </React.Fragment>
       </div>
     );
-  }
-
-  private handleClose = () => {
-    this.setState({
-        open: false,
-    });
-  }
-
-  private handleClick = () => {
-    this.setState({
-        open: true,
-    });
   }
 }
 

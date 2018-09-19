@@ -41,8 +41,10 @@ resource "aws_lambda_function" "gateway_lambda" {
   function_name = "${var.name}"
   handler = "main.handler"
   runtime = "nodejs8.10"
-  filename = "${var.lambda_file_path}"
-  source_code_hash = "${base64sha256(file(var.lambda_file_path))}"
+
+  s3_bucket = "${var.lambda_bucket_name}"
+  s3_key    = "${var.lambda_bucket_key}"
+
   role = "${aws_iam_role.gateway_lambda_role.arn}"
 }
 

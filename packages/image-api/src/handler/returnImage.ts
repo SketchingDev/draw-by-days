@@ -11,7 +11,7 @@ export interface IDailyImage {
 export const getImage = async (): Promise<IDailyImage> => Promise.resolve({
     date: new Date(Date.now()).toLocaleString(),
     image: {
-        description: "W3C image",
+        description: "Hello World",
         path: "https://www.w3.org/People/mimasa/test/imgformat/img/w3c_home.jpg",
     },
 });

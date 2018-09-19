@@ -3,6 +3,6 @@ provider "aws" {
 }
 
 module "website" {
-  source = "../../../modules/s3_website"
-  bucket_name = "draw-by-days"
+  source = "../../../modules/services/website"
+  bucket_name = "draw-by-days-website"
 }
