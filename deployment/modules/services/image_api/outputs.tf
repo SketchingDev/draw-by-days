@@ -8,6 +8,6 @@ output "bucket_name" {
 }
 
 output "bucket_artifact_key" {
-    value = "${aws_s3_bucket_object.api_lambda_object.id}"
+    value = "${aws_s3_bucket_object.api_lambda_object.*.id}"
     description = "Key for the endpoint's lambda in the bucket"
 }

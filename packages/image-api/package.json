@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "config": {
-    "deployment_path": "../../deployment/environments/dev/image-api"
+    "deployment_path": "../../deployment/environments/dev/image-api",
+    "artifact_name": "retrieve-image-lambda.zip"
   },
   "dependencies": {
     "aws-sdk": "^2.296.0"
@@ -29,8 +30,8 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "test": "jest src",
     "test:integration": "IMAGE_API_URL=$(cd $npm_package_config_deployment_path && terraform output image_api_url) jest test --runInBand",
-    "build": "webpack --env.version $npm_package_version",
-    "rollback": "BUCKET_NAME=$(cd $npm_package_config_deployment_path && terraform output bucket_name)",
-    "deploy": "BUCKET_NAME=$(cd $npm_package_config_deployment_path && terraform output bucket_name) && s3-deploy './dist/*.zip' --cwd './dist/' --private --region us-east-1 --bucket $BUCKET_NAME"
+    "build": "webpack --env.output_filename $npm_package_config_artifact_name",
+    "deploy": "export TF_VAR_lambda_filepath=$(pwd)/dist/$npm_package_config_artifact_name && export TF_VAR_lambda_key=$npm_package_version/$npm_package_config_artifact_name && cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
+    "rollback": "cd $npm_package_config_deployment_path && terraform apply"
   }
 }

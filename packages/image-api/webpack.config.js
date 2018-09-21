@@ -1,6 +1,7 @@
 var ZipPlugin = require('zip-webpack-plugin');
 
-module.exports = {
+module.exports = env => {
+  return {
   mode: "production",
   entry: "./src/main.ts",
   output: {
@@ -17,7 +18,7 @@ module.exports = {
   },
   plugins: [
     new ZipPlugin({
-      filename: `retrieve-image-lambda.zip`
+      filename: env.output_filename
     })
   ]
-}
+}}

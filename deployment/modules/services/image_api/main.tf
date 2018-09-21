@@ -1,7 +1,6 @@
 locals {
   lambda_api_gateway_name = "ImageAPI"
   lambda_bucket_name = "image-api-bucket"
-  lambda_bucket_key = "retrieve-image-lambda.zip"
 }
 
 resource "aws_s3_bucket" "api_lambda_bucket" {
@@ -21,6 +20,8 @@ resource "aws_s3_bucket_object" "api_lambda_object" {
 
 module "image_api" {
   source = "../../lambda_api_gateway"
+
+  depends_on_hack = ["${aws_s3_bucket_object.api_lambda_object.*.arn}"]
 
   name = "${local.lambda_api_gateway_name}"
   lambda_bucket_name = "${aws_s3_bucket.api_lambda_bucket.id}"
