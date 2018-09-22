@@ -1,4 +1,5 @@
-import { getImage, IDailyImage } from "./handler/returnImage";
+import { IDailyImage } from "image-lib";
+import { getImage } from "./handler/returnImage";
 
 interface IRequest {
     body: string;

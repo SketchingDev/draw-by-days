@@ -8,7 +8,8 @@
     "artifact_name": "retrieve-image-lambda.zip"
   },
   "dependencies": {
-    "aws-sdk": "^2.296.0"
+    "aws-sdk": "^2.296.0",
+    "image-lib": "^1.0.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.11",

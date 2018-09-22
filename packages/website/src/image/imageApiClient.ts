@@ -1,10 +1,5 @@
 // import axios, { AxiosResponse } from "axios";
-
-// TODO: Share with Lambda
-export interface IImage {
-    url: string;
-    description: string;
-}
+import { IImage } from "image-models-lib";
 
 export class DummyImageApiClient {
 
@@ -25,7 +20,7 @@ export class DummyImageApiClient {
     public async getImage(date: Date): Promise<IImage> {
         return Promise.resolve({
             description: "Placeholder whilst we wait to get today's image",
-            url: DummyImageApiClient.IMAGE_URL,
+            path: DummyImageApiClient.IMAGE_URL,
         });
     }
 

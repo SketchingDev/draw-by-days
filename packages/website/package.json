@@ -12,6 +12,7 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "axios": "^0.18.0",
+    "image-lib": "^1.0.0",
     "react": "latest",
     "react-dom": "latest",
     "react-scripts-ts": "latest"

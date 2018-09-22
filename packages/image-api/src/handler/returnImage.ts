@@ -1,12 +1,4 @@
-interface IImage {
-    path: string;
-    description: string;
-}
-
-export interface IDailyImage {
-    date: string;
-    image: IImage;
-}
+import { IDailyImage } from "image-models-lib";
 
 export const getImage = async (): Promise<IDailyImage> => Promise.resolve({
     date: new Date(Date.now()).toLocaleString(),
