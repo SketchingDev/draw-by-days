@@ -14,7 +14,7 @@ export class DummyImageApiClient {
     //     return url + date.toDateString();
     // }
 
-    public constructor(private endpointUrl: string) {}
+    // public constructor(private endpointUrl: string) {}
 
     // public async getImage(date: Date): Promise<IImage> {
     //     const url = ImageApiClient.formatUrl(this.endpointUrl, date);

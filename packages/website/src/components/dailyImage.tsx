@@ -12,7 +12,7 @@ interface IState {
 export class DailyImage extends React.Component<IProperties, IState> {
 
     // TODO Get from config
-    private static IMAGE_API_URL = "http://example.com/";
+    // private static IMAGE_API_URL = "http://example.com/";
     private static IMAGE_PLACEHOLDER = "https://via.placeholder.com/350x150";
     private static IMAGE_ERROR = "https://via.placeholder.com/350x750";
 
@@ -24,7 +24,9 @@ export class DailyImage extends React.Component<IProperties, IState> {
     };
 
     // TODO Investigate how to separate concerns
-    private client = new DummyImageApiClient(DailyImage.IMAGE_API_URL);
+    private client = new DummyImageApiClient();
+
+    // private client = new DummyImageApiClient(DailyImage.IMAGE_API_URL);
 
     public async componentDidMount() {
         try {

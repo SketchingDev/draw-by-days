@@ -31,7 +31,7 @@ class Index extends React.Component<WithStyles<typeof styles>, IState> {
         <AppBar position="absolute" color="default">
           <Toolbar>
             <Typography variant="title" color="inherit" noWrap={true}>
-              Draw by days
+              Draw by days (Hello World)
             </Typography>
           </Toolbar>
         </AppBar>
