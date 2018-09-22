@@ -5,7 +5,7 @@ test("Response is defined", async () => {
 
     expect(JSON.parse(response.body)).toMatchObject({
         image: {
-            description: "Hello World",
+            description: "Hello Worlddd",
             path: "https://www.w3.org/People/mimasa/test/imgformat/img/w3c_home.jpg",
         },
       });

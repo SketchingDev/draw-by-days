@@ -5,6 +5,7 @@ provider "aws" {
 module "image_api" {
   source = "../../../modules/services/image_api"
 
-  lambda_path = "${var.lambda_filepath}"
-  key = "${var.lambda_key}"
+  name_suffix = "dev"
+  source_bucket = "${var.source_bucket}"
+  lambda_key = "${var.lambda_key}"
 }

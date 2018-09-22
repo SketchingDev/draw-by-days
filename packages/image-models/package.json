@@ -1,0 +1,17 @@
+{
+  "name": "image-models",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.11",
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.9.4",
+    "@types/request": "^2.47.1",
+    "ts-loader": "^4.5.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1",
+  },
+  "scripts": {
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts'"
+  }
+}
