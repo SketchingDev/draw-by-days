@@ -19,9 +19,11 @@
   "devDependencies": {
     "@types/jest": "*",
     "@types/node": "*",
+    "rimraf": "^2.6.2",
     "typescript": "latest"
   },
   "scripts": {
+    "clean": "rimraf build/*",
     "lint": "tslint -c tslint.json 'src/**/*.ts{,x}'",
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
