@@ -9,23 +9,13 @@ interface IRequest {
     statusCode: number;
 }
 
-const createRequest = (image: IDailyImage): IRequest => {
-    if (image == null) {
-        return {
-            body: "",
-            headers: {},
-            statusCode: 300,
-        };
-    }
-
-    return {
+const createRequest = (image: IDailyImage): IRequest => ({
     body: JSON.stringify(image),
     headers: {
         "Content-Type": "application/json; charset=utf-8",
     },
     statusCode: 200,
-};
-};
+});
 
 export const handler = async (event: any) => getImage()
   .then((image) => createRequest(image));
