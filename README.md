@@ -1,5 +1,6 @@
 # Draw by Days 
 [![Build Status](https://travis-ci.org/SketchingDev/Draw-by-Days.svg?branch=react_rewrite)](https://travis-ci.org/SketchingDev/Draw-by-Days) 
+[![Coverage Status](https://coveralls.io/repos/github/SketchingDev/Draw-by-Days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/Draw-by-Days?branch=master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 Draw-by-days provides artists (amateur or professional) with an image a day to practice their particular 
