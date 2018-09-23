@@ -1,5 +1,5 @@
 // import axios, { AxiosResponse } from "axios";
-import { IImage } from "image-models-lib";
+import { IImage } from "image-lib";
 
 export class DummyImageApiClient {
 

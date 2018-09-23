@@ -1,4 +1,4 @@
-import { IDailyImage } from "image-models-lib";
+import { IDailyImage } from "image-lib";
 
 export const getImage = async (): Promise<IDailyImage> => Promise.resolve({
     date: new Date(Date.now()).toLocaleString(),

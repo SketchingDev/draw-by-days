@@ -1,5 +1,6 @@
+import { IImage } from "image-lib";
 import * as React from "react";
-import { DummyImageApiClient, IImage } from "../image/imageApiClient";
+import { DummyImageApiClient } from "../image/imageApiClient";
 
 interface IProperties {
     date: Date;
@@ -19,7 +20,7 @@ export class DailyImage extends React.Component<IProperties, IState> {
     public state = {
         image: {
             description: "Placeholder whilst we wait to get today's image",
-            url: DailyImage.IMAGE_PLACEHOLDER,
+            path: DailyImage.IMAGE_PLACEHOLDER,
         },
     };
 
@@ -35,12 +36,12 @@ export class DailyImage extends React.Component<IProperties, IState> {
         } catch (error) {
             this.setState({ image: {
                 description: "Error",
-                url: DailyImage.IMAGE_ERROR,
+                path: DailyImage.IMAGE_ERROR,
             } });
         }
     }
 
     public render() {
-        return <img src={this.state.image.url} />;
+        return <img src={this.state.image.path} />;
     }
 }
