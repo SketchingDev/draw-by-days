@@ -19,7 +19,7 @@ export class DummyImageApiClient {
 
     public async getImage(date: Date): Promise<IImage> {
         return Promise.resolve({
-            description: "The image!",
+            description: "Testing testing 123",
             path: DummyImageApiClient.IMAGE_URL,
         });
     }

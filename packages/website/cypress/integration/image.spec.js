@@ -5,7 +5,6 @@ context('Network Requests', () => {
     cy.visit('/')
   })
 
-
   it('cy.server() - control behavior of network requests and responses', () => {
     // https://on.cypress.io/server
 
@@ -13,14 +12,14 @@ context('Network Requests', () => {
       cy.route({
         method: "GET",
         url: "/images/*",
-        response: { 
+        response: {
           url: "http://example.com",
           description: "Testing testing 123"
         }
       })
     })
 
-    cy.get('img').should('have.alt', 'Testing testing 123');
+    cy.get('img').should('have.attr', 'alt', 'Testing testing 123');
   });
 
   // it('cy.request() - make an XHR request', () => {

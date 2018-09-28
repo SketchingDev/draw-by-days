@@ -20,13 +20,18 @@
   "devDependencies": {
     "@types/jest": "*",
     "@types/node": "*",
+    "cypress": "^3.1.0",
     "rimraf": "^2.6.2",
+    "start-server-and-test": "^1.7.1",
     "typescript": "latest"
   },
   "scripts": {
     "clean": "rimraf build/*",
     "lint": "tslint -c tslint.json 'src/**/*.ts{,x}'",
     "start": "react-scripts-ts start",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test:component": "start-server-and-test start http://localhost:3000 cy:run",
     "build": "react-scripts-ts build",
     "deploy": "cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
     "publish:s3": "WEBSITE_BUCKET_NAME=$(cd $npm_package_config_deployment_path && terraform output bucket_name) && aws s3 cp --recursive ./build s3://$WEBSITE_BUCKET_NAME/"

@@ -10,5 +10,7 @@ script:
   - yarn test:with-coverage | coveralls
   # --stream causes more output so CI doesn't timeout
   - yarn build --stream
+  - yarn test:component --stream
 
-cache: yarn
+cache:
+  yarn: true
