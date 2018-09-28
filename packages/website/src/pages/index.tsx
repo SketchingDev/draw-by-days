@@ -5,7 +5,7 @@ import withStyles, { WithStyles } from "@material-ui/core/styles/withStyles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import * as React from "react";
-import { DailyImage } from "../components/dailyImage";
+import { ImageForDate } from "website/src/components/ImageForDate";
 import withRoot from "../withRoot";
 
 const styles = (theme: Theme) =>
@@ -35,7 +35,7 @@ class Index extends React.Component<WithStyles<typeof styles>, IState> {
             </Typography>
           </Toolbar>
         </AppBar>
-        <DailyImage date={this.todaysDate} />
+        <ImageForDate date={this.todaysDate} />
       </React.Fragment>
       </div>
     );
