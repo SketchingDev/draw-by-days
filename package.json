@@ -12,6 +12,7 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "test:with-coverage": "lerna run test:with-coverage",
+    "test:component": "lerna run test:component",
     "build": "lerna run build"
   }
 }
