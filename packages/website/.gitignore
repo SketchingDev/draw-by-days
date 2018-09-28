@@ -1,3 +1,4 @@
 /build
+.env
 /cypress/videos
 /cypress/screenshots
