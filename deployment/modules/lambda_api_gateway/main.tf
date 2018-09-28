@@ -30,12 +30,10 @@ resource "aws_api_gateway_deployment" "gateway_deployment" {
   ]
 
   rest_api_id = "${aws_api_gateway_rest_api.gateway.id}"
-  stage_name  = "start"
+  stage_name  = "${var.stage_name}"
 }
 
-output "base_url" {
-  value = "${aws_api_gateway_deployment.gateway_deployment.invoke_url}"
-}
+
 
 resource "aws_lambda_function" "gateway_lambda" {
   function_name = "${var.name}"
