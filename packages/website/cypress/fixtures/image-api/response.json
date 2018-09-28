@@ -1,4 +1,7 @@
 {
-    "url": "http://example.com/",
-    "description": "Test image"
+    "date": "test",
+    "image": {
+        "path": "http://example.com/",
+        "description": "Test image"
+    }
 }

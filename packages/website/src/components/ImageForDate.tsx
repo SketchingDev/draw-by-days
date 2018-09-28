@@ -10,7 +10,7 @@ interface IProperties {
 
 export class ImageForDate extends React.Component<IProperties, ILoadableImage> {
 
-    public client = new ImageApiClient(process.env.IMAGE_API_URL!);
+    public client = new ImageApiClient(process.env.REACT_APP_IMAGE_API_URL!);
     public state = {
         image: null,
         requestState: RequestState.Loading,

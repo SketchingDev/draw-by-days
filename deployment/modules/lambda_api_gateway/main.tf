@@ -33,8 +33,6 @@ resource "aws_api_gateway_deployment" "gateway_deployment" {
   stage_name  = "${var.stage_name}"
 }
 
-
-
 resource "aws_lambda_function" "gateway_lambda" {
   function_name = "${var.name}"
   handler = "main.handler"
