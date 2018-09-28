@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ILoadableImage, LoadableImage, RequestState } from "website/src/components/LoadableImage";
-import { DummyImageApiClient } from "website/src/image/DummyImageApiClient";
+import { ImageApiClient } from "website/src/image/DummyImageApiClient";
 
 interface IProperties {
     date: Date;
@@ -8,7 +8,7 @@ interface IProperties {
 
 export class ImageForDate extends React.Component<IProperties, ILoadableImage> {
 
-    public client = new DummyImageApiClient();
+    public client = new ImageApiClient("http://example.com");
     public state = {
         image: null,
         requestState: RequestState.Loading,
@@ -28,5 +28,5 @@ export class ImageForDate extends React.Component<IProperties, ILoadableImage> {
         }
     }
 
-    public render = () => <LoadableImage {...this.state}/>;
+    public render = () => <LoadableImage {...this.state} />;
 }

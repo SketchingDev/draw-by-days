@@ -1,3 +1,4 @@
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { IImage } from "image-lib";
 import * as React from "react";
 
@@ -14,14 +15,14 @@ export enum RequestState {
 
 export class LoadableImage extends React.PureComponent<ILoadableImage> {
     public render() {
-        const {requestState, image} = this.props;
+        const { requestState, image } = this.props;
         switch (requestState) {
             case RequestState.Loading:
-                return <p>Loading</p>;
+                return <CircularProgress id="image-loading" />;
             case RequestState.Ok:
                 return <img src={image!.path} alt={image!.description} />;
             default:
-                return <p>Error loading image</p>;
+                return <div id="image-error">Error loading image</div>;
         }
     }
 }

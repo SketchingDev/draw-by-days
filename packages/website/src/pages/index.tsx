@@ -27,16 +27,16 @@ class Index extends React.Component<WithStyles<typeof styles>, IState> {
   public render() {
     return (
       <div className={this.props.classes.root}>
-      <React.Fragment>
-        <AppBar position="absolute" color="default">
-          <Toolbar>
-            <Typography variant="title" color="inherit" noWrap={true}>
-              Draw by days (Hello World)
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <ImageForDate date={this.todaysDate} />
-      </React.Fragment>
+        <React.Fragment>
+          <AppBar position="absolute" color="default">
+            <Toolbar>
+              <Typography variant="title" color="inherit" noWrap={true}>
+                Draw by Days
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <ImageForDate date={this.todaysDate} />
+        </React.Fragment>
       </div>
     );
   }
