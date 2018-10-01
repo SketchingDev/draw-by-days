@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "main": "src/index.tsx",
-  "homepage": "http://draw-by-days.s3-website-us-east-1.amazonaws.com",
+  "homepage": "http://draw-by-days-website.s3-website-us-east-1.amazonaws.com",
   "config": {
     "deployment_path": "../../deployment/environments/dev/website"
   },
