@@ -78,6 +78,10 @@ resource "aws_api_gateway_integration" "lambda_root" {
   resource_id = "${aws_api_gateway_method.proxy_root.resource_id}"
   http_method = "${aws_api_gateway_method.proxy_root.http_method}"
 
+  response_parameters = {
+      "method.response.header.Access-Control-Allow-Origin"  = "*"
+  }
+
   integration_http_method = "GET"
   type                    = "AWS_PROXY"
   uri                     = "${aws_lambda_function.gateway_lambda.invoke_arn}"
