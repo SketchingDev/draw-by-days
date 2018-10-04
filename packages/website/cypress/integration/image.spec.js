@@ -2,7 +2,7 @@
 
 context('Image on landing page', () => {
 
-  it('Displays image', () => {
+  it('User is shown the downloaded image', () => {
     cy.server().should((server) => {
       cy.route('GET', 'images/*', 'fixture:image-api/response.json')
         .as('getImage')
@@ -14,7 +14,7 @@ context('Image on landing page', () => {
     cy.get('img').should('have.attr', 'alt', 'Test image');
   });
 
-  it('Displays loading element', () => {
+  it('User is informed of the image being downloaded', () => {
     cy.server().should((server) => {
       cy.route({
         method: "GET",
@@ -27,7 +27,7 @@ context('Image on landing page', () => {
     cy.get('#image-loading').should('be.visible')
   });
 
-  it('Displays error message', () => {
+  it('User is informed on an error downloading the image', () => {
     cy.server().should((server) => {
       cy.route({
         method: "GET",
