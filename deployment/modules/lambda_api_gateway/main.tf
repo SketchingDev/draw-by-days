@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "gateway" {
-  name        = "${var.name}"
+  name        = "${var.namespace}_gateway"
   description = "Rest API for invoking lambdas"
 }
 
@@ -34,18 +34,17 @@ resource "aws_api_gateway_deployment" "gateway_deployment" {
 }
 
 resource "aws_lambda_function" "gateway_lambda" {
-  function_name = "${var.name}"
-  handler = "main.handler"
-  runtime = "nodejs8.10"
+  function_name = "${var.namespace}_lambda"
+  filename = "${var.lambda_filename}"
 
-  s3_bucket = "${var.lambda_bucket_name}"
-  s3_key    = "${var.lambda_bucket_key}"
+  handler = "${var.lambda_handler}"
+  runtime = "nodejs8.10"
 
   role = "${aws_iam_role.gateway_lambda_role.arn}"
 }
 
 resource "aws_iam_role" "gateway_lambda_role" {
-  name  = "process_invoker_exec_role"
+  name  = "${var.namespace}_lambda_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -68,7 +67,7 @@ resource "aws_api_gateway_integration" "lambda" {
   resource_id = "${aws_api_gateway_method.proxy.resource_id}"
   http_method = "${aws_api_gateway_method.proxy.http_method}"
 
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = "${aws_lambda_function.gateway_lambda.invoke_arn}"
 }
@@ -78,22 +77,17 @@ resource "aws_api_gateway_integration" "lambda_root" {
   resource_id = "${aws_api_gateway_method.proxy_root.resource_id}"
   http_method = "${aws_api_gateway_method.proxy_root.http_method}"
 
-  response_parameters = {
-      "method.response.header.Access-Control-Allow-Origin"  = "*"
-  }
-
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = "${aws_lambda_function.gateway_lambda.invoke_arn}"
 }
 
 resource "aws_lambda_permission" "apigw" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "${var.namespace}_allow_api_invoke_lambda"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.gateway_lambda.arn}"
   principal     = "apigateway.amazonaws.com"
 
-  # The /*/* portion grants access from any method on any resource
-  # within the API Gateway "REST API".
+  # The /*/* portion grants access from any method on any resource within the API Gateway "REST API"
   source_arn = "${aws_api_gateway_deployment.gateway_deployment.execution_arn}/*/*"
 }

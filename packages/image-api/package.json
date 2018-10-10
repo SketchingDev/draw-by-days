@@ -2,11 +2,6 @@
   "name": "image-api",
   "version": "1.0.3",
   "private": true,
-  "config": {
-    "artifact_bucket_path": "../../deployment/environments/dev/artifact-bucket",
-    "deployment_path": "../../deployment/environments/dev/image-api",
-    "artifact_name": "retrieve-image-lambda.zip"
-  },
   "dependencies": {
     "aws-sdk": "^2.296.0",
     "image-lib": "^1.0.0"
@@ -34,11 +29,6 @@
     "test": "jest src",
     "test:with-coverage": "jest src --coverage --coverageReporters=text-lcov",
     "test:integration": "IMAGE_API_URL=$(cd $npm_package_config_deployment_path && terraform output image_api_url) jest test --runInBand",
-    "build": "webpack --env.output_filename $npm_package_config_artifact_name",
-    "publish:s3": "ARTIFACT_BUCKET_NAME=$(cd $npm_package_config_artifact_bucket_path && terraform output bucket_name) && aws s3 cp ./dist/*.zip s3://$ARTIFACT_BUCKET_NAME/image-api/v$npm_package_version/$npm_package_config_artifact_name",
-    "list-versions": "aws s3api list-objects --bucket $(cd $npm_package_config_artifact_bucket_path && terraform output bucket_name) --prefix image-api --query 'Contents[].{Key: Key, Size: Size, LastModified: LastModified}'",
-    "deploy": "export TF_VAR_source_bucket=$(cd $npm_package_config_artifact_bucket_path && terraform output bucket_name) export TF_VAR_lambda_key=image-api/v$npm_package_version/$npm_package_config_artifact_name && cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
-    "destroy": "export TF_VAR_source_bucket=$(cd $npm_package_config_artifact_bucket_path && terraform output bucket_name) export TF_VAR_lambda_key=image-api/v$npm_package_version/$npm_package_config_artifact_name && cd $npm_package_config_deployment_path && terraform destroy -auto-approve -input=false",
-    "rollback": "TF_VAR_source_bucket=$(cd $npm_package_config_artifact_bucket_path && terraform output bucket_name) && cd $npm_package_config_deployment_path && terraform apply -auto-approve"
+    "build": "webpack --env.output_filename $npm_package_config_artifact_name"
   }
 }

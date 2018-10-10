@@ -11,15 +11,31 @@ developing an AWS based serverless project!
 
 ## Development
 
+* Service-oriented architecture
 * Monorepo managed by Lerna
 * Yarn
 * Node/TypeScript
-* Terraform
+
+## Deployment
+
+* Terraform (infrastructure-as-code)
+* Terragrunt
+* Terratest
+
+### Directory structure
+
+```
+deployment/     # Terraform files relating to the deployment
+  environments/ # Configuration of services for each environment
+  modules/      # Reusable modules
+  services/     # Services that are comprised of reusable modules (i.e. image-api that will make use of Lambda/API Gateway and Dynamo DB) 
+```
 
 ## Services
 
-Each directory under `packages/` is an isolated service with its own code-base, component tests, build management and deployment 
-scripts.
+Each service has a directory under:
+  * `packages/` - code
+  * `deployment/services` - infrastructure
 
- * `website/` - [README](packages/website/README.md) - Front-end website that will display a single image
- * `image-api/` - [README](packages/image-api/README.md) - API that serves images
+* `website/` - [README](packages/website/README.md) - Front-end website that will display a single image
+* `image-api/` - [README](packages/image-api/README.md) - API that serves images

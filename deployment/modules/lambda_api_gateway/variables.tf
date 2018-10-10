@@ -1,6 +1,6 @@
-variable "name" {}
+variable "namespace" {}
 
-variable "lambda_bucket_name" {}
-variable "lambda_bucket_key" {}
+variable "lambda_filename" {}
+variable "lambda_handler" {}
 
 variable "stage_name" {}

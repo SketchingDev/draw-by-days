@@ -4,9 +4,6 @@
   "private": true,
   "main": "src/index.tsx",
   "homepage": "http://draw-by-days-website.s3-website-us-east-1.amazonaws.com",
-  "config": {
-    "deployment_path": "../../deployment/environments/dev/website"
-  },
   "dependencies": {
     "@material-ui/core": "latest",
     "@types/date-fns": "^2.6.0",
@@ -35,7 +32,6 @@
     "cy:run": "cypress run",
     "test:component": "start-server-and-test start http://localhost:3000 cy:run",
     "build": "react-scripts-ts build",
-    "deploy": "cd $npm_package_config_deployment_path && terraform apply -auto-approve -input=false",
     "publish:s3": "WEBSITE_BUCKET_NAME=$(cd $npm_package_config_deployment_path && terraform output bucket_name) && aws s3 cp --recursive ./build s3://$WEBSITE_BUCKET_NAME/"
   }
 }

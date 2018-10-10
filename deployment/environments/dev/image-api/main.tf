@@ -3,9 +3,8 @@ provider "aws" {
 }
 
 module "image_api" {
-  source = "../../../modules/services/image_api"
+  source = "../../../services/image_api"
 
-  name_suffix = "dev"
-  source_bucket = "${var.source_bucket}"
-  lambda_key = "${var.lambda_key}"
+  namespace = "dev"
+  filename = "${var.filename}"
 }

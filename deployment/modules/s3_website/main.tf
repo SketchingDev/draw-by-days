@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "website_bucket" {
+resource "aws_s3_bucket" "website" {
   bucket = "${var.bucket_name}"
   acl = "public-read"
   policy = <<EOF
