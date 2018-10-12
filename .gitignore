@@ -11,6 +11,9 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+# Terragrunt
+**/.terragrunt-cache/*
+
 # Node/Yarn
 logs
 *.log

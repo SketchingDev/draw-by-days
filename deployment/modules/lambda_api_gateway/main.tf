@@ -1,3 +1,12 @@
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+terraform {
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {}
+}
+
 resource "aws_api_gateway_rest_api" "gateway" {
   name        = "${var.namespace}_gateway"
   description = "Rest API for invoking lambdas"

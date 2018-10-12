@@ -1,5 +1,14 @@
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+terraform {
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {}
+}
+
 resource "aws_s3_bucket" "website" {
-  bucket = "${var.bucket_name}"
+  bucket = "${var.namespace}-website"
   acl = "public-read"
   policy = <<EOF
 {
@@ -12,7 +21,7 @@ resource "aws_s3_bucket" "website" {
         "s3:GetObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.bucket_name}/*",
+      "Resource": "arn:aws:s3:::${var.namespace}-website/*",
       "Principal": "*"
     }
   ]

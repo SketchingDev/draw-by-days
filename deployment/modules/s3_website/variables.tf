@@ -1,3 +1,5 @@
-variable "bucket_name" {
-  description = "Name of the bucket that will serve the website assets"
+variable "namespace" {}
+
+variable "aws_region" {
+    default = "us-east-1"
 }
