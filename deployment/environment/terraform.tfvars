@@ -5,7 +5,7 @@ terragrunt = {
       bucket         = "draw-by-days-terraform-state"
       key            = "${path_relative_to_include()}/terraform.tfstate"
       region         = "us-east-1"
-      encrypt        = false
+      encrypt        = true
       dynamodb_table = "draw-by-days-lock-table"
       
       s3_bucket_tags {
