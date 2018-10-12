@@ -45,3 +45,10 @@ jobs:
           name: Deploy website
           command: terragrunt apply --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment/website
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - tests
+      - deploy
