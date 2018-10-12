@@ -2,12 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
       - image: circleci/node:8-browsers
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
 
     working_directory: ~/repo
 
@@ -36,3 +31,17 @@ jobs:
       - run:
           name: Build packages
           command: yarn build --stream
+
+  deploy:
+    docker:
+      - image: sketchingdev/terraform-terragrunt:latest
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: Deploy website
+          command: terragrunt apply --terragrunt-non-interactive -auto-approve
+          working_directory: deployment/environment/website
