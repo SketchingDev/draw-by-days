@@ -33,7 +33,7 @@ jobs:
           command: yarn build --stream
 
       - persist_to_workspace:
-          root: workspace
+          root: ~/repo
           paths:
             - packages/image-api/dist/retrieve-image-lambda.zip
 
