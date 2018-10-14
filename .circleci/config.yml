@@ -32,6 +32,11 @@ jobs:
           name: Build packages
           command: yarn build --stream
 
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - packages/image-api/dist/retrieve-image-lambda.zip
+
   deploy:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
@@ -40,11 +45,12 @@ jobs:
 
     steps:
       - checkout
-
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
-          name: Deploy website
-          command: terragrunt apply --terragrunt-non-interactive -auto-approve
-          working_directory: deployment/environment/website
+          name: Deploy all
+          command: ls -l /tmp
+          working_directory: deployment/environment
 
 workflows:
   version: 2
