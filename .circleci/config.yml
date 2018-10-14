@@ -49,7 +49,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Deploy all
-          command: ls -l /tmp
+          command: ls -l /tmp/workspace
           working_directory: deployment/environment
 
 workflows:
