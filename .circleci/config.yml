@@ -49,7 +49,9 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Deploy all
-          command: ls -l /tmp/workspace
+          command: |
+            export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
+            terragrunt apply-all --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment
 
 workflows:
