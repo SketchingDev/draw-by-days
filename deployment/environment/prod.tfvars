@@ -1,1 +1,1 @@
-namespace = "prod-draw-by-days"
+namespace = "draw-by-days-prod"

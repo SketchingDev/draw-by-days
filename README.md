@@ -1,5 +1,6 @@
-# Draw by Days 
-[![Build Status](https://travis-ci.org/SketchingDev/Draw-by-Days.svg?branch=master)](https://travis-ci.org/SketchingDev/Draw-by-Days)
+# Draw by Days
+
+[![Build Status](https://circleci.com/gh/SketchingDev/Draw-by-Days/tree/master.svg?style=svg)](https://circleci.com/gh/SketchingDev/Draw-by-Days/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/SketchingDev/Draw-by-Days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/Draw-by-Days?branch=master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 

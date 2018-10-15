@@ -1,1 +1,1 @@
-namespace = "dev-draw-by-days"
+namespace = "draw-by-days-dev"

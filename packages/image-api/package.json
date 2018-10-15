@@ -29,6 +29,6 @@
     "test": "jest src",
     "test:with-coverage": "jest src --coverage --coverageReporters=text-lcov",
     "test:integration": "IMAGE_API_URL=$(cd $npm_package_config_deployment_path && terraform output image_api_url) jest test --runInBand",
-    "build": "webpack --env.output_filename $npm_package_config_artifact_name"
+    "build": "webpack --env.output_filename retrieve-image-lambda.zip"
   }
 }
