@@ -27,6 +27,23 @@ jobs:
           root: ~/repo
           paths:
             - packages/image-api/dist/retrieve-image-lambda.zip
+            - packages/website/build
+
+  dry_run_deployment:
+    docker:
+        - image: sketchingdev/terraform-terragrunt:latest
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Plan all
+          command: |
+            export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
+            terragrunt plan-all --terragrunt-non-interactive -auto-approve
+          working_directory: deployment/environment
+
   deploy:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
@@ -36,20 +53,33 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy all
+          name: Deploy Image API
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               export TF_VAR_env=prod
             fi
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve
-          working_directory: deployment/environment
+            terragrunt apply --terragrunt-non-interactive -auto-approve
+          working_directory: deployment/environment/image-api
+      - deploy:
+          name: Deploy website
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              export TF_VAR_env=prod
+            fi
+            terragrunt apply --terragrunt-non-interactive -auto-approve
+            aws s3 cp --recursive /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/
+          working_directory: deployment/environment/website
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
       - build
+      - dry_run_deployment:
+          requires:
+            - build
       - deploy:
           requires:
             - build
+            - dry_run_deployment
