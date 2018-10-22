@@ -3,53 +3,44 @@ jobs:
   build:
     docker:
       - image: circleci/node:8-browsers
-
     working_directory: ~/repo
-
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
       - run:
           name: Install YARN dependencies
           command: yarn install
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
       - run:
           name: Test packages
           command: yarn test
       - run:
           name: Build packages
           command: yarn build --stream
-
       - persist_to_workspace:
           root: ~/repo
           paths:
             - packages/image-api/dist/retrieve-image-lambda.zip
-
   deploy:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
-
     working_directory: ~/repo
-
     steps:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
-      - run:
+      - deploy:
           name: Deploy all
           command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              export TF_VAR_env=prod
+            fi
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment
