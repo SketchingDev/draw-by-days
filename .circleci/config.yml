@@ -48,6 +48,8 @@ jobs:
             fi
             terragrunt apply --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment/image-api
+      - run: apk add --update python python-dev py-pip build-base
+      - run: pip install awscli
       - deploy:
           name: Deploy website
           command: |
