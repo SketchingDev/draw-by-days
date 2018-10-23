@@ -22,7 +22,9 @@ jobs:
           command: yarn test
       - run:
           name: Build packages
-          command: yarn build --stream
+          command: |
+          export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
+          yarn build --stream
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -42,10 +44,7 @@ jobs:
           command: |
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
 
-            # [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="dev" || TF_VAR_env="prod"
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              export TF_VAR_env=prod
-            fi
+            [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="prod"
             terragrunt apply --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment/image-api
       - run: apk add --update python python-dev py-pip build-base
@@ -53,9 +52,7 @@ jobs:
       - deploy:
           name: Deploy website
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              export TF_VAR_env=prod
-            fi
+            [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="prod"
             terragrunt apply --terragrunt-non-interactive -auto-approve
 
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
