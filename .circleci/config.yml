@@ -23,8 +23,8 @@ jobs:
       - run:
           name: Build packages
           command: |
-          export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
-          yarn build --stream
+            export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
+            yarn build --stream
       - persist_to_workspace:
           root: ~/repo
           paths:
