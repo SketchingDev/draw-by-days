@@ -1,4 +1,4 @@
-FROM alpine:3.8-alpine
+FROM alpine:3.8
 
 # Terraform
 
@@ -21,3 +21,8 @@ ENV TERRAGRUNT_TFPATH=/usr/bin/terraform
 
 RUN wget https://github.com/gruntwork-io/terragrunt/releases/download/v$TERRAGRUNT_VERSION/terragrunt_linux_386 -O /usr/bin/terragrunt && \
     chmod +x /usr/bin/terragrunt
+
+# AWS CLI
+
+RUN apk add python python-dev py-pip build-base && \
+    pip install awscli
