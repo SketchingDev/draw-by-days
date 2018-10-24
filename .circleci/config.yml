@@ -39,12 +39,11 @@ jobs:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
+      - run: [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod" || export TF_VAR_env="example"
       - deploy:
           name: Deploy Image API
           command: |
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
-
-            [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="prod"
             terragrunt apply --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment/image-api
 
@@ -56,10 +55,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
+      - run: [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod" || export TF_VAR_env="example"
       - deploy:
           name: Deploy website
           command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="prod"
             terragrunt apply --terragrunt-non-interactive -auto-approve
 
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
