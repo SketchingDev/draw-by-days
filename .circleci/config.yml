@@ -22,7 +22,7 @@ jobs:
           command: yarn test
       - run:
           name: Build packages
-          command: | 
+          command: |
             export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
             yarn build --stream
       - persist_to_workspace:
@@ -31,7 +31,7 @@ jobs:
             - packages/image-api/dist/retrieve-image-lambda.zip
             - packages/website/build
 
-  deploy:
+  deploy_image_api:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
     working_directory: ~/repo
@@ -47,6 +47,15 @@ jobs:
             [[ $CIRCLE_BRANCH = "master" ]] && TF_VAR_env="prod"
             terragrunt apply --terragrunt-non-interactive -auto-approve
           working_directory: deployment/environment/image-api
+
+  deploy_website:
+    docker:
+      - image: sketchingdev/terraform-terragrunt:latest
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
       - deploy:
           name: Deploy website
           command: |
@@ -61,6 +70,9 @@ workflows:
   build_and_deploy:
     jobs:
       - build
-      - deploy:
+      - deploy_image_api:
+          requires:
+            - build
+      - deploy_website:
           requires:
             - build
