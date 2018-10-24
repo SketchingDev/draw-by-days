@@ -48,6 +48,7 @@ jobs:
     executor: node-build-environment
     steps:
       - install-projects-dependencies
+      - run: yarn install
       - run:
           name: Build
           command: yarn build --scope=image-api --stream
