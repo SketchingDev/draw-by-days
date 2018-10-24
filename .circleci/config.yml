@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 # commands: # a reusable command with parameters
 #   s3sync:
