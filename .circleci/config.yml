@@ -1,33 +1,7 @@
 version: 2.1
 
-# commands: # a reusable command with parameters
-#   s3sync:
-#     parameters:
-#       from:
-#         type: string
-#       to:
-#         type: string
-#       overwrite:
-#         default: false
-#         type: boolean
-#     steps:
-#       - run: # a parameterized run step
-#           name: Deploy to S3
-#           command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
-
-executors:
-  build-environment-executor:
-    docker:
-      - image: circleci/node:8-browsers
-    working_directory: ~/repo
-  deploy-environment-executor:
-    docker:
-      - image: sketchingdev/terraform-terragrunt:latest
-    working_directory: ~/repo
-
-jobs:
-  build:
-    executor: build-environment-executor
+commands:
+  install-projects-dependencies:
     steps:
       - checkout
       - restore_cache:
@@ -41,22 +15,52 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+
+executors:
+  node-build-environment:
+    docker:
+      - image: circleci/node:8-browsers
+    working_directory: ~/repo
+  terragrunt-deploy-environment:
+    docker:
+      - image: sketchingdev/terraform-terragrunt:latest
+    working_directory: ~/repo
+
+jobs:
+  build_website:
+    executor: node-build-environment
+    steps:
+      - install-projects-dependencies
       - run:
-          name: Test packages
-          command: yarn test
+          name: Test
+          command: yarn test --scope website --stream
       - run:
-          name: Build packages
+          name: Build
           command: |
             export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
-            yarn build --stream
+            yarn build --scope website --stream
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/website/build
+
+  build_image_api:
+    executor: node-build-environment
+    steps:
+      - install-projects-dependencies
+      - run:
+          name: Test
+          command: yarn test --scope image-api --stream
+      - run:
+          name: Build
+          command: yarn build --scope image-api --stream
       - persist_to_workspace:
           root: ~/repo
           paths:
             - packages/image-api/dist/retrieve-image-lambda.zip
-            - packages/website/build
 
   deploy_image_api:
-    executor: deploy-environment-executor
+    executor: terragrunt-deploy-environment
     steps:
       - checkout
       - attach_workspace:
@@ -71,7 +75,7 @@ jobs:
           working_directory: deployment/environment/image-api
 
   deploy_website:
-    executor: deploy-environment-executor
+    executor: terragrunt-deploy-environment
     steps:
       - checkout
       - attach_workspace:
@@ -88,12 +92,15 @@ jobs:
 
 workflows:
   version: 2
-  build_and_deploy:
+  website:
     jobs:
-      - build
-      - deploy_image_api:
-          requires:
-            - build
+      - build_website
       - deploy_website:
           requires:
-            - build
+            - build_website
+  image-api:
+    jobs:
+      - build_image_api
+      - deploy_image_api:
+          requires:
+            - build_image_api
