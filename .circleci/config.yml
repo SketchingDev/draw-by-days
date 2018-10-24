@@ -91,15 +91,13 @@ jobs:
 
 workflows:
   version: 2
-  website:
+  build_and_deploy:
     jobs:
       - build_website
+      - build_image_api
       - deploy_website:
           requires:
             - build_website
-  image-api:
-    jobs:
-      - build_image_api
       - deploy_image_api:
           requires:
             - build_image_api
