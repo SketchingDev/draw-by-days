@@ -12,6 +12,7 @@ interface IRequest {
 const createRequest = (image: IDailyImage): IRequest => ({
     body: JSON.stringify(image),
     headers: {
+        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json; charset=utf-8",
     },
     statusCode: 200,

@@ -1,64 +1,136 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:8-browsers
+version: 2.1
 
-    working_directory: ~/repo
-
+commands:
+  yarn-install-with-cache:
     steps:
-      - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
       - run:
           name: Install YARN dependencies
           command: yarn install
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
+  yarn-build-then-test:
+    parameters:
+      package_name:
+        type: string
+    steps:
       - run:
-          name: Test packages
-          command: yarn test
+          name: Build
+          command: yarn build --scope << parameters.package_name >> --include-filtered-dependencies
       - run:
-          name: Build packages
-          command: yarn build --stream
+          name: Test
+          command: yarn test --scope << parameters.package_name >>
 
+executors:
+  node-build-environment:
+    docker:
+      - image: circleci/node:8-browsers
+    working_directory: ~/repo
+  terragrunt-deploy-environment:
+    docker:
+      - image: sketchingdev/terraform-terragrunt:latest
+    working_directory: ~/repo
+
+jobs:
+  ## Website
+
+  test_website:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - yarn-build-then-test:
+          package_name: website
+
+  build_website:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Build
+          command: |
+            export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
+            yarn build --scope website --include-filtered-dependencies
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/website/build
+
+  deploy_website:
+    executor: terragrunt-deploy-environment
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - deploy:
+          name: Deploy website
+          command: |
+            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod"
+
+            terragrunt apply --terragrunt-non-interactive -auto-approve
+            aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
+          working_directory: deployment/environment/website
+
+  ## Image API
+
+  test_image_api:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - yarn-build-then-test:
+          package_name: image-api
+
+  build_image_api:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Build
+          command: yarn build --scope image-api --include-filtered-dependencies
       - persist_to_workspace:
           root: ~/repo
           paths:
             - packages/image-api/dist/retrieve-image-lambda.zip
 
-  deploy:
-    docker:
-      - image: sketchingdev/terraform-terragrunt:latest
-
-    working_directory: ~/repo
-
+  deploy_image_api:
+    executor: terragrunt-deploy-environment
     steps:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
-      - run:
-          name: Deploy all
+      - deploy:
+          name: Deploy Image API
           command: |
+            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod"
+
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve
-          working_directory: deployment/environment
+            terragrunt apply --terragrunt-non-interactive -auto-approve
+          working_directory: deployment/environment/image-api
 
 workflows:
   version: 2
-  build_and_deploy:
+  test_build_deploy:
     jobs:
-      - build
-      - deploy:
+      - test_website
+      - build_website:
           requires:
-            - build
+            - test_website
+      - deploy_website:
+          requires:
+            - build_website
+
+      - test_image_api
+      - build_image_api:
+          requires:
+            - test_image_api
+      - deploy_image_api:
+          requires:
+            - build_image_api
