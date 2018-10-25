@@ -47,7 +47,8 @@ jobs:
   build_image_api:
     executor: node-build-environment
     steps:
-      - install-projects-dependencies
+      - checkout
+      # - install-projects-dependencies
       - run: yarn install
       - run:
           name: Build
