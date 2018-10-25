@@ -1,9 +1,8 @@
 version: 2.1
 
 commands:
-  install-projects-dependencies:
+  yarn-install-with-cache:
     steps:
-      - checkout
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
@@ -30,15 +29,16 @@ jobs:
   build_website:
     executor: node-build-environment
     steps:
-      - install-projects-dependencies
+      - checkout
+      - yarn-install-with-cache
       - run:
           name: Build
           command: |
             export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
-            yarn build --scope=website --stream
+            yarn build --scope website --include-filtered-dependencies --stream
       - run:
           name: Test
-          command: yarn test --scope=website --stream
+          command: yarn test --scope website --stream
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -48,14 +48,13 @@ jobs:
     executor: node-build-environment
     steps:
       - checkout
-      # - install-projects-dependencies
-      - run: yarn install
+      - yarn-install-with-cache
       - run:
           name: Build
-          command: yarn build --scope=image-api --stream
+          command: yarn build --scope image-api --include-filtered-dependencies --stream
       - run:
           name: Test
-          command: yarn test --scope=image-api --stream
+          command: yarn test --scope image-api --stream
       - persist_to_workspace:
           root: ~/repo
           paths:
