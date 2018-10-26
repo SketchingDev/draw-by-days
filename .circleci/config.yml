@@ -75,7 +75,7 @@ jobs:
 
             terragrunt apply --terragrunt-non-interactive -auto-approve
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
-          working_directory: deployment/environment/website
+          working_directory: terraform/deployment/website
 
   ## Image API
 
@@ -113,7 +113,7 @@ jobs:
 
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
             terragrunt apply --terragrunt-non-interactive -auto-approve
-          working_directory: deployment/environment/image-api
+          working_directory: terraform/deployment/image-api
 
 workflows:
   version: 2
