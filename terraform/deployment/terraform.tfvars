@@ -7,7 +7,7 @@ terragrunt = {
       region         = "us-east-1"
       encrypt        = true
       dynamodb_table = "draw-by-days-lock-table"
-      
+
       s3_bucket_tags {
         owner = "Draw-By-Days"
         name  = "Terraform state storage"
@@ -22,7 +22,9 @@ terragrunt = {
   terraform {
     extra_arguments "common_var" {
       commands  = ["${get_terraform_commands_that_need_vars()}"]
-      arguments = ["-var-file=${get_parent_tfvars_dir()}/${get_env("TF_VAR_env", "dev")}.tfvars"]
+      arguments = [
+        "-var-file=${get_parent_tfvars_dir()}/common.tfvars",
+        "-var-file=${get_parent_tfvars_dir()}/env-${get_env("TF_VAR_env", "dev")}.tfvars"]
     }
   }
 }
