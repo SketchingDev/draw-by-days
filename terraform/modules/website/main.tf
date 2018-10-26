@@ -7,11 +7,6 @@ terraform {
   backend "s3" {}
 }
 
-module "website" {
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//s3_website?ref=s3_website_takes_name"
-  name = "drawbydays.com"
-}
-
 data "terraform_remote_state" "domain" {
   backend = "s3"
   config {
@@ -19,6 +14,11 @@ data "terraform_remote_state" "domain" {
     bucket = "draw-by-days-terraform-state"
     key = "domain/terraform.tfstate"
   }
+}
+
+module "website" {
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//s3_website"
+  name = "drawbydays.com"
 }
 
 resource "aws_route53_record" "domain" {
