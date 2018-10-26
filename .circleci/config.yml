@@ -71,7 +71,7 @@ jobs:
       - deploy:
           name: Deploy website
           command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod"
+            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod" || export TF_VAR_env="ci"
 
             terragrunt apply --terragrunt-non-interactive -auto-approve
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
@@ -109,7 +109,7 @@ jobs:
       - deploy:
           name: Deploy Image API
           command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod"
+            [[ $CIRCLE_BRANCH = "master" ]] && export TF_VAR_env="prod" || export TF_VAR_env="ci"
 
             export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
             terragrunt apply --terragrunt-non-interactive -auto-approve
