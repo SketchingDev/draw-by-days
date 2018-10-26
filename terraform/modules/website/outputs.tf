@@ -3,5 +3,5 @@ output "bucket_name" {
 }
 
 output "url" {
-    value = "${module.website.url}"
+    value = "${aws_route53_record.domain.name}"
 }
