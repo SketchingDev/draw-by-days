@@ -8,8 +8,8 @@ terraform {
 }
 
 module "website" {
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//s3_website"
-  namespace = "${var.namespace}"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//s3_website?ref=s3_website_takes_name"
+  name = "drawbydays.com"
 }
 
 data "terraform_remote_state" "domain" {
@@ -26,7 +26,7 @@ resource "aws_route53_record" "domain" {
    name = "${data.terraform_remote_state.domain.name}"
    type = "A"
    alias {
-     name = "${module.website.url}"
+     name = "${module.website.domain}"
      zone_id = "${module.website.hosted_zone_id}"
      evaluate_target_health = true
    }
