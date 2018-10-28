@@ -3,7 +3,7 @@ terragrunt = {
     backend = "s3"
     config {
       bucket         = "draw-by-days-terraform-state"
-      key            = "${path_relative_to_include()}/terraform.tfstate"
+      key            = "${get_env("TF_VAR_env", "dev")}/${path_relative_to_include()}/terraform.tfstate"
       region         = "us-east-1"
       encrypt        = true
       dynamodb_table = "draw-by-days-lock-table"
