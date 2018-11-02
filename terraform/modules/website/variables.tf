@@ -1,3 +1,3 @@
 variable "aws_region" {}
 
-variable "namespace" {}
+variable "website_domain" {}

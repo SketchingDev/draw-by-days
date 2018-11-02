@@ -18,12 +18,12 @@ data "terraform_remote_state" "domain" {
 
 module "website" {
   source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//s3_website"
-  name = "drawbydays.com"
+  name = "${var.website_domain}"
 }
 
 resource "aws_route53_record" "domain" {
    zone_id = "${data.terraform_remote_state.domain.zone_id}"
-   name = "${data.terraform_remote_state.domain.name}"
+   name = "${var.website_domain}"
    type = "A"
    alias {
      name = "${module.website.domain}"

@@ -8,7 +8,7 @@ terraform {
 }
 
 module "image_api" {
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//lambda_api_gateway?ref=api_gateway_domain"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//lambda_api_gateway"
 
   namespace = "${var.namespace}"
 

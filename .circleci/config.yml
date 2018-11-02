@@ -55,7 +55,12 @@ jobs:
       - run:
           name: Build
           command: |
-            export REACT_APP_IMAGE_API_URL=https://7kh2kmkw87.execute-api.us-east-1.amazonaws.com/images
+            if [[ $CIRCLE_BRANCH = "master" ]]; then
+              export REACT_APP_IMAGE_API_URL=https://images.drawbydays.com/
+            else
+              export REACT_APP_IMAGE_API_URL=https://images.ci.drawbydays.com/
+            fi
+
             yarn build --scope website --include-filtered-dependencies
       - persist_to_workspace:
           root: ~/repo
