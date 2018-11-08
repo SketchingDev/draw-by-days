@@ -10,7 +10,7 @@ terraform {
 data "terraform_remote_state" "domain" {
   backend = "s3"
   config {
-    region = "${var.aws_region}"
+    region = "us-east-1"
     bucket = "draw-by-days-terraform-state"
     key = "domain/terraform.tfstate"
   }

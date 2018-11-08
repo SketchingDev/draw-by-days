@@ -1,5 +1,6 @@
 provider "aws" {
-  region = "${var.aws_region}"
+  # us-east-1 only region for certificates to be used as API Gateway domain
+  region = "us-east-1"
 }
 
 terraform {
@@ -7,10 +8,6 @@ terraform {
   backend "s3" {}
 }
 
-locals {
-  zone_domain_name = "drawbydays.com"
-}
-
 resource "aws_route53_zone" "primary" {
-  name = "${local.zone_domain_name}"
+  name = "${var.zone_domain_name}"
 }
