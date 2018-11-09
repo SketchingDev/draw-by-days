@@ -7,7 +7,7 @@ terragrunt = {
       region         = "us-east-1"
       encrypt        = true
       dynamodb_table = "draw-by-days-lock-table"
-      
+
       s3_bucket_tags {
         owner = "Draw-By-Days"
         name  = "Terraform state storage"
@@ -20,9 +20,10 @@ terragrunt = {
     }
   }
   terraform {
-    extra_arguments "common_var" {
-      commands  = ["${get_terraform_commands_that_need_vars()}"]
-      arguments = ["-var-file=${get_parent_tfvars_dir()}/${get_env("TF_VAR_env", "dev")}.tfvars"]
+    # Force Terraform to keep trying to acquire a lock for up to 5 minutes if someone else already has the lock
+    extra_arguments "retry_lock" {
+      commands  = ["${get_terraform_commands_that_need_locking()}"]
+      arguments = ["-lock-timeout=5m"]
     }
   }
 }
