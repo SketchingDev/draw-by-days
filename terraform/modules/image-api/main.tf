@@ -13,7 +13,7 @@ data "terraform_remote_state" "domain" {
   config {
     region = "us-east-1"
     bucket = "draw-by-days-terraform-state"
-    key    = "domain/terraform.tfstate"
+    key    = "global/domain/terraform.tfstate"
   }
 }
 

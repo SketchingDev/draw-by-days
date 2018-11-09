@@ -19,12 +19,4 @@ terragrunt = {
       }
     }
   }
-  terraform {
-    extra_arguments "common_var" {
-      commands  = ["${get_terraform_commands_that_need_vars()}"]
-      arguments = [
-        "-var-file=${get_parent_tfvars_dir()}/common.tfvars",
-        "-var-file=${get_parent_tfvars_dir()}/env-${get_env("TF_VAR_env", "dev")}.tfvars"]
-    }
-  }
 }

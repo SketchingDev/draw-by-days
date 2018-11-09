@@ -1,5 +1,9 @@
 # Deployment
 
+## Directory structure
+
+This uses the directory structure suggested by https://blog.gruntwork.io/how-to-manage-terraform-state-28f5697e68fa
+
 ## AWS IAM Policies
 
 ### Terragrunt remote state and locking
