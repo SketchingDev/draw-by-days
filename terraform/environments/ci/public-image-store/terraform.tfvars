@@ -6,7 +6,7 @@ terragrunt = {
     paths = ["../../global/domain"]
   }
   terraform {
-    source = "${get_tfvars_dir()}/../../../modules/image-api"
+    source = "${get_tfvars_dir()}/../../../modules/public-image-store"
   }
 }
 
