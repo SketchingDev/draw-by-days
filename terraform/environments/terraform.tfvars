@@ -25,5 +25,11 @@ terragrunt = {
       commands  = ["${get_terraform_commands_that_need_locking()}"]
       arguments = ["-lock-timeout=5m"]
     }
+    # extra_arguments "module_backends" {
+    #   commands = [
+    #     "init",
+    #   ]
+    #   arguments = ["-backend-config=${get_parent_tfvars_dir()}/remote_backend.tf"]
+    # }
   }
 }
