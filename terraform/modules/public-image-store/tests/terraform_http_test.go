@@ -10,23 +10,23 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
-func TestServiceReturnsResponse(t *testing.T) {
+func TestApiGatewayReturnsEmptyDynamoDBResponse(t *testing.T) {
 	t.Parallel()
 
 	awsRegion := "us-east-1"
 	uniqueID := random.UniqueId()
 
 	namespace := fmt.Sprintf("terratest-dynamodb-test-%s", uniqueID)
-	// domain := fmt.Sprintf("test-%s.drawbydays.com", uniqueID)
+	domain := fmt.Sprintf("%s.drawbydays.com", namespace)
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../",
 
 		Vars: map[string]interface{}{
-			"aws_region": awsRegion,
-			"namespace":  namespace,
-			// "image_api_domain": domain,
+			"namespace":        namespace,
+			"image_api_domain": domain,
 		},
+
 		EnvVars: map[string]string{
 			"AWS_DEFAULT_REGION": awsRegion,
 		},
@@ -38,7 +38,7 @@ func TestServiceReturnsResponse(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Then
-	instanceURL := terraform.OutputRequired(t, terraformOptions, "private_url")
+	instanceURL := terraform.OutputRequired(t, terraformOptions, "private-url")
 	instanceURL = fmt.Sprintf("%s/test-value", instanceURL)
 
 	expected := "{\"Count\":0,\"Items\":[],\"ScannedCount\":0}"

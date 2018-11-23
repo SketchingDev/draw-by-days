@@ -2,10 +2,10 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
-# terraform {
-#   # The configuration for this backend will be filled in by Terragrunt
-#   backend "s3" {}
-# }
+terraform {
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {}
+}
 
 data "terraform_remote_state" "domain" {
   backend = "s3"
