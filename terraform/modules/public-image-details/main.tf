@@ -1,3 +1,12 @@
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+terraform {
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {}
+}
+
 locals {
   id_column = "DateId"
 }
@@ -13,3 +22,4 @@ resource "aws_dynamodb_table" "image_table" {
     type = "S"
   }
 }
+

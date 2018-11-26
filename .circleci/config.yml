@@ -35,10 +35,6 @@ executors:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
     working_directory: ~/repo
-  infrastructure-testing-environment:
-    docker:
-      - image: sketchingdev/golang-terratest:latest
-    working_directory: /go/src/app
 
 jobs:
   ## Website
@@ -87,31 +83,42 @@ jobs:
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
           working_directory: terraform/environments/
 
-  ## Public Image Store
+  ## Public Image Details
 
-  test_public_image_store:
-    executor: infrastructure-testing-environment
+  test_public_image_details:
+    executor: node-build-environment
     steps:
       - checkout
-      - run:
-          name: Test public image store
-          command: |
-            dep ensure -v
-            go test -v -run TestApiGatewayReturnsEmptyDynamoDBResponse
-          working_directory: terraform/modules/public-image-store/tests/
+      - yarn-install-with-cache
+      - yarn-build-then-test:
+  package_name: public-image-details
 
-  deploy_public_image_store:
+  build_public_image_details:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Build
+          command: yarn build --scope public-image-details --include-filtered-dependencies
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/public-image-details/dist/save-image-metadata.zip
+
+  deploy_public_image_details:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy public image store
+          name: Deploy public image details
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/public-image-store
+            cd $ENV/public-image-details
 
+            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/image-api/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
           working_directory: terraform/environments/
 
@@ -127,7 +134,10 @@ workflows:
           requires:
             - build_website
 
-      - test_public_image_store
-      - deploy_public_image_store:
+      - test_public_image_details
+      - build_public_image_details:
           requires:
-            - test_public_image_store
+            - test_public_image_details
+      - deploy_public_image_details:
+          requires:
+            - build_public_image_details
