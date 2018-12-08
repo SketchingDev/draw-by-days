@@ -1,19 +1,77 @@
-import axios from "axios";
-import { URL } from "url";
+import { model } from "dynamoose";
+import { IPublicImageDetails } from "messages-lib/lib";
 
-describe("Integration test Process API", () => {
+import AWS from "aws-sdk";
+import { format } from "date-fns";
+import waitForExpect from "wait-for-expect";
+import { ImageModel, imageSchema } from "../src/image/saveImageDetails";
 
-  it("Calling API returns an image", async () => {
-    const startProcessUrl = new URL("/start", process.env.IMAGE_API_URL);
+const defaultTimeout = 5000;
+jest.setTimeout(defaultTimeout * 4);
 
-    const { data } = await axios.get(startProcessUrl.toString());
+describe("Public Image Details integration test", () => {
+  let ImageRecord: any;
 
-    expect(data.date).toBeDefined();
-    expect(data).toMatchObject({
-      image: {
-          description: "Hello Worlddd",
-          path: "https://www.w3.org/People/mimasa/test/imgformat/img/w3c_home.jpg",
-      },
+  beforeAll(() => {
+    expect(process.env.TABLE_NAME).toBeDefined();
+    expect(process.env.AWS_REGION).toBeDefined();
+    expect(process.env.TOPIC_ARN).toBeDefined();
+
+    ImageRecord = model<ImageModel, { DateId: string }>(process.env.TABLE_NAME!, imageSchema);
+  });
+
+  let dateIdValue: string;
+  let uniqueDescription: string;
+
+  beforeEach(() => {
+    dateIdValue = format(Date.now(), "YYYY-MM-DD");
+    uniqueDescription = Date.now().toString();
+  });
+
+  afterEach(async () => {
+    await ImageRecord.delete({ DateId: dateIdValue });
+  });
+
+  it("Details in event saved to DynamoDB", async () => {
+    const message: IPublicImageDetails = {
+      description: uniqueDescription,
+      images: [
+        {
+          publicUrl: "http://example.com/",
+          dimensions: {
+            width: 1,
+            height: 2,
+          },
+        },
+      ],
+    };
+
+    const params = {
+      Message: JSON.stringify(message),
+      TopicArn: process.env.TOPIC_ARN,
+    };
+
+    await new AWS.SNS({ apiVersion: "2010-03-31" }).publish(params).promise();
+
+    let result;
+    await waitForExpect(async () => {
+      result = await ImageRecord.queryOne("DateId")
+        .eq(dateIdValue)
+        .exec();
+      expect(result).not.toBeUndefined();
+    });
+
+    expect(result).toMatchObject({
+      Description: uniqueDescription,
+      Images: [
+        {
+          PublicUrl: "http://example.com/",
+          Dimensions: {
+            Width: 1,
+            Height: 2,
+          },
+        },
+      ],
     });
   });
 });

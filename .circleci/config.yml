@@ -91,7 +91,10 @@ jobs:
       - checkout
       - yarn-install-with-cache
       - yarn-build-then-test:
-  package_name: public-image-details
+          package_name: public-image-details
+      - run:
+          name: Integration tests
+          command: yarn test:integration --scope public-image-details
 
   build_public_image_details:
     executor: node-build-environment

@@ -22,4 +22,3 @@ resource "aws_dynamodb_table" "image_table" {
     type = "S"
   }
 }
-

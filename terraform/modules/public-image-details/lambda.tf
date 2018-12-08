@@ -2,51 +2,51 @@ data "aws_sns_topic" "image_on_platform" {
   name = "${var.namespace}-image-on-platform"
 }
 
-resource "aws_lambda_function" "save_image_details" {
+module "sns_lambda" {
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=sns_triggered_lambda"
+  sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
-  handler = "main.handler"
-  runtime = "nodejs8.10"
-  filename = "${var.save_image_metadata_lambda_filename}"
-  source_code_hash = "${base64sha256(file(var.save_image_metadata_lambda_filename))}"
-  role = "${aws_iam_role.lambda_exec.arn}"
+  function_filename = "${var.save_image_metadata_lambda_filename}"
+  function_environment {
+    variables {
+      TABLE_NAME = "${aws_dynamodb_table.image_table.name}"
+    }
+  }
 }
 
-resource "aws_lambda_permission" "allow_process_invoker" {
-  statement_id   = "AllowExecutionFromProcessInvoker"
-  action         = "lambda:InvokeFunction"
-  function_name  = "${aws_lambda_function.save_image_details.function_name}"
-  principal      = "lambda.amazonaws.com"
-}
+resource "aws_iam_policy" "dynamodb_write_access" {
+  name = "dynamodb_write_access"
+  path = "/"
+  description = "IAM policy for writing to DynamoDB"
 
-resource "aws_lambda_permission" "allow_sns_execution" {
-  statement_id  = "AllowExecutionFromSNS"
-  action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.save_image_details.function_name}"
-  principal     = "sns.amazonaws.com"
-  source_arn    = "${data.aws_sns_topic.image_on_platform.arn}"
-}
-
-resource "aws_sns_topic_subscription" "lambda" {
-  topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
-  protocol  = "lambda"
-  endpoint  = "${aws_lambda_function.save_image_details.arn}"
-}
-
-resource "aws_iam_role" "lambda_exec" {
-  name  = "lambda_exec_role"
-  assume_role_policy = <<EOF
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": ["sts:AssumeRole"],
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
+      "Sid": "SpecificTable",
       "Effect": "Allow",
-      "Sid": ""
+      "Action": [
+        "dynamodb:BatchGet*",
+        "dynamodb:DescribeStream",
+        "dynamodb:DescribeTable",
+        "dynamodb:Get*",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:BatchWrite*",
+        "dynamodb:CreateTable",
+        "dynamodb:Delete*",
+        "dynamodb:Update*",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "${aws_dynamodb_table.image_table.arn}"
     }
   ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role = "${module.sns_lambda.lambda_function_role}"
+  policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
 }
