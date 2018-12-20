@@ -95,7 +95,14 @@ jobs:
           package_name: public-image-details
       - run:
           name: Integration tests
-          command: yarn test:integration --scope public-image-details
+          command: |
+            cd terraform/environments/dev/public-image-details/
+            export AWS_REGION=us-east-1
+            export TABLE_NAME=$(terragrunt output images_table_name)
+            export TOPIC_ARN=$(terragrunt output subscribed_topic_arn)
+
+            cd -
+            yarn test:integration --scope public-image-details
 
   build_public_image_details:
     executor: node-build-environment
