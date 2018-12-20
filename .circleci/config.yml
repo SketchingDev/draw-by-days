@@ -92,6 +92,7 @@ jobs:
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: public-image-details
+      - setup_remote_docker
       - run:
           name: Integration tests
           command: yarn test:integration --scope public-image-details
