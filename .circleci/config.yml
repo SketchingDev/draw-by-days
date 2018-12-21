@@ -123,7 +123,7 @@ jobs:
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
             cd $ENV/public-image-details
 
-            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/image-api/dist/save-image-metadata.zip
+            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
             echo "Creating env.$ENV.outputs"
@@ -132,10 +132,10 @@ jobs:
             echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn) >> env.outputs
             cat env.outputs
           working_directory: terraform/environments/
-#      - persist_to_workspace:
-#          root: ~/repo
-#          paths:
-#            - terraform/environments/*/env.outputs
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - terraform/environments/*/env.outputs
 
   test_integration_public_image_details:
     executor: node-build-environment
