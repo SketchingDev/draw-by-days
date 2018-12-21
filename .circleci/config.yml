@@ -172,7 +172,8 @@ workflows:
       - test_integration_public_image_details:
           requires:
             - deploy_public_image_details
-          branches:
-            ignore:
-              - master
+          filters:
+            branches:
+              ignore:
+                - master
 
