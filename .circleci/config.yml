@@ -35,6 +35,10 @@ executors:
     docker:
       - image: sketchingdev/terraform-terragrunt:latest
     working_directory: ~/repo
+  node-terragrunt-environment:
+    docker:
+      - image: sketchingdev/node-terragrunt
+
 
 jobs:
   ## Website
@@ -93,16 +97,6 @@ jobs:
       - setup_remote_docker
       - yarn-build-then-test:
           package_name: public-image-details
-      - run:
-          name: Integration tests
-          command: |
-            cd terraform/environments/dev/public-image-details/
-            export AWS_REGION=us-east-1
-            export TABLE_NAME=$(terragrunt output images_table_name)
-            export TOPIC_ARN=$(terragrunt output subscribed_topic_arn)
-
-            cd -
-            yarn test:integration --scope public-image-details
 
   build_public_image_details:
     executor: node-build-environment
@@ -131,7 +125,30 @@ jobs:
 
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/image-api/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
+
+            echo "Creating env.$ENV.outputs"
+            echo "export AWS_REGION=$AWS_REGION" >> env.outputs
+            echo "export TF_OUTPUT_private_url=$(terragrunt output private_url)" >> env.outputs
+            echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn) >> env.outputs
+            cat env.outputs
           working_directory: terraform/environments/
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - terraform/environments/*/env.outputs
+
+  test_integration_public_image_details:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - yarn-install-with-cache
+      - run:
+          name: Integration tests
+          command: |
+            source /tmp/workspace/terraform/environments/ci/env.outputs
+            yarn test:integration --scope public-image-details
 
 workflows:
   version: 2
@@ -152,3 +169,10 @@ workflows:
       - deploy_public_image_details:
           requires:
             - build_public_image_details
+      - test_integration_public_image_details:
+          requires:
+            - deploy_public_image_details
+          branches:
+            ignore:
+              - master
+

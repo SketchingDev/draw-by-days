@@ -1,23 +1,18 @@
-import { model } from "dynamoose";
 import { IPublicImageDetails } from "messages-lib/lib";
 
 import AWS from "aws-sdk";
+import axios from "axios";
 import { format } from "date-fns";
 import waitForExpect from "wait-for-expect";
-import { ImageModel, imageSchema } from "../src/image/saveImageDetails";
 
 const defaultTimeout = 5000;
 jest.setTimeout(defaultTimeout * 4);
 
 describe("Public Image Details integration test", () => {
-  let ImageRecord: any;
-
   beforeAll(() => {
-    expect(process.env.TABLE_NAME).toBeDefined();
     expect(process.env.AWS_REGION).toBeDefined();
-    expect(process.env.TOPIC_ARN).toBeDefined();
-
-    ImageRecord = model<ImageModel, { DateId: string }>(process.env.TABLE_NAME!, imageSchema);
+    expect(process.env.TF_OUTPUT_private_url).toBeDefined();
+    expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
   });
 
   let dateIdValue: string;
@@ -26,10 +21,6 @@ describe("Public Image Details integration test", () => {
   beforeEach(() => {
     dateIdValue = format(Date.now(), "YYYY-MM-DD");
     uniqueDescription = Date.now().toString();
-  });
-
-  afterEach(async () => {
-    await ImageRecord.delete({ DateId: dateIdValue });
   });
 
   it("Details in event saved to DynamoDB", async () => {
@@ -48,30 +39,53 @@ describe("Public Image Details integration test", () => {
 
     const params = {
       Message: JSON.stringify(message),
-      TopicArn: process.env.TOPIC_ARN,
+      TopicArn: process.env.TF_OUTPUT_subscribed_topic_arn,
     };
 
     await new AWS.SNS({ apiVersion: "2010-03-31" }).publish(params).promise();
 
     let result;
     await waitForExpect(async () => {
-      result = await ImageRecord.queryOne("DateId")
-        .eq(dateIdValue)
-        .exec();
-      expect(result).not.toBeUndefined();
+      result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${dateIdValue}`);
     });
 
     expect(result).toMatchObject({
-      Description: uniqueDescription,
-      Images: [
-        {
-          PublicUrl: "http://example.com/",
-          Dimensions: {
-            Width: 1,
-            Height: 2,
+      status: 200,
+      data: {
+        Count: 1,
+        Items: [
+          {
+            Images: {
+              L: [
+                {
+                  M: {
+                    Dimensions: {
+                      M: {
+                        Width: {
+                          N: "1",
+                        },
+                        Height: {
+                          N: "2",
+                        },
+                      },
+                    },
+                    PublicUrl: {
+                      S: "http://example.com/",
+                    },
+                  },
+                },
+              ],
+            },
+            DateId: {
+              S: "2018-12-21",
+            },
+            Description: {
+              S: uniqueDescription,
+            },
           },
-        },
-      ],
+        ],
+        ScannedCount: 1,
+      },
     });
   });
 });
