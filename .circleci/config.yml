@@ -132,10 +132,10 @@ jobs:
             echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn) >> env.outputs
             cat env.outputs
           working_directory: terraform/environments/
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - terraform/environments/*/env.outputs
+#      - persist_to_workspace:
+#          root: ~/repo
+#          paths:
+#            - terraform/environments/*/env.outputs
 
   test_integration_public_image_details:
     executor: node-build-environment
