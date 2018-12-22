@@ -35,10 +35,6 @@ executors:
     docker:
       - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3
     working_directory: ~/repo
-  node-terragrunt-environment:
-    docker:
-      - image: sketchingdev/node-terragrunt
-
 
 jobs:
   ## Website
@@ -129,7 +125,7 @@ jobs:
             echo "Creating env.$ENV.outputs"
             echo "export AWS_REGION=$AWS_REGION" >> env.outputs
             echo "export TF_OUTPUT_private_url=$(terragrunt output private_url)" >> env.outputs
-            echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn) >> env.outputs
+            echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn)" >> env.outputs
             cat env.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
