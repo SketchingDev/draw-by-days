@@ -33,7 +33,7 @@ executors:
     working_directory: ~/repo
   terragrunt-deploy-environment:
     docker:
-      - image: sketchingdev/terraform-terragrunt:latest
+      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3
     working_directory: ~/repo
   node-terragrunt-environment:
     docker:

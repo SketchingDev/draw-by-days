@@ -3,6 +3,7 @@ data "aws_sns_topic" "image_on_platform" {
 }
 
 module "sns_lambda" {
+  namespace = "${var.namespace}"
   source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=sns_triggered_lambda"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
@@ -15,7 +16,7 @@ module "sns_lambda" {
 }
 
 resource "aws_iam_policy" "dynamodb_write_access" {
-  name = "dynamodb_write_access"
+  name = "${var.namespace}_dynamodb_write_access"
   path = "/"
   description = "IAM policy for writing to DynamoDB"
 
