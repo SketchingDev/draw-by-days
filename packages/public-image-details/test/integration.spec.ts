@@ -47,6 +47,19 @@ describe("Public Image Details integration test", () => {
     let result;
     await waitForExpect(async () => {
       result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${dateIdValue}`);
+
+      // Retry until value unique to the test to propagates to the data-store
+      expect(result).toMatchObject({
+        data: {
+          Items: [
+            {
+              Description: {
+                S: uniqueDescription,
+              },
+            },
+          ],
+        },
+      });
     });
 
     expect(result).toMatchObject({
@@ -77,7 +90,7 @@ describe("Public Image Details integration test", () => {
               ],
             },
             DateId: {
-              S: "2018-12-21",
+              S: dateIdValue,
             },
             Description: {
               S: uniqueDescription,

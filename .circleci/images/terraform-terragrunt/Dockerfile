@@ -1,5 +1,10 @@
 FROM alpine:3.8
 
+# Custom
+
+COPY terragrunt-output-to-env.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/terragrunt-output-to-env.sh
+
 # Terraform
 
 ENV TERRAFORM_VERSION=0.11.11

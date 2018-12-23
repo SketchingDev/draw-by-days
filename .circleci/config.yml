@@ -33,7 +33,7 @@ executors:
     working_directory: ~/repo
   terragrunt-deploy-environment:
     docker:
-      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3
+      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3-3
     working_directory: ~/repo
 
 jobs:
@@ -122,16 +122,13 @@ jobs:
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
-            echo "Creating env.$ENV.outputs"
-            echo "export AWS_REGION=$AWS_REGION" >> env.outputs
-            echo "export TF_OUTPUT_private_url=$(terragrunt output private_url)" >> env.outputs
-            echo "export TF_OUTPUT_subscribed_topic_arn=$(terragrunt output subscribed_topic_arn)" >> env.outputs
-            cat env.outputs
+            echo "export AWS_REGION=us-east-1" > ../../env.outputs
+            terragrunt-output-to-env.sh private_url subscribed_topic_arn >> ../../env.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - terraform/environments/*/env.outputs
+            - terraform/environments/env.outputs
 
   test_integration_public_image_details:
     executor: node-build-environment
@@ -143,7 +140,9 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            source /tmp/workspace/terraform/environments/ci/env.outputs
+            source /tmp/workspace/terraform/environments/env.outputs
+            echo "Loaded env file"
+            cat /tmp/workspace/terraform/environments/env.outputs
             yarn test:integration --scope public-image-details
 
 workflows:
