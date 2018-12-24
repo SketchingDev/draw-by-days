@@ -36,7 +36,7 @@ data "template_file" "dynamodb_table" {
 }
 
 module "image_api" {
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//readonly_dynamodb_api_gateway?ref=sns_triggered_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//readonly_dynamodb_api_gateway"
 
   namespace = "${var.namespace}"
 
