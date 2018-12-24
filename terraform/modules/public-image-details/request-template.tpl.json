@@ -1,0 +1,9 @@
+{
+    "TableName": "${table_name}",
+    "KeyConditionExpression": "${id_column} = :v1",
+    "ExpressionAttributeValues": {
+        ":v1": {
+            "S": "$input.params('${id_column}')"
+        }
+    }
+}

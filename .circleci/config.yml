@@ -33,7 +33,7 @@ executors:
     working_directory: ~/repo
   terragrunt-deploy-environment:
     docker:
-      - image: sketchingdev/terraform-terragrunt:latest
+      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3-3
     working_directory: ~/repo
 
 jobs:
@@ -83,44 +83,67 @@ jobs:
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
           working_directory: terraform/environments/
 
-  ## Image API
+  ## Public Image Details
 
-  test_image_api:
+  test_public_image_details:
     executor: node-build-environment
     steps:
       - checkout
       - yarn-install-with-cache
+      - setup_remote_docker
       - yarn-build-then-test:
-          package_name: image-api
+          package_name: public-image-details
 
-  build_image_api:
+  build_public_image_details:
     executor: node-build-environment
     steps:
       - checkout
       - yarn-install-with-cache
       - run:
           name: Build
-          command: yarn build --scope image-api --include-filtered-dependencies
+          command: yarn build --scope public-image-details --include-filtered-dependencies
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - packages/image-api/dist/retrieve-image-lambda.zip
+            - packages/public-image-details/dist/save-image-metadata.zip
 
-  deploy_image_api:
+  deploy_public_image_details:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy Image API
+          name: Deploy public image details
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/image-api
+            cd $ENV/public-image-details
 
-            export TF_VAR_lambda_filename=/tmp/workspace/packages/image-api/dist/retrieve-image-lambda.zip
+            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
+
+            echo "export AWS_REGION=us-east-1" > ../../env.outputs
+            terragrunt-output-to-env.sh private_url subscribed_topic_arn >> ../../env.outputs
           working_directory: terraform/environments/
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - terraform/environments/env.outputs
+
+  test_integration_public_image_details:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - yarn-install-with-cache
+      - run:
+          name: Integration tests
+          command: |
+            source /tmp/workspace/terraform/environments/env.outputs
+            echo "Loaded env file"
+            cat /tmp/workspace/terraform/environments/env.outputs
+            yarn test:integration --scope public-image-details
 
 workflows:
   version: 2
@@ -134,10 +157,18 @@ workflows:
           requires:
             - build_website
 
-      - test_image_api
-      - build_image_api:
+      - test_public_image_details
+      - build_public_image_details:
           requires:
-            - test_image_api
-      - deploy_image_api:
+            - test_public_image_details
+      - deploy_public_image_details:
           requires:
-            - build_image_api
+            - build_public_image_details
+      - test_integration_public_image_details:
+          requires:
+            - deploy_public_image_details
+          filters:
+            branches:
+              ignore:
+                - master
+
