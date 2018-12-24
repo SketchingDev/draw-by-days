@@ -2,8 +2,4 @@
 
 Provides details about images that are publicly available on the platform.
 
-## Testing
-
-```
-
-```
+![Serverless architecture for service](docs/architecture.jpg)
