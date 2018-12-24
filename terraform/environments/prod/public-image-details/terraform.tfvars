@@ -3,7 +3,10 @@ terragrunt = {
     path = "${find_in_parent_folders()}"
   }
   dependencies {
-    paths = ["../../global/domain"]
+    paths = [
+      "../../global/domain",
+      "../image-on-platform-topic"
+    ]
   }
   terraform {
     source = "${get_tfvars_dir()}/../../../modules/public-image-details"
