@@ -35,17 +35,10 @@ describe("Handles ImageDetails message over SNS", () => {
   });
 
   it("Succeeds with publicUrl of image from event", () => {
+    const imageId = "test-id";
     const imageDetails: IBasicImageDetails = {
+      imageId,
       description: "Hello World",
-      images: [
-        {
-          dimensions: {
-            height: 3,
-            width: 4,
-          },
-          publicUrl: "http://example.com/image.png",
-        },
-      ],
     };
     const snsEvent: IRecords<string> = {
       Records: [
@@ -58,26 +51,17 @@ describe("Handles ImageDetails message over SNS", () => {
     };
 
     const ImageRecord = model<ImageModel, { DateId: string }>(tableName, imageSchema);
-    const dateIdValue = format(Date.now(), "YYYY-MM-DD");
 
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
         const record = await ImageRecord.queryOne("ImageId")
-          .eq(dateIdValue)
+          .eq(imageId)
           .exec();
 
         expect(record).toMatchObject({
+          ImageId: "test-id",
           Description: "Hello World",
-          Images: [
-            {
-              PublicUrl: "http://example.com/image.png",
-              Dimensions: {
-                Height: 3,
-                Width: 4,
-              },
-            },
-          ],
         });
       });
   });
