@@ -1,1 +1,1 @@
-export { IPublicImageDetails } from "./messages/publicImageDetails";
+export { IBasicImageDetails } from "./messages/basicImageDetails";
