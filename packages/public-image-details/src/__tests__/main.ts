@@ -55,7 +55,7 @@ describe("Handles ImageDetails message over SNS", () => {
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
-        const record = await ImageRecord.queryOne("ImageId")
+        const record = await ImageRecord.queryOne("test-id")
           .eq(imageId)
           .exec();
 
