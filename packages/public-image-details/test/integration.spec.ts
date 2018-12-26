@@ -2,8 +2,8 @@ import { IBasicImageDetails } from "messages-lib/lib";
 
 import AWS from "aws-sdk";
 import axios from "axios";
-import { format } from "date-fns";
 import waitForExpect from "wait-for-expect";
+
 const uuidv4 = require("uuid/v4");
 
 const defaultTimeout = 5000;
