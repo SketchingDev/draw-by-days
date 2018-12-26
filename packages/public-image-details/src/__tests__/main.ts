@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { model } from "dynamoose";
 import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
-import { IPublicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/lib";
 import { ImageModel, imageSchema } from "../image/saveImageDetails";
 import { handler } from "../main";
 import { IRecords } from "../sns/recordTypes";
@@ -35,7 +35,7 @@ describe("Handles ImageDetails message over SNS", () => {
   });
 
   it("Succeeds with publicUrl of image from event", () => {
-    const imageDetails: IPublicImageDetails = {
+    const imageDetails: IBasicImageDetails = {
       description: "Hello World",
       images: [
         {
@@ -63,7 +63,7 @@ describe("Handles ImageDetails message over SNS", () => {
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
-        const record = await ImageRecord.queryOne("DateId")
+        const record = await ImageRecord.queryOne("ImageId")
           .eq(dateIdValue)
           .exec();
 

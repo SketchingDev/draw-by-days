@@ -8,7 +8,7 @@ terraform {
 }
 
 locals {
-  id_column = "DateId"
+  id_column = "ImageId"
 }
 
 resource "aws_dynamodb_table" "image_table" {

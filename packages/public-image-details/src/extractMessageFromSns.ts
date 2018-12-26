@@ -1,8 +1,8 @@
-import { IPublicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/lib";
 import { IRecords } from "./sns/recordTypes";
 
 export const extractMessageFromSns = () => ({
-  before: (handler: { event: IRecords<IPublicImageDetails> }, next: () => void) => {
+  before: (handler: { event: IRecords<IBasicImageDetails> }, next: () => void) => {
     const record = handler.event.Records.shift();
     if (!record) {
       throw new Error("SNS message missing Record");

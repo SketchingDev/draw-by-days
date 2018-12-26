@@ -1,10 +1,10 @@
 import { Context } from "aws-lambda";
-import { IPublicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/lib";
 import middy from "middy";
 import { IRecords } from "../recordTypes";
 import { validateSns } from "../validateSns";
 
-const passThroughHandler = (event: IPublicImageDetails, context: Context, callback: any) => {
+const passThroughHandler = (event: IBasicImageDetails, context: Context, callback: any) => {
   callback(null, event);
 };
 

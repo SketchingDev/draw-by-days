@@ -1,9 +1,10 @@
-import { IPublicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/lib";
 
 import AWS from "aws-sdk";
 import axios from "axios";
 import { format } from "date-fns";
 import waitForExpect from "wait-for-expect";
+const uuidv4 = require("uuid/v4");
 
 const defaultTimeout = 5000;
 jest.setTimeout(defaultTimeout * 4);
@@ -15,27 +16,11 @@ describe("Public Image Details integration test", () => {
     expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
   });
 
-  let dateIdValue: string;
-  let uniqueDescription: string;
-
-  beforeEach(() => {
-    dateIdValue = format(Date.now(), "YYYY-MM-DD");
-    uniqueDescription = Date.now().toString();
-  });
-
   it("Details in event saved to DynamoDB", async () => {
-    const message: IPublicImageDetails = {
-      description: uniqueDescription,
-      images: [
-        {
-          publicUrl: "http://example.com/",
-          dimensions: {
-            width: 1,
-            height: 2,
-          },
-        },
-      ],
-    };
+    const imageId = uuidv4();
+    const description = uuidv4();
+
+    const message: IBasicImageDetails = { imageId, description };
 
     const params = {
       Message: JSON.stringify(message),
@@ -46,7 +31,7 @@ describe("Public Image Details integration test", () => {
 
     let result;
     await waitForExpect(async () => {
-      result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${dateIdValue}`);
+      result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${imageId}`);
 
       // Retry until value unique to the test to propagates to the data-store
       expect(result).toMatchObject({
@@ -54,7 +39,7 @@ describe("Public Image Details integration test", () => {
           Items: [
             {
               Description: {
-                S: uniqueDescription,
+                S: description,
               },
             },
           ],
@@ -68,32 +53,11 @@ describe("Public Image Details integration test", () => {
         Count: 1,
         Items: [
           {
-            Images: {
-              L: [
-                {
-                  M: {
-                    Dimensions: {
-                      M: {
-                        Width: {
-                          N: "1",
-                        },
-                        Height: {
-                          N: "2",
-                        },
-                      },
-                    },
-                    PublicUrl: {
-                      S: "http://example.com/",
-                    },
-                  },
-                },
-              ],
-            },
-            DateId: {
-              S: dateIdValue,
+            ImageId: {
+              S: imageId,
             },
             Description: {
-              S: uniqueDescription,
+              S: description,
             },
           },
         ],
