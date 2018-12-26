@@ -32,24 +32,23 @@ describe("Public Image Details integration test", () => {
     let result;
     await waitForExpect(async () => {
       result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${imageId}`);
-    });
-
-    expect(result).toMatchObject({
-      status: 200,
-      data: {
-        Count: 1,
-        Items: [
-          {
-            ImageId: {
-              S: imageId,
+      expect(result).toMatchObject({
+        status: 200,
+        data: {
+          Count: 1,
+          Items: [
+            {
+              ImageId: {
+                S: imageId,
+              },
+              Description: {
+                S: description,
+              },
             },
-            Description: {
-              S: description,
-            },
-          },
-        ],
-        ScannedCount: 1,
-      },
+          ],
+          ScannedCount: 1,
+        },
+      });
     });
   });
 });
