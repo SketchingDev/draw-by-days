@@ -1,13 +1,13 @@
-import { IBasicImageDetails } from "messages-lib/lib";
-
 import AWS from "aws-sdk";
 import axios from "axios";
+import { IBasicImageDetails } from "messages-lib/lib";
+import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
-
-const uuidv4 = require("uuid/v4");
 
 const defaultTimeout = 5000;
 jest.setTimeout(defaultTimeout * 4);
+
+const sns = new AWS.SNS({ apiVersion: "2010-03-31" });
 
 describe("Public Image Details integration test", () => {
   beforeAll(() => {
@@ -27,42 +27,28 @@ describe("Public Image Details integration test", () => {
       TopicArn: process.env.TF_OUTPUT_subscribed_topic_arn,
     };
 
-    await new AWS.SNS({ apiVersion: "2010-03-31" }).publish(params).promise();
+    await sns.publish(params).promise();
 
     let result;
     await waitForExpect(async () => {
       result = await axios.get(`${process.env.TF_OUTPUT_private_url}/${imageId}`);
-
-      // Retry until value unique to the test to propagates to the data-store
       expect(result).toMatchObject({
+        status: 200,
         data: {
+          Count: 1,
           Items: [
             {
+              ImageId: {
+                S: imageId,
+              },
               Description: {
                 S: description,
               },
             },
           ],
+          ScannedCount: 1,
         },
       });
-    });
-
-    expect(result).toMatchObject({
-      status: 200,
-      data: {
-        Count: 1,
-        Items: [
-          {
-            ImageId: {
-              S: imageId,
-            },
-            Description: {
-              S: description,
-            },
-          },
-        ],
-        ScannedCount: 1,
-      },
     });
   });
 });
