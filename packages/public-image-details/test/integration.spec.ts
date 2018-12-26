@@ -1,13 +1,13 @@
-import { IBasicImageDetails } from "messages-lib/lib";
-
 import AWS from "aws-sdk";
 import axios from "axios";
-import waitForExpect from "wait-for-expect";
-
+import { IBasicImageDetails } from "messages-lib/lib";
 import uuidv4 from "uuid/v4";
+import waitForExpect from "wait-for-expect";
 
 const defaultTimeout = 5000;
 jest.setTimeout(defaultTimeout * 4);
+
+const sns = new AWS.SNS({ apiVersion: "2010-03-31" });
 
 describe("Public Image Details integration test", () => {
   beforeAll(() => {
@@ -27,7 +27,7 @@ describe("Public Image Details integration test", () => {
       TopicArn: process.env.TF_OUTPUT_subscribed_topic_arn,
     };
 
-    await new AWS.SNS({ apiVersion: "2010-03-31" }).publish(params).promise();
+    await sns.publish(params).promise();
 
     let result;
     await waitForExpect(async () => {
