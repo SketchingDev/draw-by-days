@@ -1,11 +1,10 @@
 {
-  "name": "public-image-details",
+  "name": "public-image-store",
   "version": "1.0.3",
   "private": true,
   "dependencies": {
     "aws-sdk": "^2.296.0",
     "date-fns": "^1.30.1",
-    "dynamoose": "^1.2.0",
     "middy": "^0.19.2",
     "object-mapper": "^5.0.0",
     "middy-middleware-lib": "^1.0.0"
@@ -21,7 +20,6 @@
     "jest": "^23.6.0",
     "lambda-tester": "^3.5.0",
     "messages-lib": "^1.0.0",
-    "aws-types-lib": "^1.0.0",
     "prettier": "^1.15.3",
     "request": "^2.88.0",
     "ts-jest": "<23.10.0",
@@ -29,6 +27,7 @@
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.17.0",
     "typescript": "^3.0.1",
+    "typescript-json-schema": "^0.34.0",
     "uuid": "^3.3.2",
     "wait-for-expect": "^1.1.0",
     "webpack": "^4.16.5",
@@ -40,11 +39,11 @@
     "clean": "rimraf dist/*",
     "lint:fix": "tslint --fix -c tslint.json '{src,test}/**/*.ts'",
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
-    "test:start-localdb": "docker-compose -f local-dynamodb.yml up -d",
-    "test:stop-localdb": "docker-compose -f local-dynamodb.yml down",
-    "test": "yarn test:start-localdb && jest src/; eval \"yarn test:stop-localdb && exit $?\"",
+    "test:start-sns": "docker-compose -f local-sns.yml up -d",
+    "test:stop-sns": "docker-compose -f local-sns.yml down",
+    "test": "yarn test:start-sns && jest src/; eval \"yarn test:stop-sns && exit $?\"",
     "test:with-coverage-output": "jest src/ --coverage --coverageReporters=text-lcov",
     "test:integration": "jest test/ --collectCoverage False",
-    "build": "webpack --env.output_filename save-image-metadata.zip"
+    "build": "webpack --env.output_filename public-image-store.zip"
   }
 }

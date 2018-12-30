@@ -26,21 +26,10 @@ export interface ImageModel {
 
 type ResultCallback = Callback<{ result: string; message: string } | null>;
 
-const tableNameMissingError = "TABLE_NAME environment variable is not defined";
-
 export const saveImageDetails = (event: IBasicImageDetails, context: Context, callback: ResultCallback) => {
-  // TODO Will the variable change per container or per invocation?
   const { TABLE_NAME } = process.env;
-  if (!TABLE_NAME) {
-    // tslint:disable-next-line:no-console
-    console.log(tableNameMissingError);
-    callback(tableNameMissingError, undefined);
-    return;
-  }
 
-  // TODO Depending on the answer to the above question this could be moved out of the handler
-  const ImageRecord = model<ImageModel, void>(TABLE_NAME, imageSchema);
-
+  const ImageRecord = model<ImageModel, void>(TABLE_NAME!, imageSchema);
   const imageRecord = new ImageRecord(objectMapper(event, imageModelToSchemaMap));
 
   imageRecord.save().then(

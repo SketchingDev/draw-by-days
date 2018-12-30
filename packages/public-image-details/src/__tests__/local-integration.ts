@@ -1,11 +1,11 @@
-import { format } from "date-fns";
+import { IRecords } from "aws-types-lib";
 import { model } from "dynamoose";
 import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
 import { IBasicImageDetails } from "messages-lib/lib";
-import { ImageModel, imageSchema } from "../image/saveImageDetails";
+import uuidv4 from "uuid/v4";
 import { handler } from "../main";
-import { IRecords } from "../sns/recordTypes";
+import { ImageModel, imageSchema } from "../saveImageDetails";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
@@ -28,6 +28,7 @@ const configureLocalDynamoDB = () => {
 
 describe("Handles ImageDetails message over SNS", () => {
   const tableName = "Test";
+  const imageIdColumnName = "ImageId";
 
   beforeAll(() => {
     configureLocalDynamoDB();
@@ -35,14 +36,15 @@ describe("Handles ImageDetails message over SNS", () => {
   });
 
   it("Succeeds with publicUrl of image from event", () => {
-    const imageId = "test-id";
+    const imageId = uuidv4();
     const imageDetails: IBasicImageDetails = {
       imageId,
       description: "Hello World",
     };
-    const snsEvent: IRecords<string> = {
+    const snsEvent: IRecords = {
       Records: [
         {
+          EventSource: "aws:sns",
           Sns: {
             Message: JSON.stringify(imageDetails),
           },
@@ -55,12 +57,12 @@ describe("Handles ImageDetails message over SNS", () => {
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
-        const record = await ImageRecord.queryOne("test-id")
+        const record = await ImageRecord.queryOne(imageIdColumnName)
           .eq(imageId)
           .exec();
 
         expect(record).toMatchObject({
-          ImageId: "test-id",
+          ImageId: imageId,
           Description: "Hello World",
         });
       });

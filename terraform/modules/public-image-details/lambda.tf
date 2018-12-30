@@ -4,7 +4,7 @@ data "aws_sns_topic" "image_on_platform" {
 
 module "sns_lambda" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=fix-lambda-logging"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
   function_filename = "${var.save_image_metadata_lambda_filename}"
@@ -47,7 +47,7 @@ resource "aws_iam_policy" "dynamodb_write_access" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
+resource "aws_iam_role_policy_attachment" "dynamo" {
   role = "${module.sns_lambda.lambda_function_role}"
   policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
 }

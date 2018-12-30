@@ -1,5 +1,5 @@
 {
-  "name": "image-lib",
+  "name": "middy-middleware-lib",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,10 +8,14 @@
     "@types/node": "^10.9.4",
     "ts-loader": "^4.5.0",
     "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
     "typescript": "^3.0.1"
   },
   "scripts": {
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "build": "tsc"
+  },
+  "dependencies": {
+    "middy": "^0.20.0"
   }
 }

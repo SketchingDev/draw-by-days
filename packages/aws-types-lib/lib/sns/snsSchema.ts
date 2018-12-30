@@ -1,5 +1,3 @@
-import { validator } from "middy/middlewares";
-
 export const snsSchema = {
   properties: {
     Records: {
@@ -87,8 +85,3 @@ export const snsSchema = {
   required: ["Records"],
   type: "object",
 };
-
-export const validateSns = () =>
-  validator({
-    inputSchema: snsSchema,
-  });
