@@ -239,14 +239,13 @@ workflows:
       - build_public_image_store:
           requires:
             - test_public_image_store
-            - deploy_public_image_store:
-                requires:
-                  - build_public_image_store
-            - test_integration_public_image_store:
-                requires:
-                  - deploy_public_image_store
-                filters:
-                  branches:
-                    ignore:
-                      - master
-
+      - deploy_public_image_store:
+          requires:
+            - build_public_image_store
+      - test_integration_public_image_store:
+          requires:
+            - deploy_public_image_store
+          filters:
+            branches:
+              ignore:
+                - master
