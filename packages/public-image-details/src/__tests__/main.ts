@@ -45,7 +45,6 @@ describe("Handles ImageDetails message over SNS", () => {
   beforeAll(async () => {
     configureLocalDynamoDB();
     await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
-    process.env.TABLE_NAME = tableName;
   });
 
   it("Succeeds with publicUrl of image from event", () => {
@@ -66,6 +65,8 @@ describe("Handles ImageDetails message over SNS", () => {
     };
 
     const ImageRecord = model<ImageModel, { DateId: string }>(tableName, imageSchema);
+
+    process.env.TABLE_NAME = tableName;
 
     return lambdaTester(handler)
       .event(snsEvent)
