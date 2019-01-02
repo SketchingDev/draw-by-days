@@ -86,11 +86,13 @@ jobs:
   ## Public Image Details
 
   test_public_image_details:
-    executor: node-build-environment
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+      - image: amazon/dynamodb-local
     steps:
       - checkout
       - yarn-install-with-cache
-      - setup_remote_docker
       - yarn-build-then-test:
           package_name: public-image-details
 
