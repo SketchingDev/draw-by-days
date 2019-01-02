@@ -26,6 +26,10 @@ const configureLocalDynamoDB = () => {
   dynamoose.local("http://127.0.0.1:8000");
 };
 
+const jestDefaultTimeout = 5000;
+const waitForLocalStackTimeout = 10000;
+jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
+
 describe("Handles ImageDetails message over SNS", () => {
   const tableName = "Test";
   const imageIdColumnName = "ImageId";
