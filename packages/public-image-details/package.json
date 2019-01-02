@@ -42,7 +42,7 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "test:start-localdb": "docker-compose -f local-dynamodb.yml up -d",
     "test:stop-localdb": "docker-compose -f local-dynamodb.yml down",
-    "test": "yarn test:start-localdb && docker ps && jest src/; eval \"yarn test:stop-localdb && exit $?\"",
+    "test": "yarn test:start-localdb && docker ps && sleep 20 && jest src/; eval \"yarn test:stop-localdb && exit $?\"",
     "test:with-coverage-output": "jest src/ --coverage --coverageReporters=text-lcov",
     "test:integration": "jest test/ --collectCoverage False",
     "build": "webpack --env.output_filename save-image-metadata.zip"
