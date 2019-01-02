@@ -4,11 +4,19 @@ import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
 import { IBasicImageDetails } from "messages-lib/lib";
 import uuidv4 from "uuid/v4";
+import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
 import { ImageModel, imageSchema } from "../saveImageDetails";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
+
+const dynamodbRespond = async () => {
+  await dynamoose
+    .ddb()
+    .listTables()
+    .promise();
+};
 
 const expectMessageProperty = (expectedMessage: string) => {
   return (item: { message: string }) => {
@@ -34,8 +42,9 @@ describe("Handles ImageDetails message over SNS", () => {
   const tableName = "Test";
   const imageIdColumnName = "ImageId";
 
-  beforeAll(() => {
+  beforeAll(async () => {
     configureLocalDynamoDB();
+    await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
     process.env.TABLE_NAME = tableName;
   });
 
