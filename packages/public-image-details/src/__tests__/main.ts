@@ -32,7 +32,7 @@ const configureLocalDynamoDB = () => {
     region: "us-east-1",
   });
 
-  dynamoose.local("http://0.0.0.0:8000");
+  dynamoose.local("http://0.0.0.0:80");
 };
 
 const jestDefaultTimeout = 5000;
