@@ -12,6 +12,7 @@ import { ImageModel, imageSchema } from "../saveImageDetails";
 require("lambda-tester").noVersionCheck();
 
 const dynamodbRespond = async () => {
+  console.log("Attempting to connect");
   await dynamoose
     .ddb()
     .listTables()
@@ -31,11 +32,11 @@ const configureLocalDynamoDB = () => {
     region: "us-east-1",
   });
 
-  dynamoose.local("http://127.0.0.1:8000");
+  dynamoose.local("http://0.0.0.0:8000");
 };
 
 const jestDefaultTimeout = 5000;
-const waitForLocalStackTimeout = 10000;
+const waitForLocalStackTimeout = 30000;
 jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
 
 describe("Handles ImageDetails message over SNS", () => {
@@ -45,6 +46,7 @@ describe("Handles ImageDetails message over SNS", () => {
   beforeAll(async () => {
     configureLocalDynamoDB();
     await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
+    console.log("Successfully connected to DynamoDB instance");
   });
 
   it("Succeeds with publicUrl of image from event", () => {
