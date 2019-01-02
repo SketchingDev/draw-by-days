@@ -212,14 +212,6 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - test_website
-      - build_website:
-          requires:
-            - test_website
-      - deploy_website:
-          requires:
-            - build_website
-
       - test_public_image_details
       - build_public_image_details:
           requires:
@@ -230,21 +222,6 @@ workflows:
       - test_integration_public_image_details:
           requires:
             - deploy_public_image_details
-          filters:
-            branches:
-              ignore:
-                - master
-
-      - test_public_image_store
-      - build_public_image_store:
-          requires:
-            - test_public_image_store
-      - deploy_public_image_store:
-          requires:
-            - build_public_image_store
-      - test_integration_public_image_store:
-          requires:
-            - deploy_public_image_store
           filters:
             branches:
               ignore:
