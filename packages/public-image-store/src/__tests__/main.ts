@@ -3,7 +3,6 @@ import { QueueArn } from "aws-sdk/clients/s3";
 import { ReceiveMessageRequest, ReceiveMessageResult } from "aws-sdk/clients/sqs";
 import { IRecords } from "aws-types-lib";
 import lambdaTester = require("lambda-tester");
-import { IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
@@ -65,7 +64,7 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
           s3: {
             bucket: {
               name: "draw-by-days-ci-public-images",
-              arn: "arn:aws:s3:::draw-by-days-ci-public-images",
+              arn: "arn:aws:s3:::test-bucket",
             },
             object: {
               key: "florence-1129553.jpg",

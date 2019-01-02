@@ -1,10 +1,10 @@
+import { snsSchema } from "aws-types-lib";
 import middy from "middy";
 import { envVarValidator, logEvent } from "middy-middleware-lib";
 import { validator } from "middy/middlewares";
 import { saveImageDetails } from "./saveImageDetails";
 import { extractFirstSnsRecord } from "./sns/extractFirstSnsRecord";
 import { extractParsedJsonSnsMessage } from "./sns/extractParsedJsonSnsMessage";
-import { snsSchema } from "aws-types-lib";
 
 const requiredEnvVariables = { Names: ["TABLE_NAME"] };
 
