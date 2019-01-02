@@ -20,6 +20,7 @@
     "jest": "^23.6.0",
     "lambda-tester": "^3.5.0",
     "messages-lib": "^1.0.0",
+    "aws-types-lib": "^1.0.0",
     "prettier": "^1.15.3",
     "request": "^2.88.0",
     "ts-jest": "<23.10.0",
