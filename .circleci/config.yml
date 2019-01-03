@@ -150,7 +150,12 @@ jobs:
   ## Public Image Store
 
   test_public_image_store:
-    executor: node-build-environment
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+      - image: localstack/localstack
+        environment:
+          SERVICES: sns,sqs
     steps:
       - checkout
       - setup_remote_docker
@@ -214,6 +219,14 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
+      - test_website
+      - build_website:
+          requires:
+            - test_website
+      - deploy_website:
+          requires:
+            - build_website
+
       - test_public_image_details
       - build_public_image_details:
           requires:
@@ -224,6 +237,21 @@ workflows:
       - test_integration_public_image_details:
           requires:
             - deploy_public_image_details
+          filters:
+            branches:
+              ignore:
+                - master
+
+      - test_public_image_store
+      - build_public_image_store:
+          requires:
+            - test_public_image_store
+      - deploy_public_image_store:
+          requires:
+            - build_public_image_store
+      - test_integration_public_image_store:
+          requires:
+            - deploy_public_image_store
           filters:
             branches:
               ignore:
