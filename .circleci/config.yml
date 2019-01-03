@@ -217,7 +217,8 @@ jobs:
 
 workflows:
   version: 2
-  test_build_deploy:
+  
+  website:
     jobs:
       - test_website
       - build_website:
@@ -227,6 +228,8 @@ workflows:
           requires:
             - build_website
 
+  public_image_details:
+    jobs:
       - test_public_image_details
       - build_public_image_details:
           requires:
@@ -242,6 +245,8 @@ workflows:
               ignore:
                 - master
 
+  public_image_store:
+    jobs:
       - test_public_image_store
       - build_public_image_store:
           requires:
