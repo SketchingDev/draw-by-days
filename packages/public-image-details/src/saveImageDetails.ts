@@ -24,21 +24,38 @@ export interface ImageModel {
   Description: string;
 }
 
+// const getTableName = () => process.env.TABLE_NAME!;
+const createImageRecordThing = () => {
+  const tableName = process.env.TABLE_NAME!;
+  return model<ImageModel, void>(tableName, imageSchema);
+};
+
+export const deps = {
+  init: () => {
+    return Promise.resolve({ imageRecord: createImageRecordThing() });
+  },
+};
+//
+// export const deps = {
+//   init: () => {
+//     return Promise.resolve(getTableName()).then((tableName: string) => ({
+//       imageRecord: createImageRecordThing(tableName),
+//     }));
+//   },
+// };
+
 type ResultCallback = Callback<{ result: string; message: string } | null>;
 
-export const saveImageDetails = (event: IBasicImageDetails, context: Context, callback: ResultCallback) => {
-  const { TABLE_NAME } = process.env;
-
-  const ImageRecord = model<ImageModel, void>(TABLE_NAME!, imageSchema);
-  const imageRecord = new ImageRecord(objectMapper(event, imageModelToSchemaMap));
-
-  imageRecord.save().then(
-    (imageModel: Model<ImageModel>) => {
-      const item = imageModel.originalItem() as ImageModel;
-      callback(null, { result: "success", message: `Details saved for ${item.ImageId}` });
-    },
-    (err: any) => {
-      callback(err, undefined);
-    },
-  );
-};
+export const saveImageDetails = (event: IBasicImageDetails, context: Context, callback: ResultCallback) =>
+  deps
+    .init()
+    .then(d => new d.imageRecord(objectMapper(event, imageModelToSchemaMap)).save())
+    .then(
+      (imageModel: Model<ImageModel>) => {
+        const item = imageModel.originalItem() as ImageModel;
+        callback(null, { result: "success", message: `Details saved for ${item.ImageId}` });
+      },
+      (err: any) => {
+        callback(err, undefined);
+      },
+    );
