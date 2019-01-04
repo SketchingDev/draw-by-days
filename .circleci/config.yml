@@ -92,6 +92,7 @@ jobs:
       - image: amazon/dynamodb-local
     steps:
       - checkout
+      - setup_remote_docker
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: public-image-details
