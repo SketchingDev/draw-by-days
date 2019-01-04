@@ -6,18 +6,17 @@ import { IBasicImageDetails } from "messages-lib/lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
-import { ImageModel, imageSchema } from "../saveImageDetails";
+import { IImage } from "../storage/image";
+import { imageSchema } from "../storage/imageSchema";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
 
-const dynamodbRespond = async () => {
-  console.log("Attempting to connect");
+const dynamodbRespond = async () =>
   await dynamoose
     .ddb()
     .listTables()
     .promise();
-};
 
 const expectMessageProperty = (expectedMessage: string) => {
   return (item: { message: string }) => {
@@ -46,7 +45,6 @@ describe("Handles ImageDetails message over SNS", () => {
   beforeAll(async () => {
     configureLocalDynamoDB();
     await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
-    console.log("Successfully connected to DynamoDB instance");
   });
 
   it("Succeeds with publicUrl of image from event", () => {
@@ -66,7 +64,7 @@ describe("Handles ImageDetails message over SNS", () => {
       ],
     };
 
-    const ImageRecord = model<ImageModel, { DateId: string }>(tableName, imageSchema);
+    const ImageRecord = model<IImage, { DateId: string }>(tableName, imageSchema);
 
     process.env.TABLE_NAME = tableName;
 

@@ -1,14 +1,14 @@
 import middy from "middy";
 import { envVarValidator, logEvent } from "middy-middleware-lib";
 import { validator } from "middy/middlewares";
-import { saveImageDetails } from "./saveImageDetails";
+import { saveImageDetailsHandler } from "./saveImageDetailsHandler";
 import { extractFirstSnsRecord } from "./sns/extractFirstSnsRecord";
 import { extractParsedJsonSnsMessage } from "./sns/extractParsedJsonSnsMessage";
 import { snsSchema } from "./sns/snsSchema";
 
 const requiredEnvVariables = { Names: ["TABLE_NAME"] };
 
-export const handler = middy(saveImageDetails)
+export const handler = middy(saveImageDetailsHandler)
   .use(logEvent())
   .use(validator({ inputSchema: snsSchema }))
   .use(envVarValidator(requiredEnvVariables))
