@@ -91,6 +91,7 @@ jobs:
       - image: circleci/node:8-browsers
       - image: amazon/dynamodb-local
     steps:
+      - setup_remote_docker
       - checkout
       - yarn-install-with-cache
       - yarn-build-then-test:
@@ -157,6 +158,7 @@ jobs:
         environment:
           SERVICES: sns,sqs
     steps:
+      - setup_remote_docker
       - checkout
       - yarn-install-with-cache
       - yarn-build-then-test:
