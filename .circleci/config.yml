@@ -92,7 +92,6 @@ jobs:
       - image: amazon/dynamodb-local
     steps:
       - checkout
-      - setup_remote_docker
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: public-image-details
@@ -159,7 +158,6 @@ jobs:
           SERVICES: sns,sqs
     steps:
       - checkout
-      - setup_remote_docker
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: public-image-store
@@ -214,7 +212,6 @@ jobs:
             echo "Loaded env file"
             cat /tmp/workspace/terraform/environments/env.outputs
             yarn test:integration --scope public-image-store
-
 
 workflows:
   version: 2

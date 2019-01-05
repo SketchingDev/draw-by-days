@@ -10,12 +10,17 @@ import { handler } from "../main";
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
 
-const region = "us-east-1";
 const snsEndpoint = "http://0.0.0.0:4575";
 const sqsEndpoint = "http://0.0.0.0:4576";
 
-const sns = new AWS.SNS({ apiVersion: "2010-03-31", region, endpoint: snsEndpoint });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05", region, endpoint: sqsEndpoint });
+AWS.config.update({
+  accessKeyId: "AKID",
+  secretAccessKey: "SECRET",
+  region: "us-east-1",
+});
+
+const sns = new AWS.SNS({ apiVersion: "2010-03-31", endpoint: snsEndpoint });
+const sqs = new AWS.SQS({ apiVersion: "2012-11-05", endpoint: sqsEndpoint });
 
 const snsAndSqsToRespond = async () => await Promise.all([sns.listTopics().promise(), sqs.listQueues().promise()]);
 
