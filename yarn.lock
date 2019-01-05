@@ -670,7 +670,7 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
-"@puresec/function-shield@^1.1.1":
+"@puresec/function-shield@^1.1.1", "@puresec/function-shield@^1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@puresec/function-shield/-/function-shield-1.2.2.tgz#9f49d6105f47c01a2830c8c2a3936de8a4d3b1aa"
   integrity sha512-LgxSpoluUo1SoJqSvz57W7+JBb57hIfFut3TIJ5Z/E3Bue+yguORhLdW+p+BOfmfRdvBDdK6Du41CeFi3g31Aw==
@@ -5291,7 +5291,7 @@ glob@7.1.2:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.3, glob@^7.0.5, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3:
+glob@^7.0.3, glob@^7.0.5, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@~7.1.2:
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.3.tgz#3960832d3f1574108342dafd3a67b332c0969df1"
   integrity sha512-vcfuiIxogLV4DlGBHIUOwI0IbrJ8HWPc4MU7HzviGeNho/UJDfi6B5p3sHeWIQ0KGIU0Jpxi5ZHxemQfLkkAwQ==
@@ -7501,7 +7501,7 @@ left-pad@^1.3.0:
   resolved "https://registry.yarnpkg.com/left-pad/-/left-pad-1.3.0.tgz#5b8a3a7765dfe001261dde915589e782f8c94d1e"
   integrity sha512-XI5MPzVNApjAyhQzphX8BkmKsKUxD4LdyK24iZeQGinBN9yTQT3bFlCBy/aVx2HrNcqQGsdot8ghrjyrvMCoEA==
 
-lerna@^3.3.2, lerna@^3.6.0:
+lerna@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/lerna/-/lerna-3.6.0.tgz#b6616873fa038ee1dae514e04322c191ff71a369"
   integrity sha512-iQFAgrgtv18SI5LtQBBca0WVeYvk2r8eYgiEQtcZBT63T5R9RVv+snsviIiOp0z6gD43tcyiWXiLvBdp1IY/Rg==
@@ -8141,6 +8141,25 @@ middy@^0.19.2:
   integrity sha512-JNDiDM3vFUSLSaHLgVBzXzZPEWdnHNE28OBxnfrptwSrQFwOImkVSiGJYeo+1LGUC9bN1BPLGGU6AFHuNg7bAg==
   dependencies:
     "@puresec/function-shield" "^1.1.1"
+    "@types/aws-lambda" "^8.10.1"
+    "@types/http-errors" "^1.6.1"
+    ajv "^6.0.0"
+    ajv-i18n "^3.1.0"
+    ajv-keywords "^3.0.0"
+    content-type "^1.0.4"
+    http-errors "^1.6.2"
+    json-mask "^0.3.8"
+    negotiator "^0.6.1"
+    once "^1.4.0"
+    qs "^6.5.0"
+    querystring "^0.2.0"
+
+middy@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/middy/-/middy-0.20.0.tgz#558ec67b4d3ddee27a19a99959a8c3228cbcee22"
+  integrity sha512-KgJW2XuxAqv3wA7FzFVv3D/RbdM9F08UmZ2jDDOaoyTh4gDjTXq7dt1SmaoVDq1I+22LbEUEnoMtQViqN/UzuA==
+  dependencies:
+    "@puresec/function-shield" "^1.2.2"
     "@types/aws-lambda" "^8.10.1"
     "@types/http-errors" "^1.6.1"
     ajv "^6.0.0"
@@ -11861,6 +11880,16 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+typescript-json-schema@^0.34.0:
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/typescript-json-schema/-/typescript-json-schema-0.34.0.tgz#25c6effeee9e885771718f510bf03122f8624e18"
+  integrity sha512-BCTqkHXEIOcI78kipp6tEMUFS8b5dbWIp8tpaPC5FFjmK7iFsE5qWS6L6S+lmt71+APp+RlapXb8EEyqkmOt/w==
+  dependencies:
+    glob "~7.1.2"
+    json-stable-stringify "^1.0.1"
+    typescript "^3.0.1"
+    yargs "^12.0.1"
 
 typescript@^3.0.1, typescript@latest:
   version "3.2.2"

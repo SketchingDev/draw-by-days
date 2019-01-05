@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "lerna run clean --stream",
     "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
     "test:with-coverage": "lerna run test:with-coverage --stream",

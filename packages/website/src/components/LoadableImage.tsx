@@ -1,6 +1,6 @@
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { IImage } from "image-lib";
 import * as React from "react";
+import { IImage } from "../image/DummyImageApiClient";
 
 export interface ILoadableImage {
     requestState: RequestState;

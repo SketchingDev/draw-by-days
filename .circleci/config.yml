@@ -86,11 +86,14 @@ jobs:
   ## Public Image Details
 
   test_public_image_details:
-    executor: node-build-environment
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+      - image: amazon/dynamodb-local
     steps:
+      - setup_remote_docker
       - checkout
       - yarn-install-with-cache
-      - setup_remote_docker
       - yarn-build-then-test:
           package_name: public-image-details
 
@@ -145,9 +148,77 @@ jobs:
             cat /tmp/workspace/terraform/environments/env.outputs
             yarn test:integration --scope public-image-details
 
+  ## Public Image Store
+
+  test_public_image_store:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+      - image: localstack/localstack
+        environment:
+          SERVICES: sns,sqs
+    steps:
+      - setup_remote_docker
+      - checkout
+      - yarn-install-with-cache
+      - yarn-build-then-test:
+          package_name: public-image-store
+
+  build_public_image_store:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Build
+          command: yarn build --scope public-image-store --include-filtered-dependencies
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/public-image-store/dist/public-image-store.zip
+
+  deploy_public_image_store:
+    executor: terragrunt-deploy-environment
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - deploy:
+          name: Deploy public image store
+          command: |
+            [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
+            cd $ENV/public-image-store
+
+            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/public-image-store/dist/public-image-store.zip
+            terragrunt apply-all --terragrunt-non-interactive -auto-approve
+
+            echo "export AWS_REGION=us-east-1" > ../../env.outputs
+            terragrunt-output-to-env.sh subscribed_topic_arn bucket_name >> ../../env.outputs
+          working_directory: terraform/environments/
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - terraform/environments/env.outputs
+
+  test_integration_public_image_store:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - yarn-install-with-cache
+      - run:
+          name: Integration tests
+          command: |
+            source /tmp/workspace/terraform/environments/env.outputs
+            echo "Loaded env file"
+            cat /tmp/workspace/terraform/environments/env.outputs
+            yarn test:integration --scope public-image-store
+
 workflows:
   version: 2
-  test_build_deploy:
+
+  website:
     jobs:
       - test_website
       - build_website:
@@ -157,6 +228,8 @@ workflows:
           requires:
             - build_website
 
+  public_image_details:
+    jobs:
       - test_public_image_details
       - build_public_image_details:
           requires:
@@ -172,3 +245,19 @@ workflows:
               ignore:
                 - master
 
+  public_image_store:
+    jobs:
+      - test_public_image_store
+      - build_public_image_store:
+          requires:
+            - test_public_image_store
+      - deploy_public_image_store:
+          requires:
+            - build_public_image_store
+      - test_integration_public_image_store:
+          requires:
+            - deploy_public_image_store
+          filters:
+            branches:
+              ignore:
+                - master

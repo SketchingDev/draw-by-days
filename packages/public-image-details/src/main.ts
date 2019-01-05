@@ -1,14 +1,18 @@
 import middy from "middy";
-import { extractMessageFromSns } from "./extractMessageFromSns";
-import { saveImageDetails } from "./image/saveImageDetails";
-import { logEvent } from "./logEvent";
-import { parseJsonMessagesInSns } from "./sns/parseJsonMessagesInSns";
-import { validateSns } from "./sns/validateSns";
+import { envVarValidator, logEvent } from "middy-middleware-lib";
+import { validator } from "middy/middlewares";
+import { saveImageDetailsHandler } from "./saveImageDetailsHandler";
+import { extractFirstSnsRecord } from "./sns/extractFirstSnsRecord";
+import { extractParsedJsonSnsMessage } from "./sns/extractParsedJsonSnsMessage";
+import { snsSchema } from "./sns/snsSchema";
 
-export const handler = middy(saveImageDetails)
+const requiredEnvVariables = { Names: ["TABLE_NAME"] };
+
+export const handler = middy(saveImageDetailsHandler)
   .use(logEvent())
-  .use(validateSns()) // TODO If Terraform is filtering by SNS subject then I shouldn't need to worry about this
-  .use(parseJsonMessagesInSns())
-  .use(extractMessageFromSns());
+  .use(validator({ inputSchema: snsSchema }))
+  .use(envVarValidator(requiredEnvVariables))
+  .use(extractFirstSnsRecord())
+  .use(extractParsedJsonSnsMessage());
 
 module.exports = { handler };

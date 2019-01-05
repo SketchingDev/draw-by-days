@@ -1,14 +1,22 @@
-import { format } from "date-fns";
+import { IRecords } from "aws-types-lib";
 import { model } from "dynamoose";
 import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
 import { IBasicImageDetails } from "messages-lib/lib";
-import { ImageModel, imageSchema } from "../image/saveImageDetails";
+import uuidv4 from "uuid/v4";
+import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
-import { IRecords } from "../sns/recordTypes";
+import { IImage } from "../storage/image";
+import { imageSchema } from "../storage/imageSchema";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
+
+const dynamodbRespond = async () =>
+  await dynamoose
+    .ddb()
+    .listTables()
+    .promise();
 
 const expectMessageProperty = (expectedMessage: string) => {
   return (item: { message: string }) => {
@@ -23,26 +31,32 @@ const configureLocalDynamoDB = () => {
     region: "us-east-1",
   });
 
-  dynamoose.local("http://127.0.0.1:8000");
+  dynamoose.local("http://0.0.0.0:8000");
 };
+
+const jestDefaultTimeout = 5000;
+const waitForLocalStackTimeout = 30000;
+jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
 
 describe("Handles ImageDetails message over SNS", () => {
   const tableName = "Test";
+  const imageIdColumnName = "ImageId";
 
-  beforeAll(() => {
+  beforeAll(async () => {
     configureLocalDynamoDB();
-    process.env.TABLE_NAME = tableName;
+    await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
   });
 
   it("Succeeds with publicUrl of image from event", () => {
-    const imageId = "test-id";
+    const imageId = uuidv4();
     const imageDetails: IBasicImageDetails = {
       imageId,
       description: "Hello World",
     };
-    const snsEvent: IRecords<string> = {
+    const snsEvent: IRecords = {
       Records: [
         {
+          EventSource: "aws:sns",
           Sns: {
             Message: JSON.stringify(imageDetails),
           },
@@ -50,17 +64,19 @@ describe("Handles ImageDetails message over SNS", () => {
       ],
     };
 
-    const ImageRecord = model<ImageModel, { DateId: string }>(tableName, imageSchema);
+    const ImageRecord = model<IImage, { DateId: string }>(tableName, imageSchema);
+
+    process.env.TABLE_NAME = tableName;
 
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
-        const record = await ImageRecord.queryOne("test-id")
+        const record = await ImageRecord.queryOne(imageIdColumnName)
           .eq(imageId)
           .exec();
 
         expect(record).toMatchObject({
-          ImageId: "test-id",
+          ImageId: imageId,
           Description: "Hello World",
         });
       });

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "commonjs",
+    "target": "es2018",
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "lib": ["es2018", "esnext.asynciterable"],
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules"]
+}
