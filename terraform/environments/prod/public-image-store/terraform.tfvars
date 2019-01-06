@@ -13,4 +13,4 @@ terragrunt = {
 }
 
 aws_region = "us-east-1"
-namespace = "draw-by-days"
+namespace = "draw-by-days-prod"
