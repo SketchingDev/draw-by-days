@@ -13,6 +13,10 @@ import { imageSchema } from "../storage/imageSchema";
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
 
+const defaultJestTimeout = 5 * 1000;
+const localStackStartupTimeout = 10 * 1000;
+jest.setTimeout(defaultJestTimeout + localStackStartupTimeout);
+
 const dynamodbRespond = async () =>
   await dynamoose
     .ddb()
@@ -35,17 +39,13 @@ const configureLocalDynamoDB = () => {
   dynamoose.local("http://0.0.0.0:4569");
 };
 
-const jestDefaultTimeout = 5000;
-const waitForLocalStackTimeout = 30000;
-jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
-
 describe("Handles ImageDetails message over SNS", () => {
   const tableName = "Test";
   const imageIdColumnName = "ImageId";
 
   beforeAll(async () => {
     configureLocalDynamoDB();
-    await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
+    await waitForExpect(dynamodbRespond, localStackStartupTimeout);
 
     deps.init = (): Promise<IDeps> =>
       Promise.resolve({

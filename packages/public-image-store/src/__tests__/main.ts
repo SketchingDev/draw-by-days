@@ -1,8 +1,9 @@
 import AWS from "aws-sdk";
 import { QueueArn } from "aws-sdk/clients/s3";
-import { ReceiveMessageRequest, ReceiveMessageResult } from "aws-sdk/clients/sqs";
+import { ReceiveMessageResult } from "aws-sdk/clients/sqs";
 import { IRecords } from "aws-types-lib";
 import lambdaTester = require("lambda-tester");
+import { IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
@@ -11,21 +12,25 @@ import { deps, IDeps } from "../produceImageAvailableEventHandler";
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
 
-const snsEndpoint = "http://0.0.0.0:4575";
-const sqsEndpoint = "http://0.0.0.0:4576";
+const defaultJestTimeout = 5 * 1000;
+const localStackStartupTimeout = 10 * 1000;
+jest.setTimeout(defaultJestTimeout + localStackStartupTimeout);
 
-AWS.config.update({
-  accessKeyId: "AKID",
-  secretAccessKey: "SECRET",
-  region: "us-east-1",
-});
+const localSnsEndpoint = "http://0.0.0.0:4575";
+const localSqsEndpoint = "http://0.0.0.0:4576";
 
-const sns = new AWS.SNS({ apiVersion: "2010-03-31", endpoint: snsEndpoint });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05", endpoint: sqsEndpoint });
+const configureForLocalEnvironment = () => {
+  AWS.config.update({
+    accessKeyId: "AKID",
+    secretAccessKey: "SECRET",
+    region: "us-east-1",
+  });
+};
 
-const snsAndSqsToRespond = async () => await Promise.all([sns.listTopics().promise(), sqs.listQueues().promise()]);
+const snsAndSqsToRespond = (sns: AWS.SNS, sqs: AWS.SQS) => async () =>
+  await Promise.all([sns.listTopics().promise(), sqs.listQueues().promise()]);
 
-const getQueueArn = async (queueUrl: string) => {
+const getQueueArn = async (sqs: AWS.SQS, queueUrl: string) => {
   const queueAttributesParams = {
     QueueUrl: queueUrl,
     AttributeNames: ["QueueArn"],
@@ -34,15 +39,17 @@ const getQueueArn = async (queueUrl: string) => {
   return queueAttributes.Attributes!.QueueArn;
 };
 
-const jestDefaultTimeout = 5000;
-const waitForLocalStackTimeout = 10000;
-jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
-
 describe("Produces ImageAvailable event from S3 'create' event", () => {
-  let receiveMessagesParams: ReceiveMessageRequest;
+  let sns: AWS.SNS;
+  let sqs: AWS.SQS;
+  let sqsQueueUrl: string;
 
   beforeAll(async () => {
-    await waitForExpect(snsAndSqsToRespond, waitForLocalStackTimeout);
+    configureForLocalEnvironment();
+    sns = new AWS.SNS({ apiVersion: "2010-03-31", endpoint: localSnsEndpoint });
+    sqs = new AWS.SQS({ apiVersion: "2012-11-05", endpoint: localSqsEndpoint });
+
+    await waitForExpect(snsAndSqsToRespond(sns, sqs), localStackStartupTimeout);
   });
 
   beforeEach(async () => {
@@ -52,16 +59,17 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
     const subscribeParams = {
       Protocol: "sqs",
       TopicArn: createdTopic.TopicArn!,
-      Endpoint: await getQueueArn(createdQueue.QueueUrl!),
+      Endpoint: await getQueueArn(sqs, createdQueue.QueueUrl!),
     };
     await sns.subscribe(subscribeParams).promise();
 
-    receiveMessagesParams = { QueueUrl: createdQueue.QueueUrl! };
+    sqsQueueUrl = createdQueue.QueueUrl!;
 
     deps.init = (): Promise<IDeps> =>
       Promise.resolve({
         sns,
         snsTopicArn: createdTopic.TopicArn!,
+        bucketPublicUrl: "http://example.com/",
       });
   });
 
@@ -76,7 +84,7 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
               arn: "arn:aws:s3:::test-bucket",
             },
             object: {
-              key: "florence-1129553.jpg",
+              key: "florence.jpg",
               size: 1642847,
               eTag: "8e81bdf6f079dd056f5f548b0a0e039d",
             },
@@ -90,7 +98,7 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
       .expectResult(async () => {
         let response: ReceiveMessageResult;
         await waitForExpect(async () => {
-          response = await sqs.receiveMessage(receiveMessagesParams).promise();
+          response = await sqs.receiveMessage({ QueueUrl: sqsQueueUrl }).promise();
           expect(response.Messages).toBeDefined();
         });
 
@@ -101,7 +109,10 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
         const message = messages[0];
         const body = JSON.parse(message.Body!);
 
-        expect(body.Message).toEqual("Hello World");
+        const messageInBody: IImageSource = JSON.parse(body.Message);
+        expect(messageInBody).toMatchObject({
+          publicUrl: "http://example.com/florence.jpg",
+        });
       });
   });
 });

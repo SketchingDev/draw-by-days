@@ -1,13 +1,16 @@
 import AWS from "aws-sdk";
 import { ReceiveMessageResult } from "aws-sdk/clients/sqs";
+import axios from "axios";
+import { IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 
-const waitForLocalStackTimeout = 60000;
-// const defaultTimeout = 5000;
-jest.setTimeout(waitForLocalStackTimeout * 4);
+const waitForSqsMessageTimeout = 10 * 1000;
+jest.setTimeout(waitForSqsMessageTimeout * 2);
 
-const getQueueArn = async (queueUrl: string) => {
+const sqsPollInterval = 3 * 1000;
+
+const getQueueArn = async (sqs: AWS.SQS, queueUrl: string) => {
   const queueAttributesParams = {
     QueueUrl: queueUrl,
     AttributeNames: ["QueueArn"],
@@ -16,21 +19,30 @@ const getQueueArn = async (queueUrl: string) => {
   return queueAttributes.Attributes!.QueueArn;
 };
 
-const sns = new AWS.SNS({ apiVersion: "2010-03-31" });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
-const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+const assertInputEnvVariablesSet = () => {
+  expect(process.env.AWS_REGION).toBeDefined();
+  expect(process.env.TF_OUTPUT_bucket_name).toBeDefined();
+  expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
+};
 
 describe("Public Image Store integration test", () => {
+  let sns: AWS.SNS;
+  let sqs: AWS.SQS;
+  let s3: AWS.S3;
+
   beforeAll(() => {
-    expect(process.env.AWS_REGION).toBeDefined();
-    expect(process.env.TF_OUTPUT_bucket_name).toBeDefined();
-    expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
+    sns = new AWS.SNS({ apiVersion: "2010-03-31" });
+    sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+    s3 = new AWS.S3({ apiVersion: "2006-03-01" });
   });
 
   let createdBucketKey: AWS.S3.ManagedUpload.SendData;
   let subscription: AWS.SNS.SubscribeResponse;
   let createdQueue: AWS.SQS.CreateQueueResult;
+
   beforeEach(async () => {
+    assertInputEnvVariablesSet();
+
     createdQueue = await sqs.createQueue({ QueueName: uuidv4() }).promise();
 
     const policyDocument = {
@@ -41,7 +53,7 @@ describe("Public Image Store integration test", () => {
             AWS: "*",
           },
           Action: "SQS:SendMessage",
-          Resource: await getQueueArn(createdQueue.QueueUrl!),
+          Resource: await getQueueArn(sqs, createdQueue.QueueUrl!),
           Condition: {
             ArnEquals: {
               "aws:SourceArn": process.env.TF_OUTPUT_subscribed_topic_arn,
@@ -51,40 +63,41 @@ describe("Public Image Store integration test", () => {
       ],
     };
 
-    const paramsTwo = {
+    const setSqsPolicyParams = {
       QueueUrl: createdQueue.QueueUrl!,
       Attributes: {
         Policy: JSON.stringify(policyDocument),
       },
     };
-    await sqs.setQueueAttributes(paramsTwo).promise();
+    await sqs.setQueueAttributes(setSqsPolicyParams).promise();
   });
 
   afterEach(async () => {
     await sns.unsubscribe({ SubscriptionArn: subscription.SubscriptionArn! }).promise();
     await sqs.deleteQueue({ QueueUrl: createdQueue.QueueUrl! }).promise();
 
-    const params = {
+    const deleteObjectParams = {
       Bucket: createdBucketKey.Bucket,
       Key: createdBucketKey.Key,
     };
-    await s3.deleteObject(params).promise();
+    await s3.deleteObject(deleteObjectParams).promise();
   });
 
-  it("Details in event saved to DynamoDB", async () => {
+  it("Event published containing public URL to S3 object", async () => {
     const subscribeParams = {
       Protocol: "sqs",
       TopicArn: process.env.TF_OUTPUT_subscribed_topic_arn!,
-      Endpoint: await getQueueArn(createdQueue.QueueUrl!),
+      Endpoint: await getQueueArn(sqs, createdQueue.QueueUrl!),
     };
     subscription = await sns.subscribe(subscribeParams).promise();
 
-    const params = {
+    const uniqueBody = uuidv4();
+    const uploadParams = {
       Bucket: process.env.TF_OUTPUT_bucket_name!,
       Key: `${uuidv4()}.txt`,
-      Body: "Contents of file",
+      Body: uniqueBody,
     };
-    createdBucketKey = await s3.upload(params).promise();
+    createdBucketKey = await s3.upload(uploadParams).promise();
 
     let response: ReceiveMessageResult;
     await waitForExpect(
@@ -92,8 +105,8 @@ describe("Public Image Store integration test", () => {
         response = await sqs.receiveMessage({ QueueUrl: createdQueue.QueueUrl! }).promise();
         expect(response.Messages).toBeDefined();
       },
-      waitForLocalStackTimeout,
-      3000,
+      waitForSqsMessageTimeout,
+      sqsPollInterval,
     );
 
     const messages = response!.Messages!;
@@ -103,6 +116,10 @@ describe("Public Image Store integration test", () => {
     const message = messages[0];
     const body = JSON.parse(message.Body!);
 
-    expect(body.Message).toEqual("Hello World");
+    const messageInBody: IImageSource = JSON.parse(body.Message);
+    const { publicUrl } = messageInBody;
+
+    const result = await axios.get(publicUrl);
+    expect(result.data).toBe(uniqueBody);
   });
 });

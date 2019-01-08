@@ -1,15 +1,17 @@
 import { Callback, Context } from "aws-lambda";
 import AWS, { AWSError } from "aws-sdk";
 import { PublishInput, PublishResponse } from "aws-sdk/clients/sns";
-import { IRecords } from "aws-types-lib";
+import { IS3Record } from "aws-types-lib";
 import { IImageSource } from "messages-lib";
 import { throwIfUndefined } from "middy-middleware-lib";
+import * as url from "url";
 
 type ResultCallback = Callback<{ result: string; message: string } | null>;
 
 export interface IDeps {
   sns: { publish: (params: PublishInput, callback: (err: AWSError, data: PublishResponse) => void) => void };
   snsTopicArn: string;
+  bucketPublicUrl: string;
 }
 export const deps = {
   init: (): Promise<IDeps> =>
@@ -19,29 +21,33 @@ export const deps = {
         region: "us-east-1",
       }),
       snsTopicArn: throwIfUndefined(process.env.SNS_TOPIC_ARN, "SNS_TOPIC_ARN environment variable not set"),
+      bucketPublicUrl: throwIfUndefined(process.env.BUCKET_PUBLIC_URL, "BUCKET_PUBLIC_URL environment variable not set"),
     }),
 };
 
-const transformEvent = (event: IRecords): IImageSource => {
+const transformEvent = (bucketPublicUrl: string, event: IS3Record): IImageSource => {
+  const objectPublicUrl = url.resolve(bucketPublicUrl, event.s3.object.key);
+
   return {
     imageId: "This is an ID",
-    publicUrl: "This is a public URL",
+    publicUrl: objectPublicUrl,
+
     dimensions: {
-      width: 100,
-      height: 100,
+      width: 0,
+      height: 0,
     },
   };
 };
 
-export const produceImageAvailableEventHandler = (event: IRecords, context: Context, callback: ResultCallback) =>
-  deps.init().then(({ sns, snsTopicArn }) => {
-    const imageSource = transformEvent(event);
+export const produceImageAvailableEventHandler = (event: IS3Record, context: Context, callback: ResultCallback) =>
+  deps.init().then(({ sns, snsTopicArn, bucketPublicUrl }) => {
+    const imageSource = transformEvent(bucketPublicUrl, event);
 
-    sns.publish({ TopicArn: snsTopicArn, Message: "Hello World" }, (err: AWSError) => {
+    sns.publish({ TopicArn: snsTopicArn, Message: JSON.stringify(imageSource) }, (err: AWSError) => {
       if (err) {
         callback(err, undefined);
       } else {
-        callback(null, { result: "success", message: "SNS published for THING" });
+        callback(null, { result: "success", message: `SNS published for ${imageSource.imageId}` });
       }
     });
   });
