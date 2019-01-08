@@ -74,7 +74,7 @@ resource "aws_lambda_function" "public_image_event_publisher" {
   environment   = {
     variables {
       SNS_TOPIC_ARN = "${data.aws_sns_topic.image_on_platform.arn}"
-      BUCKET_PUBLIC_URL = "${aws_s3_bucket.public_images.bucket_domain_name}"
+      BUCKET_PUBLIC_URL = "https://${aws_s3_bucket.public_images.bucket_domain_name}"
     }
   }
 }
