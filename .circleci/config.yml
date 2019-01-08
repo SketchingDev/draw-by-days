@@ -89,7 +89,9 @@ jobs:
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
-      - image: amazon/dynamodb-local
+      - image: localstack/localstack
+        environment:
+          SERVICES: dynamodb
     steps:
       - setup_remote_docker
       - checkout
