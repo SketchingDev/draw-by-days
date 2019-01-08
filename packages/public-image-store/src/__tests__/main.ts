@@ -6,6 +6,7 @@ import lambdaTester = require("lambda-tester");
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
+import { deps, IDeps } from "../produceImageAvailableEventHandler";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
@@ -38,7 +39,6 @@ const waitForLocalStackTimeout = 10000;
 jest.setTimeout(waitForLocalStackTimeout + jestDefaultTimeout);
 
 describe("Produces ImageAvailable event from S3 'create' event", () => {
-  let snsTopicArn: string;
   let receiveMessagesParams: ReceiveMessageRequest;
 
   beforeAll(async () => {
@@ -58,7 +58,11 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
 
     receiveMessagesParams = { QueueUrl: createdQueue.QueueUrl! };
 
-    snsTopicArn = createdTopic.TopicArn!;
+    deps.init = (): Promise<IDeps> =>
+      Promise.resolve({
+        sns,
+        snsTopicArn: createdTopic.TopicArn!,
+      });
   });
 
   it("Succeeds with publicUrl of image from event", async () => {
@@ -80,9 +84,6 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
         },
       ],
     };
-
-    process.env.SNS_ENDPOINT = snsEndpoint;
-    process.env.SNS_TOPIC_ARN = snsTopicArn;
 
     return lambdaTester(handler)
       .event(s3Event)

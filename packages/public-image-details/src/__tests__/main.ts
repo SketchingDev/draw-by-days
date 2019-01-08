@@ -6,6 +6,7 @@ import { IBasicImageDetails } from "messages-lib/lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
+import { deps, IDeps } from "../saveImageDetailsHandler";
 import { IImage } from "../storage/image";
 import { imageSchema } from "../storage/imageSchema";
 
@@ -31,7 +32,7 @@ const configureLocalDynamoDB = () => {
     region: "us-east-1",
   });
 
-  dynamoose.local("http://0.0.0.0:8000");
+  dynamoose.local("http://0.0.0.0:4569");
 };
 
 const jestDefaultTimeout = 5000;
@@ -45,6 +46,11 @@ describe("Handles ImageDetails message over SNS", () => {
   beforeAll(async () => {
     configureLocalDynamoDB();
     await waitForExpect(dynamodbRespond, waitForLocalStackTimeout);
+
+    deps.init = (): Promise<IDeps> =>
+      Promise.resolve({
+        imageRecord: model<IImage, void>(tableName, imageSchema),
+      });
   });
 
   it("Succeeds with publicUrl of image from event", () => {
@@ -65,8 +71,6 @@ describe("Handles ImageDetails message over SNS", () => {
     };
 
     const ImageRecord = model<IImage, { DateId: string }>(tableName, imageSchema);
-
-    process.env.TABLE_NAME = tableName;
 
     return lambdaTester(handler)
       .event(snsEvent)
