@@ -19,6 +19,24 @@ const getQueueArn = async (sqs: AWS.SQS, queueUrl: string) => {
   return queueAttributes.Attributes!.QueueArn;
 };
 
+const createPermissiveSqsPolicy = (resourceArn: string, sourceArn: string) => ({
+  Statement: [
+    {
+      Effect: "Allow",
+      Principal: {
+        AWS: "*",
+      },
+      Action: "SQS:SendMessage",
+      Resource: resourceArn,
+      Condition: {
+        ArnEquals: {
+          "aws:SourceArn": sourceArn,
+        },
+      },
+    },
+  ],
+});
+
 const assertInputEnvVariablesSet = () => {
   expect(process.env.AWS_REGION).toBeDefined();
   expect(process.env.TF_OUTPUT_bucket_name).toBeDefined();
@@ -45,28 +63,12 @@ describe("Public Image Store integration test", () => {
 
     createdQueue = await sqs.createQueue({ QueueName: uuidv4() }).promise();
 
-    const policyDocument = {
-      Statement: [
-        {
-          Effect: "Allow",
-          Principal: {
-            AWS: "*",
-          },
-          Action: "SQS:SendMessage",
-          Resource: await getQueueArn(sqs, createdQueue.QueueUrl!),
-          Condition: {
-            ArnEquals: {
-              "aws:SourceArn": process.env.TF_OUTPUT_subscribed_topic_arn,
-            },
-          },
-        },
-      ],
-    };
-
+    const createdQueueArn = await getQueueArn(sqs, createdQueue.QueueUrl!);
+    const policy = createPermissiveSqsPolicy(createdQueueArn, process.env.TF_OUTPUT_subscribed_topic_arn!);
     const setSqsPolicyParams = {
       QueueUrl: createdQueue.QueueUrl!,
       Attributes: {
-        Policy: JSON.stringify(policyDocument),
+        Policy: JSON.stringify(policy),
       },
     };
     await sqs.setQueueAttributes(setSqsPolicyParams).promise();
