@@ -25,6 +25,13 @@ commands:
       - run:
           name: Test
           command: yarn test --scope << parameters.package_name >>
+      - run:
+          name: Upload coverage
+          command: yarn test:upload-coverage --scope << parameters.package_name >>
+      - store_test_results:
+          path: ./packages/<< parameters.package_name >>/reports/junit/
+      - store_artifacts:
+          path: ./packages/<< parameters.package_name >>/reports/junit/
 
 executors:
   node-build-environment:

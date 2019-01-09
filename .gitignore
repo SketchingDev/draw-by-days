@@ -34,6 +34,7 @@ pids
 
 lib-cov
 coverage
+reports
 .lock-wscript
 build/Release
 node_modules/
