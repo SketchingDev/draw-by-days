@@ -29,7 +29,7 @@ const transformEvent = (bucketPublicUrl: string, event: IS3Record): IImageSource
   const objectPublicUrl = url.resolve(bucketPublicUrl, event.s3.object.key);
 
   return {
-    imageId: "This is an ID",
+    imageId: event.s3.object.key,
     publicUrl: objectPublicUrl,
   };
 };

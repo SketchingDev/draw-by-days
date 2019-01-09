@@ -93,11 +93,12 @@ describe("Public Image Store integration test", () => {
     };
     subscription = await sns.subscribe(subscribeParams).promise();
 
-    const uniqueBody = uuidv4();
+    const objectKey = `${uuidv4()}.txt`;
+    const objectBody = uuidv4();
     const uploadParams = {
       Bucket: process.env.TF_OUTPUT_bucket_name!,
-      Key: `${uuidv4()}.txt`,
-      Body: uniqueBody,
+      Key: objectKey,
+      Body: objectBody,
     };
     createdBucketKey = await s3.upload(uploadParams).promise();
 
@@ -112,16 +113,15 @@ describe("Public Image Store integration test", () => {
     );
 
     const messages = response!.Messages!;
-
     expect(messages.length).toBe(1);
 
     const message = messages[0];
     const body = JSON.parse(message.Body!);
 
     const messageInBody: IImageSource = JSON.parse(body.Message);
-    const { publicUrl } = messageInBody;
+    expect(messageInBody.imageId).toBe(objectKey);
 
-    const result = await axios.get(publicUrl);
-    expect(result.data).toBe(uniqueBody);
+    const result = await axios.get(messageInBody.publicUrl);
+    expect(result.data).toBe(objectBody);
   });
 });

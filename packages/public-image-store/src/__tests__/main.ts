@@ -39,6 +39,17 @@ const getQueueArn = async (sqs: AWS.SQS, queueUrl: string) => {
   return queueAttributes.Attributes!.QueueArn;
 };
 
+const pollQueueForMessage = async (sqs: AWS.SQS, sqsQueueUrl: string): Promise<ReceiveMessageResult> => {
+  let message: ReceiveMessageResult;
+
+  await waitForExpect(async () => {
+    message = await sqs.receiveMessage({ QueueUrl: sqsQueueUrl }).promise();
+    expect(message.Messages).toBeDefined();
+  });
+
+  return Promise.resolve(message!);
+};
+
 describe("Produces ImageAvailable event from S3 'create' event", () => {
   let sns: AWS.SNS;
   let sqs: AWS.SQS;
@@ -73,20 +84,20 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
       });
   });
 
-  it("Succeeds with publicUrl of image from event", async () => {
+  it("Publishes event with ID and public URL for the uploaded file", async () => {
     const s3Event: IRecords = {
       Records: [
         {
           eventSource: "aws:s3",
           s3: {
             bucket: {
-              name: "draw-by-days-ci-public-images",
-              arn: "arn:aws:s3:::test-bucket",
+              name: "",
+              arn: "",
             },
             object: {
               key: "florence.jpg",
-              size: 1642847,
-              eTag: "8e81bdf6f079dd056f5f548b0a0e039d",
+              size: 0,
+              eTag: "",
             },
           },
         },
@@ -96,21 +107,15 @@ describe("Produces ImageAvailable event from S3 'create' event", () => {
     return lambdaTester(handler)
       .event(s3Event)
       .expectResult(async () => {
-        let response: ReceiveMessageResult;
-        await waitForExpect(async () => {
-          response = await sqs.receiveMessage({ QueueUrl: sqsQueueUrl }).promise();
-          expect(response.Messages).toBeDefined();
-        });
+        const { Messages } = await pollQueueForMessage(sqs, sqsQueueUrl);
+        expect(Messages).toBeDefined();
 
-        const messages = response!.Messages!;
-
-        expect(messages.length).toBe(1);
-
-        const message = messages[0];
-        const body = JSON.parse(message.Body!);
+        expect(Messages).toHaveLength(1);
+        const body = JSON.parse(Messages![0].Body!);
 
         const messageInBody: IImageSource = JSON.parse(body.Message);
         expect(messageInBody).toMatchObject({
+          imageId: "florence.jpg",
           publicUrl: "http://example.com/florence.jpg",
         });
       });
