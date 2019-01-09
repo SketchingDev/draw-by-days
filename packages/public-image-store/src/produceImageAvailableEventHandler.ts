@@ -31,11 +31,6 @@ const transformEvent = (bucketPublicUrl: string, event: IS3Record): IImageSource
   return {
     imageId: "This is an ID",
     publicUrl: objectPublicUrl,
-
-    dimensions: {
-      width: 0,
-      height: 0,
-    },
   };
 };
 
