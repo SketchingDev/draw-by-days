@@ -4,16 +4,22 @@ import { IBasicImageDetails } from "messages-lib/lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 
-const defaultTimeout = 5000;
-jest.setTimeout(defaultTimeout * 4);
+jest.setTimeout(20 * 1000);
 
-const sns = new AWS.SNS({ apiVersion: "2010-03-31" });
+const assertInputEnvVariablesSet = () => {
+  expect(process.env.TF_OUTPUT_aws_region).toBeDefined();
+  expect(process.env.TF_OUTPUT_private_url).toBeDefined();
+  expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
+};
 
 describe("Public Image Details integration test", () => {
+  let sns: AWS.SNS;
+
   beforeAll(() => {
-    expect(process.env.AWS_REGION).toBeDefined();
-    expect(process.env.TF_OUTPUT_private_url).toBeDefined();
-    expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
+    assertInputEnvVariablesSet();
+
+    AWS.config.update({ region: process.env.TF_OUTPUT_aws_region });
+    sns = new AWS.SNS({ apiVersion: "2010-03-31" });
   });
 
   it("Details in event saved to DynamoDB", async () => {

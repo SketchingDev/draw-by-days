@@ -70,9 +70,11 @@ resource "aws_lambda_function" "public_image_event_publisher" {
   role          = "${aws_iam_role.iam_for_lambda.arn}"
   handler       = "main.handler"
   runtime       = "nodejs8.10"
+  source_code_hash = "${base64sha256(file(var.new_image_event_producer_lambda_filename))}"
   environment   = {
     variables {
       SNS_TOPIC_ARN = "${data.aws_sns_topic.image_on_platform.arn}"
+      BUCKET_PUBLIC_URL = "https://${aws_s3_bucket.public_images.bucket_domain_name}"
     }
   }
 }

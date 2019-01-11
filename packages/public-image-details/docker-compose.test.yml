@@ -1,7 +1,9 @@
 version: '2.1'
 
 services:
-  dynamodb-local:
-    image: amazon/dynamodb-local
+  localstack:
+    image: localstack/localstack
     ports:
-      - "8000:8000"
+      - '4569:4569'
+    environment:
+      SERVICES: dynamodb

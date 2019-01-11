@@ -1,11 +1,10 @@
 import middy from "middy";
-import { envVarValidator, logEvent } from "middy-middleware-lib";
-import { produceImageAvailableEvent } from "./produceImageAvailableEvent";
+import { logEvent } from "middy-middleware-lib";
+import { produceImageAvailableEventHandler } from "./produceImageAvailableEventHandler";
+import { extractFirstS3Record } from "./s3/extractFirstS3Record";
 
-const requiredEnvVariables = { Names: ["SNS_TOPIC_ARN"] };
-
-export const handler = middy(produceImageAvailableEvent)
+export const handler = middy(produceImageAvailableEventHandler)
   .use(logEvent())
-  .use(envVarValidator(requiredEnvVariables));
+  .use(extractFirstS3Record());
 
 module.exports = { handler };

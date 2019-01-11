@@ -1,3 +1,7 @@
+output "aws_region" {
+  value = "${var.aws_region}"
+}
+
 output "private_url" {
   value = "${module.image_api.url}"
 }
