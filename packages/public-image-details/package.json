@@ -51,6 +51,7 @@
     "build": "webpack --env.output_filename save-image-metadata.zip"
   },
   "jest-junit": {
+    "suiteName": "jest tests",
     "outputDirectory": "reports/junit/",
     "outputName": "js-test-results.xml"
   }

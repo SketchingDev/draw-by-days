@@ -50,6 +50,7 @@
     "build": "webpack --env.output_filename public-image-store.zip"
   },
   "jest-junit": {
+    "suiteName": "jest tests",
     "outputDirectory": "reports/junit/",
     "outputName": "js-test-results.xml"
   }
