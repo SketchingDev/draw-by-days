@@ -132,8 +132,7 @@ jobs:
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
-            echo "export AWS_REGION=us-east-1" > ../../env.outputs
-            terragrunt-output-to-env.sh private_url subscribed_topic_arn >> ../../env.outputs
+            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
@@ -199,8 +198,7 @@ jobs:
             export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/public-image-store/dist/public-image-store.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
-            echo "export AWS_REGION=us-east-1" > ../../env.outputs
-            terragrunt-output-to-env.sh subscribed_topic_arn bucket_name >> ../../env.outputs
+            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo

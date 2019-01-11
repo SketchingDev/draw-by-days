@@ -7,7 +7,7 @@ import waitForExpect from "wait-for-expect";
 jest.setTimeout(20 * 1000);
 
 const assertInputEnvVariablesSet = () => {
-  expect(process.env.AWS_REGION).toBeDefined();
+  expect(process.env.TF_OUTPUT_aws_region).toBeDefined();
   expect(process.env.TF_OUTPUT_private_url).toBeDefined();
   expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
 };
@@ -17,6 +17,8 @@ describe("Public Image Details integration test", () => {
 
   beforeAll(() => {
     assertInputEnvVariablesSet();
+
+    AWS.config.update({ region: process.env.TF_OUTPUT_aws_region });
     sns = new AWS.SNS({ apiVersion: "2010-03-31" });
   });
 

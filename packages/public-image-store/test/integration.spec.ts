@@ -38,7 +38,7 @@ const createPermissiveSqsPolicy = (resourceArn: string, sourceArn: string) => ({
 });
 
 const assertInputEnvVariablesSet = () => {
-  expect(process.env.AWS_REGION).toBeDefined();
+  expect(process.env.TF_OUTPUT_aws_region).toBeDefined();
   expect(process.env.TF_OUTPUT_bucket_name).toBeDefined();
   expect(process.env.TF_OUTPUT_subscribed_topic_arn).toBeDefined();
 };
@@ -49,6 +49,7 @@ describe("Public Image Store integration test", () => {
   let s3: AWS.S3;
 
   beforeAll(() => {
+    AWS.config.update({ region: process.env.TF_OUTPUT_aws_region });
     sns = new AWS.SNS({ apiVersion: "2010-03-31" });
     sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
     s3 = new AWS.S3({ apiVersion: "2006-03-01" });

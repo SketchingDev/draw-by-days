@@ -1,3 +1,7 @@
+output "aws_region" {
+  value = "${var.aws_region}"
+}
+
 output "subscribed_topic_arn" {
   value = "${data.aws_sns_topic.image_on_platform.arn}"
 }
