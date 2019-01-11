@@ -44,14 +44,9 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "test:start-sns": "docker-compose -f docker-compose.test.yml up -d",
     "test:stop-sns": "docker-compose -f docker-compose.test.yml down",
-    "test": "yarn test:start-sns && jest src/ --runInBand --reporters=jest-junit; eval \"yarn test:stop-sns && exit $?\"",
+    "test": "yarn test:start-sns && jest src/ --runInBand; eval \"yarn test:stop-sns && exit $?\"",
     "test:upload-coverage": "cat ./coverage/lcov.info | coveralls",
     "test:integration": "jest test/ --collectCoverage False",
     "build": "webpack --env.output_filename public-image-store.zip"
-  },
-  "jest-junit": {
-    "suiteName": "jest tests",
-    "outputDirectory": "reports/junit/",
-    "outputName": "js-test-results.xml"
   }
 }

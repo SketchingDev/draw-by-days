@@ -1,25 +1,26 @@
 module.exports = {
-  "globals": {
+  globals: {
     "ts-jest": {
-      "tsConfigFile": "./tsconfig.json"
-    }
+      tsConfigFile: "./tsconfig.json",
+    },
   },
-  "transform": {
-    "^.+\\.tsx?$": "ts-jest"
+  transform: {
+    "^.+\\.tsx?$": "ts-jest",
   },
-  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-  "moduleFileExtensions": [
-    "ts",
-    "tsx",
-    "js",
-    "jsx",
-    "json",
-    "node"
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  testEnvironment: "node",
+  collectCoverage: true,
+  collectCoverageFrom: ["**/*.{ts,tsx}", "!**/node_modules/**"],
+  reporters: [
+    "default",
+    [
+      "jest-junit",
+      {
+        suiteName: "jest tests",
+        outputDirectory: "reports/junit/",
+        outputName: "js-test-results.xml",
+      },
+    ],
   ],
-  "testEnvironment": "node",
-  "collectCoverage": true,
-  "collectCoverageFrom": [
-    "**/*.{ts,tsx}",
-    "!**/node_modules/**",
-  ]
 };
