@@ -79,7 +79,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy website
+          name: Deploy
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
             cd $ENV/website
@@ -124,7 +124,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy public image details
+          name: Deploy
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
             cd $ENV/public-image-details
@@ -143,15 +143,15 @@ jobs:
     executor: node-build-environment
     steps:
       - checkout
+      - yarn-install-with-cache
       - attach_workspace:
           at: /tmp/workspace
-      - yarn-install-with-cache
       - run:
           name: Integration tests
           command: |
             source /tmp/workspace/terraform/environments/env.outputs
-            echo "Loaded env file"
             cat /tmp/workspace/terraform/environments/env.outputs
+
             yarn test:integration --scope public-image-details
 
   ## Public Image Store
@@ -164,9 +164,9 @@ jobs:
         environment:
           SERVICES: sns,sqs
     steps:
-      - setup_remote_docker
       - checkout
       - yarn-install-with-cache
+      - setup_remote_docker
       - yarn-build-then-test:
           package_name: public-image-store
 
@@ -190,7 +190,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - deploy:
-          name: Deploy public image store
+          name: Deploy
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
             cd $ENV/public-image-store
@@ -209,15 +209,15 @@ jobs:
     executor: node-build-environment
     steps:
       - checkout
+      - yarn-install-with-cache
       - attach_workspace:
           at: /tmp/workspace
-      - yarn-install-with-cache
       - run:
           name: Integration tests
           command: |
             source /tmp/workspace/terraform/environments/env.outputs
-            echo "Loaded env file"
             cat /tmp/workspace/terraform/environments/env.outputs
+
             yarn test:integration --scope public-image-store
 
 workflows:
