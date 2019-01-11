@@ -30,8 +30,6 @@ commands:
           command: yarn test:upload-coverage --scope << parameters.package_name >>
       - store_test_results:
           path: ./packages/<< parameters.package_name >>/reports/
-      - store_artifacts:
-          path: ./packages/<< parameters.package_name >>/reports/
 
 executors:
   node-build-environment:
