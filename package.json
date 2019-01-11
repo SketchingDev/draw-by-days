@@ -13,6 +13,7 @@
     "test": "lerna run test --stream",
     "test:integration": "lerna run test:integration --stream",
     "test:upload-coverage": "lerna run test:upload-coverage --stream",
+    "test:e2e" : "lerna run test:e2e --scope e2e --stream",
     "build": "lerna run build --stream"
   }
 }
