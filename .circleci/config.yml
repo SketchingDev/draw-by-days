@@ -132,12 +132,12 @@ jobs:
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
-            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.outputs
+            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.public_image_details.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - terraform/environments/env.outputs
+            - terraform/environments/env.public_image_details.outputs
 
   test_integration_public_image_details:
     executor: node-build-environment
@@ -149,8 +149,8 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            source /tmp/workspace/terraform/environments/env.outputs
-            cat /tmp/workspace/terraform/environments/env.outputs
+            source /tmp/workspace/terraform/environments/env.public_image_details.outputs
+            cat /tmp/workspace/terraform/environments/env.public_image_details.outputs
 
             yarn test:integration --scope public-image-details
 
@@ -198,12 +198,12 @@ jobs:
             export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/public-image-store/dist/public-image-store.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve
 
-            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.outputs
+            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.public_image_store.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - terraform/environments/env.outputs
+            - terraform/environments/env.public_image_store.outputs
 
   test_integration_public_image_store:
     executor: node-build-environment
@@ -215,16 +215,30 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            source /tmp/workspace/terraform/environments/env.outputs
-            cat /tmp/workspace/terraform/environments/env.outputs
+            source /tmp/workspace/terraform/environments/env.public_image_store.outputs
+            cat /tmp/workspace/terraform/environments/env.public_image_store.outputs
 
             yarn test:integration --scope public-image-store
+
+  ## End to End Tests
+
+  end_to_end_test:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Test
+          command: yarn test:e2e
 
 workflows:
   version: 2
 
-  website:
+  test_build_it_e2e_all_services:
     jobs:
+
+      ## Website
+
       - test_website
       - build_website:
           requires:
@@ -233,8 +247,8 @@ workflows:
           requires:
             - build_website
 
-  public_image_details:
-    jobs:
+      ## Public Image Details
+
       - test_public_image_details
       - build_public_image_details:
           requires:
@@ -250,8 +264,8 @@ workflows:
               ignore:
                 - master
 
-  public_image_store:
-    jobs:
+      ## Public Image Store
+
       - test_public_image_store
       - build_public_image_store:
           requires:
@@ -262,6 +276,18 @@ workflows:
       - test_integration_public_image_store:
           requires:
             - deploy_public_image_store
+          filters:
+            branches:
+              ignore:
+                - master
+
+      ## End to End Tests
+
+      - end_to_end_test:
+          requires:
+            - deploy_website
+            - test_integration_public_image_details
+            - test_integration_public_image_store
           filters:
             branches:
               ignore:
