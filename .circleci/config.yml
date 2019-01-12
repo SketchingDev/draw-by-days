@@ -38,7 +38,7 @@ executors:
     working_directory: ~/repo
   terragrunt-deploy-environment:
     docker:
-      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3-3
+      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3-4
     working_directory: ~/repo
 
 jobs:
@@ -84,7 +84,7 @@ jobs:
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
             cd $ENV/website
 
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve
+            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
           working_directory: terraform/environments/
 
@@ -130,7 +130,7 @@ jobs:
             cd $ENV/public-image-details
 
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve
+            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact
 
             terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.public_image_details.outputs
           working_directory: terraform/environments/
@@ -196,7 +196,7 @@ jobs:
             cd $ENV/public-image-store
 
             export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/public-image-store/dist/public-image-store.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve
+            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact
 
             terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.public_image_store.outputs
           working_directory: terraform/environments/

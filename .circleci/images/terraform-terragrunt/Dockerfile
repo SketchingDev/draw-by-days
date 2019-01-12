@@ -1,9 +1,9 @@
 FROM alpine:3.8
 
-# Custom
+# AWS CLI
 
-COPY terragrunt-output-to-env.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/terragrunt-output-to-env.sh
+RUN apk add python python-dev py-pip build-base && \
+    pip install awscli
 
 # Terraform
 
@@ -27,7 +27,8 @@ ENV TERRAGRUNT_TFPATH=/usr/bin/terraform
 RUN wget https://github.com/gruntwork-io/terragrunt/releases/download/v$TERRAGRUNT_VERSION/terragrunt_linux_386 -O /usr/bin/terragrunt && \
     chmod +x /usr/bin/terragrunt
 
-# AWS CLI
+# Custom scripts
 
-RUN apk add python python-dev py-pip build-base && \
-    pip install awscli
+COPY terragrunt-output-to-env.sh redact.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/terragrunt-output-to-env.sh && \
+    chmod +x /usr/local/bin/redact.sh
