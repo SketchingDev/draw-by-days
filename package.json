@@ -2,7 +2,9 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.6.0"
+    "lerna": "^3.6.0",
+    "coveralls": "^3.0.2",
+    "lcov-result-merger": "^3.1.0"
   },
   "workspaces": [
     "packages/*"
@@ -13,6 +15,7 @@
     "test": "lerna run test --stream",
     "test:integration": "lerna run test:integration --stream",
     "test:upload-coverage": "lerna run test:upload-coverage --stream",
+    "test:merge-coverage": "yarn lcov-result-merger 'packages/*/coverage/lcov.info' lcov-merged.info",
     "test:e2e" : "lerna run test:e2e --scope e2e --stream",
     "build": "lerna run build --stream"
   }
