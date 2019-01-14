@@ -19,6 +19,7 @@
     "@types/jest": "*",
     "@types/node": "^10.11.2",
     "cypress": "^3.1.0",
+    "jest-junit": "^6.0.0",
     "rimraf": "^2.6.2",
     "start-server-and-test": "^1.7.1",
     "typescript": "latest"
@@ -27,6 +28,7 @@
     "clean": "rimraf build/*",
     "lint": "tslint -c tslint.json 'src/**/*.ts{,x}'",
     "start": "react-scripts-ts start",
+    "test": "CI=true react-scripts-ts test",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "test:component": "start-server-and-test start http://localhost:3000 cy:run",
