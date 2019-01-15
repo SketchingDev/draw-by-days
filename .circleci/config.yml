@@ -252,7 +252,7 @@ workflows:
           type: approval
       - teardown_public_image_details_in_ci:
           requires:
-            - request-teardown
+            - request-teadown-of-public-image-details
 
   test_build_it_e2e_all_services:
     jobs:
