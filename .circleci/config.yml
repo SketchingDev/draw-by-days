@@ -150,7 +150,7 @@ jobs:
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/dummy-lambda
 
             terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/public-image-details
+          working_directory: terraform/environments/ci/image-details-service
 
   it_image_details:
     executor: node-build-environment
@@ -229,7 +229,7 @@ jobs:
             export TF_VAR_new_image_event_producer_lambda_filename=/tmp/dummy-lambda
 
             terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/public-image-store
+          working_directory: terraform/environments/ci/image-store-service
 
   it_image_store:
     executor: node-build-environment
