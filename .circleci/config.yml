@@ -139,7 +139,7 @@ jobs:
           paths:
             - terraform/environments/env.image_details_service.outputs
 
-  test_integration_image_details:
+  it_image_details:
     executor: node-build-environment
     steps:
       - checkout
@@ -205,7 +205,7 @@ jobs:
           paths:
             - terraform/environments/env.image_store_service.outputs
 
-  test_integration_image_store:
+  it_image_store:
     executor: node-build-environment
     steps:
       - checkout
@@ -256,7 +256,7 @@ workflows:
       - deploy_image_details:
           requires:
             - build_image_details
-      - test_integration_image_details:
+      - it_image_details:
           requires:
             - deploy_image_details
           filters:
@@ -273,7 +273,7 @@ workflows:
       - deploy_image_store:
           requires:
             - build_image_store
-      - test_integration_image_store:
+      - it_image_store:
           requires:
             - deploy_image_store
           filters:
@@ -286,8 +286,8 @@ workflows:
       - end_to_end_test:
           requires:
             - deploy_website
-            - test_integration_image_details
-            - test_integration_image_store
+            - it_image_details
+            - it_image_store
           filters:
             branches:
               ignore:
