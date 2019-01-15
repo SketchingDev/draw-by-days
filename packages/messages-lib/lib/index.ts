@@ -1,2 +1,2 @@
-export { IImageSource } from "./messages/imageSource";
-export { IBasicImageDetails } from "./messages/basicImageDetails";
+export { IImageSource } from "./messages/imageStore/imageSource";
+export { IBasicImageDetails } from "./messages/imageDetails/basicImageDetails";
