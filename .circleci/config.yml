@@ -88,9 +88,9 @@ jobs:
             aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
           working_directory: terraform/environments/
 
-  ## Public Image Details
+  ## Image Details
 
-  test_public_image_details:
+  test_image_details:
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
@@ -102,22 +102,22 @@ jobs:
       - checkout
       - yarn-install-with-cache
       - yarn-build-then-test:
-          package_name: public-image-details
+          package_name: image-details-service
 
-  build_public_image_details:
+  build_image_details:
     executor: node-build-environment
     steps:
       - checkout
       - yarn-install-with-cache
       - run:
           name: Build
-          command: yarn build --scope public-image-details --include-filtered-dependencies
+          command: yarn build --scope image-details-service --include-filtered-dependencies
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - packages/public-image-details/dist/save-image-metadata.zip
+            - packages/image-details-service/dist/save-image-metadata.zip
 
-  deploy_public_image_details:
+  deploy_image_details:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -127,19 +127,19 @@ jobs:
           name: Deploy
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/public-image-details
+            cd $ENV/image-details-service
 
-            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/public-image-details/dist/save-image-metadata.zip
+            export TF_VAR_save_image_metadata_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-metadata.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
 
-            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.public_image_details.outputs
+            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.image_details_service.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - terraform/environments/env.public_image_details.outputs
+            - terraform/environments/env.image_details_service.outputs
 
-  teardown_public_image_details_in_ci:
+  teardown_image_details_in_ci:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -150,9 +150,9 @@ jobs:
             export TF_VAR_save_image_metadata_lambda_filename=/tmp/dummy-lambda
 
             terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/public-image-details
+          working_directory: terraform/environments/ci/image-details-service
 
-  test_integration_public_image_details:
+  it_image_details:
     executor: node-build-environment
     steps:
       - checkout
@@ -162,14 +162,14 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            source /tmp/workspace/terraform/environments/env.public_image_details.outputs
-            cat /tmp/workspace/terraform/environments/env.public_image_details.outputs
+            source /tmp/workspace/terraform/environments/env.image_details_service.outputs
+            cat /tmp/workspace/terraform/environments/env.image_details_service.outputs
 
-            yarn test:integration --scope public-image-details
+            yarn test:integration --scope image-details-service
 
-  ## Public Image Store
+  ## Image Store
 
-  test_public_image_store:
+  test_image_store:
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
@@ -181,22 +181,22 @@ jobs:
       - yarn-install-with-cache
       - setup_remote_docker
       - yarn-build-then-test:
-          package_name: public-image-store
+          package_name: image-store-service
 
-  build_public_image_store:
+  build_image_store:
     executor: node-build-environment
     steps:
       - checkout
       - yarn-install-with-cache
       - run:
           name: Build
-          command: yarn build --scope public-image-store --include-filtered-dependencies
+          command: yarn build --scope image-store-service --include-filtered-dependencies
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - packages/public-image-store/dist/public-image-store.zip
+            - packages/image-store-service/dist/image-store.zip
 
-  deploy_public_image_store:
+  deploy_image_store:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -206,19 +206,19 @@ jobs:
           name: Deploy
           command: |
             [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/public-image-store
+            cd $ENV/image-store-service
 
-            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/public-image-store/dist/public-image-store.zip
+            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/image-store-service/dist/image-store.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
 
-            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.public_image_store.outputs
+            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.image_store_service.outputs
           working_directory: terraform/environments/
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - terraform/environments/env.public_image_store.outputs
+            - terraform/environments/env.image_store_service.outputs
 
-  teardown_public_image_store_in_ci:
+  teardown_image_store_in_ci:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -229,9 +229,9 @@ jobs:
             export TF_VAR_new_image_event_producer_lambda_filename=/tmp/dummy-lambda
 
             terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/public-image-store
+          working_directory: terraform/environments/ci/image-store-service
 
-  test_integration_public_image_store:
+  it_image_store:
     executor: node-build-environment
     steps:
       - checkout
@@ -241,10 +241,10 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            source /tmp/workspace/terraform/environments/env.public_image_store.outputs
-            cat /tmp/workspace/terraform/environments/env.public_image_store.outputs
+            source /tmp/workspace/terraform/environments/env.image_store_service.outputs
+            cat /tmp/workspace/terraform/environments/env.image_store_service.outputs
 
-            yarn test:integration --scope public-image-store
+            yarn test:integration --scope image-store-service
 
   ## End to End Tests
 
@@ -264,14 +264,14 @@ workflows:
     jobs:
       - request-teadown-approval:
           type: approval
-      - teardown_public_image_details_in_ci:
+      - teardown_image_details_in_ci:
           requires:
             - request-teadown-approval
-      - teardown_public_image_store_in_ci:
+      - teardown_image_store_in_ci:
           requires:
             - request-teadown-approval
 
-  test_build_it_e2e_all_services:
+  build:
     jobs:
 
       ## Website
@@ -284,35 +284,35 @@ workflows:
           requires:
             - build_website
 
-      ## Public Image Details
+      ## Image Details
 
-      - test_public_image_details
-      - build_public_image_details:
+      - test_image_details
+      - build_image_details:
           requires:
-            - test_public_image_details
-      - deploy_public_image_details:
+            - test_image_details
+      - deploy_image_details:
           requires:
-            - build_public_image_details
-      - test_integration_public_image_details:
+            - build_image_details
+      - it_image_details:
           requires:
-            - deploy_public_image_details
+            - deploy_image_details
           filters:
             branches:
               ignore:
                 - master
 
-      ## Public Image Store
+      ## Image Store
 
-      - test_public_image_store
-      - build_public_image_store:
+      - test_image_store
+      - build_image_store:
           requires:
-            - test_public_image_store
-      - deploy_public_image_store:
+            - test_image_store
+      - deploy_image_store:
           requires:
-            - build_public_image_store
-      - test_integration_public_image_store:
+            - build_image_store
+      - it_image_store:
           requires:
-            - deploy_public_image_store
+            - deploy_image_store
           filters:
             branches:
               ignore:
@@ -323,8 +323,8 @@ workflows:
       - end_to_end_test:
           requires:
             - deploy_website
-            - test_integration_public_image_details
-            - test_integration_public_image_store
+            - it_image_details
+            - it_image_store
           filters:
             branches:
               ignore:
