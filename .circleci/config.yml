@@ -139,6 +139,19 @@ jobs:
           paths:
             - terraform/environments/env.public_image_details.outputs
 
+  teardown_public_image_details_in_ci:
+    executor: terragrunt-deploy-environment
+    steps:
+      - checkout
+      - run:
+          name: Destroy
+          command: |
+            touch /tmp/dummy-lambda
+            export TF_VAR_save_image_metadata_lambda_filename=/tmp/dummy-lambda
+
+            terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
+          working_directory: terraform/environments/ci/public-image-details
+
   test_integration_public_image_details:
     executor: node-build-environment
     steps:
@@ -205,6 +218,19 @@ jobs:
           paths:
             - terraform/environments/env.public_image_store.outputs
 
+  teardown_public_image_store_in_ci:
+    executor: terragrunt-deploy-environment
+    steps:
+      - checkout
+      - run:
+          name: Destroy
+          command: |
+            touch /tmp/dummy-lambda
+            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/dummy-lambda
+
+            terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
+          working_directory: terraform/environments/ci/public-image-store
+
   test_integration_public_image_store:
     executor: node-build-environment
     steps:
@@ -233,6 +259,17 @@ jobs:
 
 workflows:
   version: 2
+
+  teardown_ci:
+    jobs:
+      - request-teadown-approval:
+          type: approval
+      - teardown_public_image_details_in_ci:
+          requires:
+            - request-teadown-approval
+      - teardown_public_image_store_in_ci:
+          requires:
+            - request-teadown-approval
 
   test_build_it_e2e_all_services:
     jobs:
