@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import axios from "axios";
-import { IBasicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/messages/imageDetails";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 

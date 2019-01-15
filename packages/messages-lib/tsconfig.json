@@ -4,12 +4,11 @@
     "module": "commonjs",
     "target": "es2018",
     "sourceMap": false,
-    "outDir": "./dist",
     "declaration": true,
     "skipLibCheck": true
   },
   "include": [
-    "lib/**/*"
+    "messages/**/*"
   ],
   "exclude": [
     "node_modules"

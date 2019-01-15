@@ -1,7 +1,7 @@
 import { Context } from "aws-lambda";
 import { ResultCallback } from "aws-types-lib";
 import { model, Model } from "dynamoose";
-import { IBasicImageDetails } from "messages-lib/lib";
+import { IBasicImageDetails } from "messages-lib/messages/imageDetails";
 import { throwIfUndefined } from "middy-middleware-lib";
 import { basicImageDetailsToImageSchemaMap } from "./basicImageDetailsToImageSchemaMap";
 import { IImage } from "./storage/image";

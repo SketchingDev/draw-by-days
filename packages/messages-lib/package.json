@@ -1,8 +1,7 @@
 {
   "name": "messages-lib",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "index.d.ts",
   "private": true,
   "devDependencies": {
     "@types/node": "^10.9.4",
@@ -11,8 +10,6 @@
     "typescript": "^3.0.1"
   },
   "scripts": {
-    "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
-    "build": "tsc"
-  },
-  "dependencies": {}
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts'"
+  }
 }
