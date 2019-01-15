@@ -181,7 +181,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - packages/image-store-service/dist/image-store-service.zip
+            - packages/image-store-service/dist/image-store.zip
 
   deploy_image_store:
     executor: terragrunt-deploy-environment
