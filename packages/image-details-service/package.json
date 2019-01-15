@@ -1,5 +1,5 @@
 {
-  "name": "public-image-details",
+  "name": "image-details-service",
   "version": "1.0.3",
   "private": true,
   "dependencies": {

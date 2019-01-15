@@ -8,7 +8,7 @@ terragrunt = {
     ]
   }
   terraform {
-    source = "${get_tfvars_dir()}/../../../modules/public-image-store"
+    source = "${get_tfvars_dir()}/../../../modules/image-store-service"
   }
 }
 

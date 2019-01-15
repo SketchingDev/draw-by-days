@@ -9,10 +9,10 @@ terragrunt = {
     ]
   }
   terraform {
-    source = "${get_tfvars_dir()}/../../../modules/public-image-details"
+    source = "${get_tfvars_dir()}/../../../modules/image-details-service"
   }
 }
 
 aws_region = "us-east-1"
-namespace = "draw-by-days-ci"
-image_api_domain = "images-ci.drawbydays.com"
+namespace = "draw-by-days-prod"
+image_api_domain = "images.drawbydays.com"

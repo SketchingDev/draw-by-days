@@ -8,9 +8,9 @@ terragrunt = {
     ]
   }
   terraform {
-    source = "${get_tfvars_dir()}/../../../modules/public-image-store"
+    source = "${get_tfvars_dir()}/../../../modules/image-store-service"
   }
 }
 
 aws_region = "us-east-1"
-namespace = "draw-by-days-ci"
+namespace = "draw-by-days-dev"

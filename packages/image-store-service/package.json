@@ -1,5 +1,5 @@
 {
-  "name": "public-image-store",
+  "name": "image-store-service",
   "version": "1.0.3",
   "private": true,
   "dependencies": {
@@ -47,6 +47,6 @@
     "test": "yarn test:start-sns && jest src/ --runInBand; eval \"yarn test:stop-sns && exit $?\"",
     "test:upload-coverage": "cat ./coverage/lcov.info | coveralls",
     "test:integration": "jest test/ --collectCoverage False",
-    "build": "webpack --env.output_filename public-image-store.zip"
+    "build": "webpack --env.output_filename image-store.zip"
   }
 }
