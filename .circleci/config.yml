@@ -274,7 +274,7 @@ workflows:
       - teardown_ci_image_details
       - teardown_ci_image_store
 
-  commit:
+  commit_jobs:
     jobs:
 
       ## Website
