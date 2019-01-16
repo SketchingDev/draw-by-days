@@ -1,8 +1,8 @@
 import { Callback, Context } from "aws-lambda";
 import AWS, { AWSError } from "aws-sdk";
 import { PublishInput, PublishResponse } from "aws-sdk/clients/sns";
-import { IS3Record } from "aws-types-lib";
-import { IImageSource } from "messages-lib/messages/imageStore";
+import { IS3Record } from "aws-types-lib/lib";
+import { IImageSource } from "messages-lib";
 import { throwIfUndefined } from "middy-middleware-lib";
 import * as url from "url";
 

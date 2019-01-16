@@ -1,6 +1,6 @@
 import { Context } from "aws-lambda";
 import { ISnsRecord } from "aws-types-lib";
-import { IBasicImageDetails } from "messages-lib/messages/imageDetails";
+import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
 import middy from "middy";
 import { extractParsedJsonSnsMessage } from "../extractParsedJsonSnsMessage";
 
