@@ -42,6 +42,7 @@ executors:
     working_directory: ~/repo
 
 jobs:
+
   ## Website
 
   test_website:
@@ -139,7 +140,7 @@ jobs:
           paths:
             - terraform/environments/env.image_details_service.outputs
 
-  teardown_image_details_in_ci:
+  teardown_ci_image_details:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -218,7 +219,7 @@ jobs:
           paths:
             - terraform/environments/env.image_store_service.outputs
 
-  teardown_image_store_in_ci:
+  teardown_ci_image_store:
     executor: terragrunt-deploy-environment
     steps:
       - checkout
@@ -260,18 +261,20 @@ jobs:
 workflows:
   version: 2
 
-  teardown_ci:
+  # Prevent building up state in the CI environment
+  nightly_ci_teardown:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
     jobs:
-      - request-teadown-approval:
-          type: approval
-      - teardown_image_details_in_ci:
-          requires:
-            - request-teadown-approval
-      - teardown_image_store_in_ci:
-          requires:
-            - request-teadown-approval
+      - teardown_ci_image_details
+      - teardown_ci_image_store
 
-  build:
+  commit:
     jobs:
 
       ## Website
