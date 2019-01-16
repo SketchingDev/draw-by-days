@@ -2,7 +2,7 @@ import { IRecords } from "aws-types-lib";
 import { model } from "dynamoose";
 import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
-import { IBasicImageDetails } from "messages-lib/messages/imageDetails";
+import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";
