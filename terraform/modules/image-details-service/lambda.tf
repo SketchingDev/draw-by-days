@@ -2,12 +2,25 @@ data "aws_sns_topic" "image_on_platform" {
   name = "${var.namespace}-image-on-platform"
 }
 
-module "sns_lambda" {
+module "save_image_url" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=fix-lambda-logging"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
+  function_name = "${var.namespace}-save-image-url"
+  function_filename = "${var.save_image_url_lambda_filename}"
+  function_environment {
+    variables {
+      TABLE_NAME = "${aws_dynamodb_table.image_table.name}"
+    }
+  }
+}
+
+module "save_image_details" {
+  namespace = "${var.namespace}"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
-  function_filename = "${var.save_image_metadata_lambda_filename}"
+  function_filename = "${var.save_image_details_lambda_filename}"
   function_environment {
     variables {
       TABLE_NAME = "${aws_dynamodb_table.image_table.name}"
@@ -47,7 +60,12 @@ resource "aws_iam_policy" "dynamodb_write_access" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "dynamo" {
-  role = "${module.sns_lambda.lambda_function_role}"
+resource "aws_iam_role_policy_attachment" "image_details_dynamodb_acess" {
+  role = "${module.save_image_details.lambda_function_role}"
+  policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "image_url_dynamodb_acess" {
+  role = "${module.save_image_url.lambda_function_role}"
   policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
 }
