@@ -7,6 +7,9 @@ const imageAttributes = {
   Description: {
     type: String,
   },
+  PublicUrl: {
+    type: String,
+  },
 };
 
 export const imageSchema = new Schema(imageAttributes);

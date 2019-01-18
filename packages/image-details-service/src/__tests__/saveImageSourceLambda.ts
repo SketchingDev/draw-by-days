@@ -1,51 +1,29 @@
 import { IRecords } from "aws-types-lib";
 import { model } from "dynamoose";
-import dynamoose = require("dynamoose");
 import lambdaTester from "lambda-tester";
-import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
-import { handler } from "../main";
-import { deps, IDeps } from "../saveImageDetailsHandler";
+import { deps, IDeps } from "../saveImageSource/saveImageSourceHandler";
+import { handler } from "../saveImageSourceEntry";
 import { IImage } from "../storage/image";
 import { imageSchema } from "../storage/imageSchema";
+import { configureLocalDynamoDB, listTables, localStackStartupTimeout } from "./utilities/dynamodb";
+import { expectMessageProperty } from "./utilities/jest";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
 
 const defaultJestTimeout = 5 * 1000;
-const localStackStartupTimeout = 10 * 1000;
 jest.setTimeout(defaultJestTimeout + localStackStartupTimeout);
 
-const dynamodbRespond = async () =>
-  await dynamoose
-    .ddb()
-    .listTables()
-    .promise();
-
-const expectMessageProperty = (expectedMessage: string) => {
-  return (item: { message: string }) => {
-    expect(item.message).toBe(expectedMessage);
-  };
-};
-
-const configureLocalDynamoDB = () => {
-  dynamoose.AWS.config.update({
-    accessKeyId: "AKID",
-    secretAccessKey: "SECRET",
-    region: "us-east-1",
-  });
-
-  dynamoose.local("http://0.0.0.0:4569");
-};
-
-describe("Handles ImageDetails message over SNS", () => {
+describe("Handles ImageSource message over SNS", () => {
   const tableName = "Test";
   const imageIdColumnName = "ImageId";
 
   beforeAll(async () => {
     configureLocalDynamoDB();
-    await waitForExpect(dynamodbRespond, localStackStartupTimeout);
+    await waitForExpect(listTables, localStackStartupTimeout);
 
     deps.init = (): Promise<IDeps> =>
       Promise.resolve({
@@ -53,18 +31,19 @@ describe("Handles ImageDetails message over SNS", () => {
       });
   });
 
-  it("Succeeds with publicUrl of image from event", () => {
+  test("Saves SNS event containing ImageSource to DynamoDB", () => {
     const imageId = uuidv4();
-    const imageDetails: IBasicImageDetails = {
+    const publicUrl = uuidv4();
+    const imageSource: IImageSource = {
       imageId,
-      description: "Hello World",
+      publicUrl,
     };
     const snsEvent: IRecords = {
       Records: [
         {
           EventSource: "aws:sns",
           Sns: {
-            Message: JSON.stringify(imageDetails),
+            Message: JSON.stringify(imageSource),
           },
         },
       ],
@@ -81,12 +60,12 @@ describe("Handles ImageDetails message over SNS", () => {
 
         expect(record).toMatchObject({
           ImageId: imageId,
-          Description: "Hello World",
+          PublicUrl: publicUrl,
         });
       });
   });
 
-  it("Fails validation when event does not match SNS schema", () => {
+  test("Fails validation when SNS event is invalid", () => {
     const emptyEvent = {};
 
     return lambdaTester(handler)

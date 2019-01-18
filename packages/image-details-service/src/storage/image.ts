@@ -1,4 +1,5 @@
 export interface IImage {
   ImageId: string;
-  Description: string;
+  Description?: string;
+  PublicUrl?: string;
 }
