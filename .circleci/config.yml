@@ -257,9 +257,18 @@ jobs:
     steps:
       - checkout
       - yarn-install-with-cache
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Test
-          command: yarn test:e2e
+          command: |
+            source /tmp/workspace/terraform/environments/env.image_details_service.outputs
+            cat /tmp/workspace/terraform/environments/env.image_details_service.outputs
+
+            source /tmp/workspace/terraform/environments/env.image_store_service.outputs
+            cat /tmp/workspace/terraform/environments/env.image_store_service.outputs
+
+            yarn test:e2e
 
 workflows:
   version: 2
