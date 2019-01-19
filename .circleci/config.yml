@@ -132,7 +132,7 @@ jobs:
             cd $ENV/image-details-service
 
             export TF_VAR_save_image_details_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-details.zip
-            export TF_VAR_save_image_url_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-url.zip
+            export TF_VAR_save_image_source_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-source.zip
             terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
 
             terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.image_details_service.outputs

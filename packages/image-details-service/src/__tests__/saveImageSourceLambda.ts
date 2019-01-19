@@ -1,7 +1,7 @@
 import { IRecords } from "aws-types-lib";
-import { model } from "dynamoose";
+import { model, ModelConstructor } from "dynamoose";
 import lambdaTester from "lambda-tester";
-import { IImageSource } from "messages-lib";
+import { IBasicImageDetails, IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { deps, IDeps } from "../saveImageSource/saveImageSourceHandler";
@@ -17,21 +17,23 @@ require("lambda-tester").noVersionCheck();
 const defaultJestTimeout = 5 * 1000;
 jest.setTimeout(defaultJestTimeout + localStackStartupTimeout);
 
-describe("Handles ImageSource message over SNS", () => {
+describe("Saves image source from messaging service", () => {
   const tableName = "Test";
   const imageIdColumnName = "ImageId";
+  let ImageRecord: ModelConstructor<IImage, string>;
 
   beforeAll(async () => {
     configureLocalDynamoDB();
     await waitForExpect(listTables, localStackStartupTimeout);
 
+    ImageRecord = model<IImage, string>(tableName, imageSchema);
     deps.init = (): Promise<IDeps> =>
       Promise.resolve({
-        imageRecord: model<IImage, void>(tableName, imageSchema),
+        imageRecord: ImageRecord,
       });
   });
 
-  test("Saves SNS event containing ImageSource to DynamoDB", () => {
+  test("Creates new item in DB with image details from event", () => {
     const imageId = uuidv4();
     const publicUrl = uuidv4();
     const imageSource: IImageSource = {
@@ -49,8 +51,6 @@ describe("Handles ImageSource message over SNS", () => {
       ],
     };
 
-    const ImageRecord = model<IImage, { DateId: string }>(tableName, imageSchema);
-
     return lambdaTester(handler)
       .event(snsEvent)
       .expectResult(async () => {
@@ -61,6 +61,53 @@ describe("Handles ImageSource message over SNS", () => {
         expect(record).toMatchObject({
           ImageId: imageId,
           PublicUrl: publicUrl,
+        });
+      });
+  });
+
+  test("Update item in DB with image source from event", async () => {
+    const originalItemId = uuidv4();
+    const originalDescription = uuidv4();
+    const originalPublicUrl = uuidv4();
+
+    const savedRecord = await new ImageRecord({
+      ImageId: originalItemId,
+      Description: originalDescription,
+      PublicUrl: originalPublicUrl,
+    }).save();
+    expect(savedRecord).toMatchObject({
+      ImageId: originalItemId,
+      Description: originalDescription,
+      PublicUrl: originalPublicUrl,
+    });
+
+    const newPublicUrl = uuidv4();
+    const imageSource: IImageSource = {
+      imageId: originalItemId,
+      publicUrl: newPublicUrl,
+    };
+    const snsEvent: IRecords = {
+      Records: [
+        {
+          EventSource: "aws:sns",
+          Sns: {
+            Message: JSON.stringify(imageSource),
+          },
+        },
+      ],
+    };
+
+    return lambdaTester(handler)
+      .event(snsEvent)
+      .expectResult(async () => {
+        const record = await ImageRecord.queryOne(imageIdColumnName)
+          .eq(originalItemId)
+          .exec();
+
+        expect(record).toMatchObject({
+          ImageId: originalItemId,
+          Description: originalDescription,
+          PublicUrl: newPublicUrl,
         });
       });
   });

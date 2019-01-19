@@ -4,10 +4,15 @@ data "aws_sns_topic" "image_on_platform" {
 
 module "save_image_url" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=sns_lambda_filter"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-url"
-  function_filename = "${var.save_image_url_lambda_filename}"
+  function_filename = "${var.save_image_source_lambda_filename}"
+  sns_filter_policy= <<EOF
+{
+  "event" : ["ImageSource"]
+}
+EOF
   function_environment {
     variables {
       TABLE_NAME = "${aws_dynamodb_table.image_table.name}"
@@ -17,10 +22,15 @@ module "save_image_url" {
 
 module "save_image_details" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=sns_lambda_filter"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
   function_filename = "${var.save_image_details_lambda_filename}"
+  sns_filter_policy= <<EOF
+{
+  "event" : ["ImageDetails"]
+}
+EOF
   function_environment {
     variables {
       TABLE_NAME = "${aws_dynamodb_table.image_table.name}"

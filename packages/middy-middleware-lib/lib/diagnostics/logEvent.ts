@@ -4,4 +4,7 @@ export const logEvent = () => ({
     console.log("Event received", JSON.stringify(handler.event));
     next();
   },
+  onError: (handler: { error: object }, next: () => void) => {
+    console.log("Error", handler.error);
+  },
 });

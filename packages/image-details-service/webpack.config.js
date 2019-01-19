@@ -18,17 +18,17 @@ const commonConfig = {
 
 const saveImageDetails = filename =>
   Object.assign({}, commonConfig, {
-    entry: "./src/saveImageDetails/main.ts",
+    entry: "./src/saveImageDetailsEntry.ts",
     plugins: [new ZipPlugin({ filename })],
   });
 
-const saveImageStore = filename =>
+const saveImageSource = filename =>
   Object.assign({}, commonConfig, {
-    entry: "./src/saveImageStore/main.ts",
+    entry: "./src/saveImageSourceEntry.ts",
     plugins: [new ZipPlugin({ filename })],
   });
 
 module.exports = env => [
   saveImageDetails(env.save_image_details_filename),
-  saveImageStore(env.save_image_store_filename),
+  saveImageSource(env.save_image_source_filename),
 ];
