@@ -1,14 +1,10 @@
 import { Context } from "aws-lambda";
 import { ResultCallback } from "aws-types-lib";
-import { model, Model, ModelConstructor } from "dynamoose";
-import { IImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { model, ModelConstructor } from "dynamoose";
+import { Model } from "dynamoose";
 import { throwIfUndefined } from "middy-middleware-lib";
-import { IImage } from "../storage/image";
-import { imageSchema } from "../storage/imageSchema";
-import { imageDetailsToImageSchemaMap } from "./imageDetailsToImageSchemaMap";
-
-// tslint:disable-next-line:no-var-requires
-const objectMapper = require("object-mapper");
+import { IImage } from "./storage/image";
+import { imageSchema } from "./storage/imageSchema";
 
 export interface IDeps {
   imageRecord: ModelConstructor<IImage, string>;
@@ -23,11 +19,6 @@ export const deps = {
     }),
 };
 
-const saveImageDetails = (imageRecord: ModelConstructor<IImage, string>, imageDetails: IImageDetails) => {
-  const dbImage: IImage = objectMapper(imageDetails, imageDetailsToImageSchemaMap);
-  return imageRecord.update(dbImage.ImageId, { Description: dbImage.Description });
-};
-
 const successResult = (savedItem: Model<IImage>) => {
   const item = savedItem.originalItem() as IImage;
   console.log("Successfully saved", JSON.stringify(item));
@@ -40,8 +31,13 @@ const failedResult = (err: any) => {
   return err;
 };
 
-export const saveImageDetailsHandler = (imageDetails: IImageDetails, context: Context, callback: ResultCallback) =>
+export const saveImageState = <T extends { imageId: string }>(
+  updateObjectGenerator: (sourceMessage: T) => Partial<IImage>,
+) => (message: T, context: Context, callback: ResultCallback) =>
   deps
     .init()
-    .then(({ imageRecord }) => saveImageDetails(imageRecord, imageDetails))
+    .then(({ imageRecord }) => {
+      const updateObject = updateObjectGenerator(message);
+      return imageRecord.update(message.imageId, updateObject);
+    })
     .then(image => callback(null, successResult(image)), (err: any) => callback(failedResult(err), undefined));

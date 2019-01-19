@@ -1,15 +1,14 @@
 import { IRecords } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import lambdaTester from "lambda-tester";
-import { IImageDetails, IImageSource } from "messages-lib";
+import { IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
-import { deps, IDeps } from "../saveImageSource/saveImageSourceHandler";
 import { handler } from "../saveImageSourceEntry";
+import { deps, IDeps } from "../saveImageState";
 import { IImage } from "../storage/image";
 import { imageSchema } from "../storage/imageSchema";
 import { configureLocalDynamoDB, listTables, localStackStartupTimeout } from "./utilities/dynamodb";
-import { expectMessageProperty } from "./utilities/jest";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
