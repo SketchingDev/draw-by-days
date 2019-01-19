@@ -1,5 +1,8 @@
 # Public Image Details Service
 
-Provides details about images that are publicly available on the platform.
+Provides a HTTP endpoint for accessing the URL and description of images on the platform.
 
-![Serverless architecture for service](docs/architecture.jpg)
+
+## Architecture
+
+![Serverless architecture for service](docs/architecture.png)

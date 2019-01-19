@@ -1,6 +1,6 @@
 import { Context } from "aws-lambda";
 import { ISnsRecord } from "aws-types-lib";
-import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { IImageDetails } from "messages-lib/lib/messages/imageDetails";
 import middy from "middy";
 import { extractParsedJsonSnsMessage } from "../extractParsedJsonSnsMessage";
 
@@ -13,7 +13,7 @@ function createSnsRecord(message: string): ISnsRecord {
   };
 }
 
-const passThroughHandler = (event: IBasicImageDetails, context: Context, callback: any) => {
+const passThroughHandler = (event: IImageDetails, context: Context, callback: any) => {
   callback(null, event);
 };
 

@@ -1,3 +1,2 @@
-export { envVarValidator } from "./validation/envVarValidator";
-export { logEvent } from "./diagnostics/logEvent";
-export { throwIfUndefined } from "./validation/envVarValidator";
+export { log } from "./diagnostics/log";
+export { throwIfUndefined } from "./validation/throwIfUndefined";
