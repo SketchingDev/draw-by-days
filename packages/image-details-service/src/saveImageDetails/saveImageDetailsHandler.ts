@@ -1,11 +1,11 @@
 import { Context } from "aws-lambda";
 import { ResultCallback } from "aws-types-lib";
 import { model, Model, ModelConstructor } from "dynamoose";
-import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { IImageDetails } from "messages-lib/lib/messages/imageDetails";
 import { throwIfUndefined } from "middy-middleware-lib";
 import { IImage } from "../storage/image";
 import { imageSchema } from "../storage/imageSchema";
-import { basicImageDetailsToImageSchemaMap } from "./basicImageDetailsToImageSchemaMap";
+import { imageDetailsToImageSchemaMap } from "./imageDetailsToImageSchemaMap";
 
 // tslint:disable-next-line:no-var-requires
 const objectMapper = require("object-mapper");
@@ -23,8 +23,8 @@ export const deps = {
     }),
 };
 
-const saveImageDetails = (imageRecord: ModelConstructor<IImage, string>, imageDetails: IBasicImageDetails) => {
-  const dbImage: IImage = objectMapper(imageDetails, basicImageDetailsToImageSchemaMap);
+const saveImageDetails = (imageRecord: ModelConstructor<IImage, string>, imageDetails: IImageDetails) => {
+  const dbImage: IImage = objectMapper(imageDetails, imageDetailsToImageSchemaMap);
   return imageRecord.update(dbImage.ImageId, { Description: dbImage.Description });
 };
 
@@ -40,7 +40,7 @@ const failedResult = (err: any) => {
   return err;
 };
 
-export const saveImageDetailsHandler = (imageDetails: IBasicImageDetails, context: Context, callback: ResultCallback) =>
+export const saveImageDetailsHandler = (imageDetails: IImageDetails, context: Context, callback: ResultCallback) =>
   deps
     .init()
     .then(({ imageRecord }) => saveImageDetails(imageRecord, imageDetails))

@@ -1,7 +1,7 @@
 import { IRecords } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import lambdaTester from "lambda-tester";
-import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { IImageDetails } from "messages-lib/lib/messages/imageDetails";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { deps, IDeps } from "../saveImageDetails/saveImageDetailsHandler";
@@ -36,7 +36,7 @@ describe("Saves image details from messaging service", () => {
   test("Creates new item in DB with image details from event", () => {
     const imageId = uuidv4();
     const description = uuidv4();
-    const imageDetails: IBasicImageDetails = {
+    const imageDetails: IImageDetails = {
       imageId,
       description,
     };
@@ -82,7 +82,7 @@ describe("Saves image details from messaging service", () => {
     });
 
     const newDescription = uuidv4();
-    const imageDetails: IBasicImageDetails = {
+    const imageDetails: IImageDetails = {
       imageId: originalItemId,
       description: newDescription,
     };
@@ -110,13 +110,5 @@ describe("Saves image details from messaging service", () => {
           PublicUrl: originalPublicUrl,
         });
       });
-  });
-
-  test("Fails validation when SNS event is invalid", () => {
-    const emptyEvent = {};
-
-    return lambdaTester(handler)
-      .event(emptyEvent)
-      .expectError(expectMessageProperty("Event object failed validation"));
   });
 });

@@ -1,11 +1,11 @@
 import AWS from "aws-sdk";
 import axios from "axios";
 import { IImageSource } from "messages-lib";
-import { IBasicImageDetails } from "messages-lib/lib/messages/imageDetails";
+import { IImageDetails } from "messages-lib/lib/messages/imageDetails";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 
-jest.setTimeout(40 * 1000);
+jest.setTimeout(20 * 1000);
 
 const assertInputEnvVariablesSet = () => {
   expect(process.env.TF_OUTPUT_aws_region).toBeDefined();
@@ -27,7 +27,7 @@ describe("Public Image Details integration test", () => {
     const imageId = uuidv4();
     const description = uuidv4();
 
-    const message: IBasicImageDetails = { imageId, description };
+    const message: IImageDetails = { imageId, description };
 
     const params = {
       Message: JSON.stringify(message),
@@ -113,7 +113,7 @@ describe("Public Image Details integration test", () => {
     const publicUrl = uuidv4();
 
     const imageSourceMessage: IImageSource = { imageId, publicUrl };
-    const imageDetailsMessage: IBasicImageDetails = { imageId, description };
+    const imageDetailsMessage: IImageDetails = { imageId, description };
 
     const imageSourceMessageParams = {
       Message: JSON.stringify(imageSourceMessage),

@@ -1,4 +1,4 @@
-export const basicImageDetailsToImageSchemaMap = {
+export const imageDetailsToImageSchemaMap = {
   imageId: "ImageId",
   description: "Description",
 };

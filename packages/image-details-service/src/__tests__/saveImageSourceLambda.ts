@@ -1,7 +1,7 @@
 import { IRecords } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import lambdaTester from "lambda-tester";
-import { IBasicImageDetails, IImageSource } from "messages-lib";
+import { IImageDetails, IImageSource } from "messages-lib";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { deps, IDeps } from "../saveImageSource/saveImageSourceHandler";
@@ -110,13 +110,5 @@ describe("Saves image source from messaging service", () => {
           PublicUrl: newPublicUrl,
         });
       });
-  });
-
-  test("Fails validation when SNS event is invalid", () => {
-    const emptyEvent = {};
-
-    return lambdaTester(handler)
-      .event(emptyEvent)
-      .expectError(expectMessageProperty("Event object failed validation"));
   });
 });

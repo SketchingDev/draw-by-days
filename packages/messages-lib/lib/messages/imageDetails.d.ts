@@ -1,4 +1,4 @@
-export interface IBasicImageDetails {
+export interface IImageDetails {
   imageId: string;
   description: string;
 }
