@@ -38,7 +38,18 @@ export const produceImageAvailableEventHandler = (event: IS3Record, context: Con
   deps.init().then(({ sns, snsTopicArn, bucketPublicUrl }) => {
     const imageSource = transformEvent(bucketPublicUrl, event);
 
-    sns.publish({ TopicArn: snsTopicArn, Message: JSON.stringify(imageSource) }, (err: AWSError) => {
+    const message = {
+      TopicArn: snsTopicArn,
+      Message: JSON.stringify(imageSource),
+      MessageAttributes: {
+        event: {
+          DataType: "String",
+          StringValue: "ImageSource",
+        },
+      },
+    };
+
+    sns.publish(message, (err: AWSError) => {
       if (err) {
         callback(err, undefined);
       } else {
