@@ -1,4 +1,4 @@
-export const logEvent = () => ({
+export const log = () => ({
   before: (handler: { event: object }, next: () => void) => {
     console.log("Event received", JSON.stringify(handler.event));
     next();

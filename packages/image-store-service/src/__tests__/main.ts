@@ -3,7 +3,7 @@ import { QueueArn } from "aws-sdk/clients/s3";
 import { ReceiveMessageResult } from "aws-sdk/clients/sqs";
 import { IRecords } from "aws-types-lib";
 import lambdaTester = require("lambda-tester");
-import { IImageSource } from "messages-lib/lib/messages/imageStore";
+import { IImageSource } from "messages-lib/lib/messages/imageSource";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 import { handler } from "../main";

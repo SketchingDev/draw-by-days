@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import { ReceiveMessageResult } from "aws-sdk/clients/sqs";
 import axios from "axios";
-import { IImageSource } from "messages-lib/lib/messages/imageStore";
+import { IImageSource } from "messages-lib/lib/messages/imageSource";
 import uuidv4 from "uuid/v4";
 import waitForExpect from "wait-for-expect";
 
