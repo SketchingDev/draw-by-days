@@ -34,6 +34,7 @@ pids
 
 lib-cov
 coverage
+lcov-merged.info
 reports
 .lock-wscript
 build/Release
