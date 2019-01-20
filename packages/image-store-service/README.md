@@ -3,6 +3,11 @@
 Maintains a bucket of publicly accessible images and publishes the URL of newly
 added images over SNS.
 
+## Architecture
+
+![Serverless architecture for service](docs/architecture.jpg)
+
+
 ## Advertising new images
 
 When an image is added to the bucket then a message is published over SNS:
