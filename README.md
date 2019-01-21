@@ -1,8 +1,7 @@
 # Draw by Days
 
-[![Build Status](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master.svg?style=svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
+[![Build Status](https://img.shields.io/circleci/project/github/SketchingDev/draw-by-days/master.svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/SketchingDev/draw-by-days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/draw-by-days?branch=master)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 Draw-by-days provides artists (amateur or professional) with an image a day to practice their particular
 artistry. The more days you do the better you'll get.
