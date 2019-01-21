@@ -45,7 +45,6 @@
     "test:start-sns": "docker-compose -f docker-compose.test.yml up -d",
     "test:stop-sns": "docker-compose -f docker-compose.test.yml down",
     "test": "yarn test:start-sns && jest src/ --runInBand; eval \"yarn test:stop-sns && exit $?\"",
-    "test:upload-coverage": "cat ./coverage/lcov.info | coveralls",
     "test:integration": "jest test/ --collectCoverage False",
     "build": "webpack --env.output_filename image-store.zip"
   }

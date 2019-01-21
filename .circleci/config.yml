@@ -25,9 +25,6 @@ commands:
       - run:
           name: Test
           command: yarn test --scope << parameters.package_name >>
-      - run:
-          name: Upload coverage
-          command: yarn test:upload-coverage --scope << parameters.package_name >>
       - store_test_results:
           path: ./packages/<< parameters.package_name >>/reports/
 
@@ -104,6 +101,10 @@ jobs:
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: image-details-service
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/image-details-service/coverage/lcov.info
 
   build_image_details:
     executor: node-build-environment
@@ -172,6 +173,10 @@ jobs:
       - setup_remote_docker
       - yarn-build-then-test:
           package_name: image-store-service
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/image-store-service/coverage/lcov.info
 
   build_image_store:
     executor: node-build-environment
@@ -222,6 +227,22 @@ jobs:
             cat /tmp/workspace/terraform/environments/env.image_store_service.outputs
 
             yarn test:integration --scope image-store-service
+
+  ## Test Coverage
+
+  collate_test_coverage:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Collate
+          command: yarn test:merge-coverage
+      - run:
+          name: Upload
+          command: yarn test:upload-coverage
 
   ## End to End Tests
 
@@ -292,6 +313,14 @@ workflows:
             branches:
               ignore:
                 - master
+
+      ## Collage coverage
+
+      - collate_test_coverage:
+          requires:
+            - test_website
+            - test_image_details
+            - test_image_store
 
       ## End to End Tests
 
