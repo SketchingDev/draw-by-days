@@ -8,10 +8,9 @@ module.exports = {
     "^.+\\.tsx?$": "ts-jest",
   },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  testPathIgnorePatterns: ["/node_modules/", "/__tests__/utilities/.*"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testEnvironment: "node",
-  collectCoverage: true,
-  collectCoverageFrom: ["**/*.{ts,tsx}", "!**/node_modules/**"],
   reporters: [
     "default",
     [
@@ -23,12 +22,4 @@ module.exports = {
       },
     ],
   ],
-  coverageThreshold: {
-    global: {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: -10,
-    },
-  },
 };

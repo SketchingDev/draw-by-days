@@ -11,8 +11,6 @@ module.exports = {
   testPathIgnorePatterns: ["/node_modules/", "/__tests__/utilities/.*"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testEnvironment: "node",
-  collectCoverage: true,
-  collectCoverageFrom: ["**/*.{ts,tsx}", "!**/node_modules/**"],
   reporters: [
     "default",
     [
@@ -24,12 +22,4 @@ module.exports = {
       },
     ],
   ],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: -10,
-    },
-  },
 };
