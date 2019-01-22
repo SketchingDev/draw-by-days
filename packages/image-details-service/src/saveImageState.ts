@@ -26,11 +26,6 @@ const successResult = (savedItem: Model<IImage>) => {
   return { result: "success", message: `Details stored for ${item.ImageId}` };
 };
 
-const failedResult = (err: any) => {
-  console.log("Failed to save item", JSON.stringify(err));
-  return err;
-};
-
 export const saveImageState = <T extends { imageId: string }>(
   updateObjectGenerator: (sourceMessage: T) => Partial<IImage>,
 ) => (message: T, context: Context, callback: ResultCallback) =>
@@ -40,4 +35,4 @@ export const saveImageState = <T extends { imageId: string }>(
       const updateObject = updateObjectGenerator(message);
       return imageRecord.update(message.imageId, updateObject);
     })
-    .then(image => callback(null, successResult(image)), (err: any) => callback(failedResult(err), undefined));
+    .then(image => callback(null, successResult(image)));
