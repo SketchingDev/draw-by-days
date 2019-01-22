@@ -44,8 +44,8 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
     "test:start-localdb": "docker-compose -f docker-compose.test.yml up -d",
     "test:stop-localdb": "docker-compose -f docker-compose.test.yml down",
-    "test": "yarn test:start-localdb && jest src/ --runInBand; eval \"yarn test:stop-localdb && exit $?\"",
-    "test:integration": "jest test/ --collectCoverage False",
+    "test": "yarn test:start-localdb && jest src/ -c jest.config.coverage.js --runInBand; eval \"yarn test:stop-localdb && exit $?\"",
+    "test:integration": "jest test/ -c jest.config.js",
     "build": "webpack --env.save_image_details_filename save-image-details.zip --env.save_image_source_filename save-image-source.zip"
   }
 }
