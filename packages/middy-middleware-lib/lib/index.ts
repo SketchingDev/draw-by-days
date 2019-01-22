@@ -1,2 +1,2 @@
-export { log } from "./diagnostics/log";
+export { logEvent } from "./diagnostics/logEvent";
 export { throwIfUndefined } from "./validation/throwIfUndefined";
