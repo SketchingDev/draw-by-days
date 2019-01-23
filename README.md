@@ -52,9 +52,8 @@ here's an image of the [CI/CD workflow from CircleCI](https://circleci.com/gh/Sk
 
 ![CI Pipleline](./docs/ci-pipeline.png)
 
-*The image has been doctored a little to re-order the jobs, CircleCI seems to enjoy jumbling up the jobs and [this
-closed issue](https://discuss.circleci.com/t/properly-sort-jobs-in-workflows/16258) suggests it won't change anytime
-soon.*
+*The image has been doctored a little to re-order the jobs, since CircleCI seems to enjoy
+[jumbling them up](https://discuss.circleci.com/t/properly-sort-jobs-in-workflows/16258).*
 
 [terraform]: https://www.terraform.io/
 [terraform-best-practises]: https://www.terraform.io/docs/enterprise/workspaces/repo-structure.html
