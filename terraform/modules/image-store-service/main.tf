@@ -71,6 +71,9 @@ resource "aws_lambda_function" "public_image_event_publisher" {
   handler       = "main.handler"
   runtime       = "nodejs8.10"
   source_code_hash = "${base64sha256(file(var.new_image_event_producer_lambda_filename))}"
+  tracing_config {
+    mode = "PassThrough"
+  }
   environment   = {
     variables {
       SNS_TOPIC_ARN = "${data.aws_sns_topic.image_on_platform.arn}"
