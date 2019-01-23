@@ -29,10 +29,10 @@ to reproduce in their particular medium. The more days you complete the better y
 It's worth starting by explaining that a service's code and infrastructure are stored separately: 
 
  * `packages/` - Code and [component tests](https://microservices.io/patterns/testing/service-component-test.html) for services
- * `terraform/`
-   * `modules/` - Infrastructure for services *(Common infrastructure stored in a [separate repo with tests][terraform-modules])*
-   * `environment/`
-     * `<environment>/` - Variables for each service per environment
+ * `terraform/` - Infrastructure for services 
+   * `modules/` - Module per service *(sub-modules common between services are stored in a [separate repo][terraform-modules])*
+   * `environments/` - Variables for each service per environment
+     * `<environment>/<service>/terraform.tfvars`
 
 *This split is due to the convention of node projects living under a `packages` directory and
 [Terraform best practises][terraform-best-practises] advising that infrastructure lives under `modules` and
