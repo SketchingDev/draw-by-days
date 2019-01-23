@@ -17,6 +17,10 @@ describe("Public Image Details integration test", () => {
   let sns: AWS.SNS;
 
   beforeAll(() => {
+    process.env.TF_OUTPUT_aws_region = "us-east-1";
+    process.env.TF_OUTPUT_private_url = "https://v7m6u7x6ag.execute-api.us-east-1.amazonaws.com/images";
+    process.env.TF_OUTPUT_public_url = "images-ci.drawbydays.com";
+    process.env.TF_OUTPUT_subscribed_topic_arn = "arn:aws:sns:us-east-1:794559416598:draw-by-days-ci-image-on-platform";
     assertInputEnvVariablesSet();
 
     AWS.config.update({ region: process.env.TF_OUTPUT_aws_region });
