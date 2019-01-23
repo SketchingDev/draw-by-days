@@ -1,7 +1,11 @@
-# Public Image Store Service
+# Image Store Service
 
-Maintains a bucket of publicly accessible images and publishes the URL of newly
-added images over SNS.
+Maintains a bucket of publicly accessible images and publishes the URL of newly added images over SNS.
+
+## Architecture
+
+![Serverless architecture for service](docs/architecture.jpg)
+
 
 ## Advertising new images
 
