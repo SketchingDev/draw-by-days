@@ -1,3 +1,4 @@
+import AWS from "aws-sdk";
 import { IRecords } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import lambdaTester from "lambda-tester";

@@ -6,6 +6,10 @@ import { IImageSource } from "messages-lib";
 import { throwIfUndefined } from "middy-middleware-lib";
 import * as url from "url";
 
+// tslint:disable-next-line:no-var-requires
+const AWSXRay = require("aws-xray-sdk");
+const AwsWithXRay = AWSXRay.captureAWS(AWS);
+
 type ResultCallback = Callback<{ result: string; message: string } | null>;
 
 export interface IDeps {
@@ -16,7 +20,7 @@ export interface IDeps {
 export const deps = {
   init: (): Promise<IDeps> =>
     Promise.resolve({
-      sns: new AWS.SNS({
+      sns: new AwsWithXRay.SNS({
         apiVersion: "2010-03-31",
         region: "us-east-1",
       }),

@@ -1,10 +1,16 @@
 import { Context } from "aws-lambda";
+import AWS from "aws-sdk";
 import { ResultCallback } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import { Model } from "dynamoose";
+import dynamoose = require("dynamoose");
 import { throwIfUndefined } from "middy-middleware-lib";
 import { IImage } from "./storage/image";
 import { imageSchema } from "./storage/imageSchema";
+
+// tslint:disable-next-line:no-var-requires
+const AWSXRay = require("aws-xray-sdk");
+dynamoose.AWS = AWSXRay.captureAWS(AWS);
 
 export interface IDeps {
   imageRecord: ModelConstructor<IImage, string>;
