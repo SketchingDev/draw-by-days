@@ -4,10 +4,13 @@ data "aws_sns_topic" "image_on_platform" {
 
 module "save_image_url" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=tracing-option-lambda"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-url"
   function_filename = "${var.save_image_source_lambda_filename}"
+  function_tracing_config = {
+    mode = "PassThrough"
+  }
   sns_filter_policy= <<EOF
 {
   "event" : ["ImageSource"]
@@ -22,10 +25,13 @@ EOF
 
 module "save_image_details" {
   namespace = "${var.namespace}"
-  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda"
+  source = "git::https://github.com/SketchingDev/draw-by-days-terraform-modules.git//sns_subscribed_lambda?ref=tracing-option-lambda"
   sns_topic_arn = "${data.aws_sns_topic.image_on_platform.arn}"
   function_name = "${var.namespace}-save-image-details"
   function_filename = "${var.save_image_details_lambda_filename}"
+  function_tracing_config = {
+    mode = "PassThrough"
+  }
   sns_filter_policy= <<EOF
 {
   "event" : ["ImageDetails"]
