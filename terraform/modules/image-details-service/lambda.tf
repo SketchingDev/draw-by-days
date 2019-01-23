@@ -9,7 +9,7 @@ module "save_image_url" {
   function_name = "${var.namespace}-save-image-url"
   function_filename = "${var.save_image_source_lambda_filename}"
   function_tracing_config = {
-    mode = "PassThrough"
+    mode = "Active"
   }
   sns_filter_policy= <<EOF
 {
@@ -30,7 +30,7 @@ module "save_image_details" {
   function_name = "${var.namespace}-save-image-details"
   function_filename = "${var.save_image_details_lambda_filename}"
   function_tracing_config = {
-    mode = "PassThrough"
+    mode = "Active"
   }
   sns_filter_policy= <<EOF
 {
@@ -76,12 +76,22 @@ resource "aws_iam_policy" "dynamodb_write_access" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "image_details_dynamodb_acess" {
+resource "aws_iam_role_policy_attachment" "image_details_dynamodb_access" {
   role = "${module.save_image_details.lambda_function_role}"
   policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
 }
 
-resource "aws_iam_role_policy_attachment" "image_url_dynamodb_acess" {
+resource "aws_iam_role_policy_attachment" "image_url_dynamodb_access" {
   role = "${module.save_image_url.lambda_function_role}"
   policy_arn = "${aws_iam_policy.dynamodb_write_access.arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "image_details_xray_access" {
+  role = "${module.save_image_details.lambda_function_role}"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "image_url_xray_access" {
+  role = "${module.save_image_url.lambda_function_role}"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
 }
