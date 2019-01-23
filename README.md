@@ -1,8 +1,7 @@
 # Draw by Days
 
-[![Build Status](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master.svg?style=svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
+[![Build Status](https://img.shields.io/circleci/project/github/SketchingDev/draw-by-days/master.svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/SketchingDev/draw-by-days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/draw-by-days?branch=master)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 Draw by Days is project that I've been using to explore the emerging serverless offerings of AWS. Take a look around,
 you'll find:
@@ -29,6 +28,7 @@ to reproduce in their particular medium. The more days you complete the better y
 
  * [Image Details Service](packages/image-details-service) - Exposes url and details of all stored images
  * [Image Store Service](packages/image-store-service) - Publicly accessible S3 bucket of images
+ * [Website](packages/website) - An unloved website that will present the images
 
 ### Project structure
 
