@@ -8,10 +8,10 @@ Draw by Days is project that I've been using to explore the emerging serverless 
 you'll find:
 
   * Event-driven architecture with SNS as the backbone
-  * Serverless microservices (deploy independently)
-  * Imperfect solutions as I try to learn the plethora of whizzy technologies out there
+  * Serverless microservices (deployed independently)
+  * Wiki pages explaining my findings
 
-Besides a learning exercise I'm hoping Draw by Days will provide artists (amateur or professional) with an image a day
+Besides a learning exercise I'm hoping this project will provide artists (amateur or professional) with an image a day
 to reproduce in their particular medium. The more days you complete the better you'll get - or at least I'm hoping!
 
 ## Technologies
