@@ -25,9 +25,6 @@ commands:
       - run:
           name: Test
           command: yarn test --scope << parameters.package_name >>
-      - run:
-          name: Upload coverage
-          command: yarn test:upload-coverage --scope << parameters.package_name >>
       - store_test_results:
           path: ./packages/<< parameters.package_name >>/reports/
 
@@ -104,6 +101,10 @@ jobs:
       - yarn-install-with-cache
       - yarn-build-then-test:
           package_name: image-details-service
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/image-details-service/coverage/lcov.info
 
   build_image_details:
     executor: node-build-environment
@@ -157,20 +158,6 @@ jobs:
 
             yarn test:integration --scope image-details-service
 
-  teardown_ci_image_details:
-    executor: terragrunt-deploy-environment
-    steps:
-      - checkout
-      - run:
-          name: Destroy
-          command: |
-            touch /tmp/dummy-lambda
-            export TF_VAR_save_image_metadata_lambda_filename=/tmp/dummy-lambda
-            export TF_VAR_TF_VAR_save_image_url_lambda_filename=/tmp/dummy-lambda
-
-            terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/image-details-service
-
   ## Image Store
 
   test_image_store:
@@ -186,6 +173,10 @@ jobs:
       - setup_remote_docker
       - yarn-build-then-test:
           package_name: image-store-service
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/image-store-service/coverage/lcov.info
 
   build_image_store:
     executor: node-build-environment
@@ -237,18 +228,21 @@ jobs:
 
             yarn test:integration --scope image-store-service
 
-  teardown_ci_image_store:
-    executor: terragrunt-deploy-environment
+  ## Test Coverage
+
+  collate_test_coverage:
+    executor: node-build-environment
     steps:
       - checkout
+      - yarn-install-with-cache
+      - attach_workspace:
+          at: ~/repo
       - run:
-          name: Destroy
-          command: |
-            touch /tmp/dummy-lambda
-            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/dummy-lambda
-
-            terragrunt destroy --terragrunt-non-interactive -auto-approve | redact.sh
-          working_directory: terraform/environments/ci/image-store-service
+          name: Collate
+          command: yarn test:merge-coverage
+      - run:
+          name: Upload
+          command: yarn test:upload-coverage
 
   ## End to End Tests
 
@@ -272,19 +266,6 @@ jobs:
 
 workflows:
   version: 2
-
-  # Prevent building up state in the CI environment
-  nightly_ci_teardown:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - teardown_ci_image_details
-      - teardown_ci_image_store
 
   commit_jobs:
     jobs:
@@ -332,6 +313,14 @@ workflows:
             branches:
               ignore:
                 - master
+
+      ## Collage coverage
+
+      - collate_test_coverage:
+          requires:
+            - test_website
+            - test_image_details
+            - test_image_store
 
       ## End to End Tests
 

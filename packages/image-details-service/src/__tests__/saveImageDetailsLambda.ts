@@ -110,4 +110,14 @@ describe("Saves image details from messaging service", () => {
         });
       });
   });
+
+  test("Validation fails when SNS event does not match SNS schema", () => {
+    const emptyEvent = {};
+
+    return lambdaTester(handler)
+      .event(emptyEvent)
+      .expectError((item: { message: string }) => {
+        expect(item.message).toBe("Event object failed validation");
+      });
+  });
 });

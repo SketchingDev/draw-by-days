@@ -14,7 +14,7 @@
     "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
     "test:integration": "lerna run test:integration --stream",
-    "test:upload-coverage": "lerna run test:upload-coverage --stream",
+    "test:upload-coverage": "cat ./lcov-merged.info | coveralls",
     "test:merge-coverage": "yarn lcov-result-merger 'packages/*/coverage/lcov.info' lcov-merged.info",
     "test:e2e" : "lerna run test:e2e --scope e2e --stream",
     "build": "lerna run build --stream"
