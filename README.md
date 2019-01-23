@@ -26,7 +26,9 @@ to reproduce in their particular medium. The more days you complete the better y
 
 ## Where to start
 
-It's worth starting by explaining that a service's code and infrastructure are stored separately: 
+**Directory structure**
+
+I'll start by explaining how each microservice is separated by its code and infrastructure:
 
  * `packages/` - Code and [component tests](https://microservices.io/patterns/testing/service-component-test.html) for services
  * `terraform/` - Infrastructure for services 
@@ -37,6 +39,21 @@ It's worth starting by explaining that a service's code and infrastructure are s
 *This split is due to the convention of node projects living under a `packages` directory and
 [Terraform best practises][terraform-best-practises] advising that infrastructure lives under `modules` and
 `environments` directories.*
+
+**Continuous delivery pipeline**
+
+Next take a look at the CI/CD pipeline which should hopefully show the process of testing, building, deploying each
+service independently. Those who think in code can view the [config.yml](./.circleci/config.yml), the rest of us can
+look at a [workflow](https://circleci.com/gh/SketchingDev/workflows/draw-by-days/tree/master).
+
+
+![CI Pipleline](./docs/ci-pipeline.png)
+
+
+**The image is doctored a little to line up dependent jobs, CircleCI seems to enjoy jumbling up the jobs and [this
+closed issue](https://discuss.circleci.com/t/properly-sort-jobs-in-workflows/16258) suggests it won't change anytime
+soon.**
+
 
 
 [terraform]: https://www.terraform.io/
