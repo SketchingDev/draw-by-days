@@ -1,5 +1,4 @@
 import { Context } from "aws-lambda";
-import AWS from "aws-sdk";
 import { ResultCallback } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import { Model } from "dynamoose";
@@ -17,7 +16,7 @@ export interface IDeps {
 
 export const deps = {
   init: (): Promise<IDeps> => {
-    dynamoose.AWS = AWSXRay.captureAWS(AWS);
+    dynamoose.AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
     return Promise.resolve({
       imageRecord: model<IImage, string>(
