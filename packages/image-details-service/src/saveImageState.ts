@@ -2,21 +2,29 @@ import { Context } from "aws-lambda";
 import { ResultCallback } from "aws-types-lib";
 import { model, ModelConstructor } from "dynamoose";
 import { Model } from "dynamoose";
+import dynamoose = require("dynamoose");
 import { throwIfUndefined } from "middy-middleware-lib";
 import { IImage } from "./storage/image";
 import { imageSchema } from "./storage/imageSchema";
 
+// tslint:disable-next-line:no-var-requires
+const AWSXRay = require("aws-xray-sdk");
+
 export interface IDeps {
   imageRecord: ModelConstructor<IImage, string>;
 }
+
 export const deps = {
-  init: (): Promise<IDeps> =>
-    Promise.resolve({
+  init: (): Promise<IDeps> => {
+    dynamoose.AWS = AWSXRay.captureAWS(require("aws-sdk"));
+
+    return Promise.resolve({
       imageRecord: model<IImage, string>(
         throwIfUndefined(process.env.TABLE_NAME, "TABLE_NAME environment variable not set"),
         imageSchema,
       ),
-    }),
+    });
+  },
 };
 
 const successResult = (savedItem: Model<IImage>) => {

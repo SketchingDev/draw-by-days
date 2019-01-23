@@ -6,6 +6,9 @@ import { IImageSource } from "messages-lib";
 import { throwIfUndefined } from "middy-middleware-lib";
 import * as url from "url";
 
+// tslint:disable-next-line:no-var-requires
+const AWSXRay = require("aws-xray-sdk");
+
 type ResultCallback = Callback<{ result: string; message: string } | null>;
 
 export interface IDeps {
@@ -14,15 +17,18 @@ export interface IDeps {
   bucketPublicUrl: string;
 }
 export const deps = {
-  init: (): Promise<IDeps> =>
-    Promise.resolve({
-      sns: new AWS.SNS({
+  init: (): Promise<IDeps> => {
+    const AwsWithXRay = AWSXRay.captureAWS(AWS);
+
+    return Promise.resolve({
+      sns: new AwsWithXRay.SNS({
         apiVersion: "2010-03-31",
         region: "us-east-1",
       }),
       snsTopicArn: throwIfUndefined(process.env.SNS_TOPIC_ARN, "SNS_TOPIC_ARN environment variable not set"),
       bucketPublicUrl: throwIfUndefined(process.env.BUCKET_PUBLIC_URL, "BUCKET_PUBLIC_URL environment variable not set"),
-    }),
+    });
+  },
 };
 
 const transformEvent = (bucketPublicUrl: string, event: IS3Record): IImageSource => {
