@@ -16,7 +16,7 @@ to reproduce in their particular medium. The more days you complete the better y
 
 ## Technologies
 
- * AWS Lambda, DynamoDB, SNS, API Gateway, S3 etc
+ * AWS Lambda / DynamoDB / SNS / API Gateway / S3
  * Terraform / Terragrunt / Terratest
  * NodeJS / TypeScript / Lerna / Yarn
  * CircleCI
@@ -24,39 +24,18 @@ to reproduce in their particular medium. The more days you complete the better y
 ## Architecture
 
 
-## Project structure
+## Where to start
 
-Following the general patterns for node projects to live under a `packages` directory and
-[Terraform best practises][terraform-best-practises] to define infrastructure under a `modules` directory and
-environment specific variables in their own directories has left me with the following structure:
+It's worth starting by explaining that a service's code and infrastructure are stored separately: 
 
-```
-terraform/
-   modules/
-       image-details-service/          # Terraform for the Image Details service
-   environments/                       # Production specific variables for said service
-       prod/
-           image-details-service/
-               terraform.tfvars
-packages/
-    image-details-service/
-        src/                           # Code for Lambdas of said service
-        test/                          # Integration test run against deployed service
-```
+ * `packages/` - Contains code and [component tests](https://microservices.io/patterns/testing/service-component-test.html) for services
+ * `terraform/modules/` - Contains infrastructure for services
+   * *Common infrastructure between these modules are stored in a [separate repo with tests][terraform-modules]*
+ * `terraforn/environment/<environment>/` - Contains variables for each service per environment
 
-## Deployment
-
-All infrastructure is defined as code using [Terraform][terraform]. Read in more detail at 
-[terraform/README.md](./terraform/README.md), otherwise here are some key points...
-
-* IaC using Terraform
-* [Terragrunt][terragrunt] used as wrapper to help follow best practises and keep infrastructure DRY
-* Services are encapsulated in Terraform modules
-  * Modules that are reusable between services (e.g. [SNS triggered Lambdas][sns-subscribed-lambda]) are defined in 
-  [their own repo][terraform-modules] with [Terratest][terratest] tests
-* [Component tests](https://microservices.io/patterns/testing/service-component-test.html) for each service are 
-  contained in their respective `packages/` directory
-
+*This split is due to the convention of node projects living under a `packages` directory and
+[Terraform best practises][terraform-best-practises] advising that infrastructure lives under `modules` and
+`environments` directories.*
 
 
 [terraform]: https://www.terraform.io/
