@@ -21,12 +21,11 @@ to reproduce in their particular medium. The more days you complete the better y
  * NodeJS / TypeScript / Lerna / Yarn
  * CircleCI
 
-## Architecture
+## Overview
 
+### Architecture
 
-## Where to start
-
-**Directory structure**
+### Project structure
 
 I'll start by explaining how each microservice is separated by its code and infrastructure:
 
@@ -40,21 +39,17 @@ I'll start by explaining how each microservice is separated by its code and infr
 [Terraform best practises][terraform-best-practises] advising that infrastructure lives under `modules` and
 `environments` directories.*
 
-**Continuous delivery pipeline**
+### Continuous delivery pipeline
 
 Next take a look at the CI/CD pipeline which should hopefully show the process of testing, building, deploying each
-service independently. Those who think in code can view the [config.yml](./.circleci/config.yml), the rest of us can
-look at a [workflow](https://circleci.com/gh/SketchingDev/workflows/draw-by-days/tree/master).
-
+service independently. Those who think in code can view the [config.yml](./.circleci/config.yml) and for the rest of us
+here's an image of the [CI/CD workflow from CircleCI](https://circleci.com/gh/SketchingDev/workflows/draw-by-days/).
 
 ![CI Pipleline](./docs/ci-pipeline.png)
 
-
-**The image is doctored a little to line up dependent jobs, CircleCI seems to enjoy jumbling up the jobs and [this
+*The image has been doctored a little to re-order the jobs, CircleCI seems to enjoy jumbling up the jobs and [this
 closed issue](https://discuss.circleci.com/t/properly-sort-jobs-in-workflows/16258) suggests it won't change anytime
-soon.**
-
-
+soon.*
 
 [terraform]: https://www.terraform.io/
 [terraform-best-practises]: https://www.terraform.io/docs/enterprise/workspaces/repo-structure.html
