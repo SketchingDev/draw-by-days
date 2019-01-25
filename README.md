@@ -22,8 +22,6 @@ to reproduce in their particular medium. The more days you complete the better y
 
 ## Overview
 
-### Architecture
-
 ![architecture](docs/architecture.png)
 
  * [Image Details Service](packages/image-details-service) - Exposes url and details of all stored images
