@@ -24,7 +24,7 @@ to reproduce in their particular medium. The more days you complete the better y
 
 ### Architecture
 
-::Whizzy diagram coming soon::
+![architecture](docs/architecture.png)
 
  * [Image Details Service](packages/image-details-service) - Exposes url and details of all stored images
  * [Image Store Service](packages/image-store-service) - Publicly accessible S3 bucket of images
