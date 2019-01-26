@@ -22,7 +22,9 @@ to reproduce in their particular medium. The more days you complete the better y
 
 ## Overview
 
-![architecture](docs/architecture.png)
+<p align="center">
+  <img src="docs/architecture.png">
+</p>
 
  * [Image Details Service](packages/image-details-service) - Exposes url and details of all stored images
  * [Image Store Service](packages/image-store-service) - Publicly accessible S3 bucket of images
