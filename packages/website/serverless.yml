@@ -1,0 +1,30 @@
+service:
+  name: website
+
+plugins:
+  - serverless-finch
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+custom:
+  siteName: dev.drawbydays.com
+  client:
+    bucketName: ${self:custom.siteName}
+    distributionFolder: build/
+  domain:
+    name: ${self:custom.siteName}
+    hostedZoneName: drawbydays.com.
+
+resources:
+  Resources:
+    S3WebsiteDnsEntry:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        Name: ${self:custom.domain.name}
+        HostedZoneName: ${self:custom.domain.hostedZoneName}
+        Type: A
+        AliasTarget:
+          DNSName: s3-website-us-east-1.amazonaws.com
+          HostedZoneId: Z3AQBSTGFYJSTF # us-east-1

@@ -1,0 +1,18 @@
+type Mutation {
+	createDailyImage(url: AWSURL! date: AWSDate!): DailyImage!
+}
+
+type Query {
+	getDailyImage(date: AWSDate!): [DailyImage]!
+}
+
+type DailyImage {
+	id: ID!
+	url: AWSURL!
+	date: AWSDate!
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+}

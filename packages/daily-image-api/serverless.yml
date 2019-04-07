@@ -1,0 +1,78 @@
+# Interesting article with Default filename conventions for mapping templates and public/private APIs
+# https://hackernoon.com/serverless-appsync-plugin-top-10-new-features-3faaf6789480
+
+# GitHub repo showing how to configure with tests
+# https://github.com/serverless/serverless-graphql/tree/master/app-backend/appsync/dynamo
+
+# serverless-appsync-offline doesn't support AWS scalars
+service:
+  name: daily-image-api
+
+plugins:
+  - serverless-appsync-plugin
+  - serverless-dynamodb-local
+  - serverless-appsync-offline
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+custom:
+  appsync-offline:
+    port: 62222
+    dynamodb:
+      client:
+        endpoint: "http://localhost:8000"
+        region: localhost
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: false
+
+  appSync:
+    name: draw-by-days-serverless-${opt:stage, 'dev'}-daily-images
+    authenticationType: API_KEY
+    mappingTemplates:
+      - dataSource: DailyImages
+        type: Query
+        field: getDailyImage
+        request: "getDailyImage-request-mapping-template.vtl"
+        response: "getDailyImage-response-mapping-template.vtl"
+      - dataSource: DailyImages
+        type: Mutation
+        field: createDailyImage
+        request: "createDailyImage-request-mapping-template.vtl"
+        response: "createDailyImage-response-mapping-template.vtl"
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: DailyImages
+        description: 'Daily images table'
+        config:
+          tableName: 'DailyImages'
+          iamRoleStatements:
+            - Effect: "Allow"
+              Action:
+                - "dynamodb:Scan"
+                - "dynamodb:PutItem"
+              Resource:
+                - "arn:aws:dynamodb:${self:provider.region}:*:table/DailyImages"
+                - "arn:aws:dynamodb:${self:provider.region}:*:table/DailyImages/*"
+
+resources:
+  Resources:
+    DailyImageTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: "DailyImages"

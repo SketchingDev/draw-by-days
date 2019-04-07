@@ -2,21 +2,23 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.6.0",
-    "coveralls": "^3.0.2",
-    "lcov-result-merger": "^3.1.0"
+    "lerna": "^3.6.0"
   },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "clean": "lerna run clean --stream",
-    "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
-    "test:integration": "lerna run test:integration --stream",
-    "test:upload-coverage": "cat ./lcov-merged.info | coveralls",
-    "test:merge-coverage": "yarn lcov-result-merger 'packages/*/coverage/lcov.info' lcov-merged.info",
-    "test:e2e" : "lerna run test:e2e --scope e2e --stream",
-    "build": "lerna run build --stream"
+    "build": "lerna run build --stream",
+    "deploy:all": "lerna run deploy --stream",
+    "deploy:website": "lerna run deploy --include-filtered-dependencies --scope website",
+    "deploy:image-storage": "lerna run deploy --include-filtered-dependencies --scope image-storage",
+    "deploy:image-ingest": "lerna run deploy --include-filtered-dependencies --scope image-ingest",
+    "deploy:daily-image-api": "lerna run deploy --include-filtered-dependencies --scope daily-image-api",
+    "remove:website": "lerna run remove --scope website",
+    "remove:image-storage": "lerna run remove --scope image-storage",
+    "remove:image-ingest": "lerna run remove --scope image-ingest",
+    "remove:daily-image-api": "lerna run remove --scope daily-image-api",
+    "remove:all": "yarn remove:website && yarn remove:image-ingest && yarn remove:image-storage && yarn remove:daily-image-api"
   }
 }

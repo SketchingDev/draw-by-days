@@ -1,0 +1,26 @@
+service:
+  name: image-ingest
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  tracing:
+    lambda: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${cf:image-storage-dev.ImagesBucketName}/*"
+
+functions:
+  pixabayImageIngester:
+    handler: handler.pixabayImageIngester
+    timeout: 10
+    environment:
+      imageStorageBucketName: ${cf:image-storage-dev.ImagesBucketName}
+      pixabayApiKey: ${ssm:/drawbydays/pixabay/apiKey~true}
+    events:
+      - schedule: rate(24 hours)

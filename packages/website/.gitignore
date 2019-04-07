@@ -1,4 +1,19 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
 /build
-.env
-/cypress/videos
-/cypress/screenshots
+
+# Yarn
+yarn-debug.log*
+yarn-error.log*

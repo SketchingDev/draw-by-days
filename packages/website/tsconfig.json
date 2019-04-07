@@ -4,26 +4,21 @@
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es5",
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "lib": ["es6", "dom"],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
-    "types": [],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
+    "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "typeRoots": [
-      "../node_modules/@types"
-    ]
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
@@ -32,7 +27,6 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts",
-    "cypress"
+    "src/setupTests.ts"
   ]
 }

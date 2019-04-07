@@ -1,0 +1,67 @@
+service:
+  name: image-storage
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  tracing:
+    lambda: true
+
+custom:
+  bucketName: draw-by-days-${opt:stage, 'dev'}-images
+
+functions:
+  saveDailyImages:
+    handler: handler.saveDailyImages
+    environment:
+      baseBucketUrl: https://s3.amazonaws.com/${self:custom.bucketName}/
+      dailyImageApiUrl: ${cf:daily-image-api-dev.GraphQlApiUrl}
+      dailyImageApiKey: ${cf:daily-image-api-dev.GraphQlApiKeyDefault}
+    events:
+      - s3:
+          bucket: photos
+          event: s3:ObjectCreated:*
+
+resources:
+  Resources:
+    S3BucketPhotos:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        AccessControl: PublicRead
+    S3BucketPhotosAllowPublicReadPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref S3BucketPhotos
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource:
+                - !Join ["", ["arn:aws:s3:::", !Ref S3BucketPhotos, '/*']]
+              Principal: "*"
+    SaveDailyImagesLambdaPermissionPhotosS3:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        FunctionName:
+          "Fn::GetAtt":
+            - SaveDailyImagesLambdaFunction
+            - Arn
+        Principal: "s3.amazonaws.com"
+        Action: "lambda:InvokeFunction"
+        SourceAccount:
+          Ref: AWS::AccountId
+        SourceArn: "arn:aws:s3:::${self:custom.bucketName}"
+
+  Outputs:
+    ImagesBucketName:
+      Value: ${self:custom.bucketName}
+
+    ImagesBucketUrl:
+      Value:
+        "Fn::GetAtt": [ S3BucketPhotos, WebsiteURL ]
