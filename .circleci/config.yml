@@ -33,32 +33,32 @@ executors:
     docker:
       - image: circleci/node:8-browsers
     working_directory: ~/repo
-  serverless-deploy-environment:
-    docker:
-      - image: amaysim/serverless:1.36.3
-    working_directory: ~/repo
+#  serverless-deploy-environment:
+#    docker:
+#      - image: amaysim/serverless:1.36.3
+#    working_directory: ~/repo
 
 jobs:
 
-  ## Website
+  ## Daily Image API
 
-  test_website:
-    executor: node-build-environment
-    steps:
-      - checkout
-      - yarn-install-with-cache
-      - yarn-build-then-test:
-          package_name: website
+#  test_daily_image_api:
+#    executor: node-build-environment
+#    steps:
+#      - checkout
+#      - yarn-install-with-cache
+#      - yarn-build-then-test:
+#          package_name: daily-image-api
 
 workflows:
   version: 2
 
-  commit_jobs:
-    jobs:
+#  commit_jobs:
+#    jobs:
 
       ## Website
 
-      - test_website
+#      - test_daily_image_api
 #      - build_website
 #      - deploy_website:
 #          requires:

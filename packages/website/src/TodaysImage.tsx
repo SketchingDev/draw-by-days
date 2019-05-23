@@ -1,9 +1,6 @@
-import { graphqlOperation } from "aws-amplify";
-import { Connect } from "aws-amplify-react";
 import * as React from "react";
 import { Image } from "semantic-ui-react";
 import { IDailyImage } from "./@types/dailyImage";
-import { getDailyImage as getDailyImageQuery } from "./graphql/queries";
 
 interface IProps {
    date: Date;

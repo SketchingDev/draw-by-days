@@ -3,24 +3,42 @@ service:
 
 plugins:
   - serverless-webpack
+  - '@anttiviljami/serverless-stack-output'
+
+custom:
+  stages:
+    - dev
+    - component
+    - prod
+  bucketName:
+    dev: ${cf:image-storage-dev.ImagesBucketName}
+    component: "${self:service.name}-component-${sls:instanceId}"
+  output:
+    file: ./.serverless/outputs.json
 
 provider:
   name: aws
   runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
   tracing:
     lambda: true
   iamRoleStatements:
     - Effect: Allow
       Action:
         - s3:PutObject
-      Resource: "arn:aws:s3:::${cf:image-storage-dev.ImagesBucketName}/*"
+      Resource: "arn:aws:s3:::${self:custom.bucketName.${self:provider.stage}}/*"
 
 functions:
   pixabayImageIngester:
     handler: handler.pixabayImageIngester
     timeout: 10
     environment:
-      imageStorageBucketName: ${cf:image-storage-dev.ImagesBucketName}
-      pixabayApiKey: ${ssm:/drawbydays/pixabay/apiKey~true}
+      IMAGE_STORAGE_BUCKET_NAME: ${self:custom.bucketName.${self:provider.stage}}
+      PIXABAY_API_KEY: ${ssm:/drawbydays/pixabay/apiKey~true}
     events:
       - schedule: rate(24 hours)
+
+resources:
+  Outputs:
+    ImagesBucketName:
+      Value: ${self:custom.bucketName.${self:provider.stage}}

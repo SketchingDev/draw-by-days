@@ -5,7 +5,7 @@
   "description": "Draw By Days website",
   "main": "handler.js",
   "scripts": {
-    "deploy": "yarn build && yarn deploy:s3 && yarn deploy:domain",
+
     "deploy:s3": "serverless client deploy --no-confirm",
     "deploy:domain": "serverless deploy -v",
     "remove": "yarn remove:domain && yarn remove:s3",
@@ -18,8 +18,7 @@
     "eject": "react-scripts-ts eject"
   },
   "dependencies": {
-    "aws-amplify": "^1.1.19",
-    "aws-amplify-react": "^2.3.0",
+    "axios": "^0.19.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-router-dom": "^4.3.1",
@@ -27,15 +26,17 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.85.0",
     "serverless-finch": "^2.4.2",
-    "serverless-stack-output": "^0.2.3"
+    "serverless-stack-output": "^0.2.3",
+    "serverless-stage-manager": "^1.0.5"
   },
   "devDependencies": {
-    "daily-image-api": "^1.0.0",
+    "@types/axios": "^0.14.0",
     "@types/jest": "^24.0.6",
     "@types/node": "^11.9.4",
     "@types/react": "^16.8.4",
     "@types/react-dom": "^16.8.2",
     "@types/react-router-dom": "^4.3.1",
+    "daily-image-api": "^1.0.0",
     "typescript": "^3.3.3333"
   }
 }

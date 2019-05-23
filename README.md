@@ -3,14 +3,12 @@
 [![Build Status](https://img.shields.io/circleci/project/github/SketchingDev/draw-by-days/master.svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/SketchingDev/draw-by-days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/draw-by-days?branch=master)
 
-Draw by Days is project that I've been using to explore the serverless offerings of AWS. 
-
-Besides a learning exercise this project will provide artists (amateur or professional) with an image a day
-to reproduce in their particular medium. The more days you complete the better you'll get - or at least I'm hoping!
+Draw by Days provides artists (amateur or professional) with an image a day to reproduce in their particular medium. The 
+more days you complete the better you'll get - or at least I'm hoping!
 
 ## Technologies
 
- * AWS Lambda / AppSync / DynamoDB / S3
+ * AWS Lambda / API Gateway / DynamoDB / S3 / SQS
  * Serverless Framework
  * NodeJS / TypeScript / Lerna / Yarn
  * CircleCI

@@ -1,52 +1,53 @@
 import AWSXRay from "aws-xray-sdk";
-
-import https from "https";
-AWSXRay.captureHTTPsGlobal(https);
-
-import { S3CreateEvent, S3Handler } from "aws-lambda";
-import AWSAppSyncClient, { AUTH_TYPE } from "aws-appsync/lib";
-import { AppSyncDailyImageRepo, DailyImageRepository } from "./storage/dailyImageRepo";
+import { S3Handler } from "aws-lambda";
+import { SqsDailyImageRepo } from "./storage/SqsDailyImageRepo";
 import laconia from "@laconia/core";
 import { DailyImage } from "./storage/domain/dailyImage";
-import { DailyImageEventConverter } from "./storage/dailyImageEventConverter";
+import AWS from "aws-sdk";
+import https from "https";
+import { s3CreateEventToDailyImage } from "./storage/s3CreateEventToDailyImage";
+import { DailyImageRepository } from "./storage/DailyImageRepository";
 
-interface EnvDependencies {
-  baseBucketUrl: string;
-  dailyImageApiUrl: string;
-  dailyImageApiKey: string;
+export interface EnvDependencies {
+  REGION: string;
+  BASE_BUCKET_URL: string;
+  DAILY_IMAGE_SQS_QUEUE_NAME: string;
 }
+
+export type DateGenerator = () => Date;
 
 export interface AppDependencies {
   dailyImageRepo: DailyImageRepository;
-  eventConverter: DailyImageEventConverter;
+  dateGenerator: DateGenerator;
 }
 
-const instances = ({ env }: { env: EnvDependencies }): AppDependencies => {
-  const appSyncClient = new AWSAppSyncClient({
-    auth: {
-      type: AUTH_TYPE.API_KEY,
-      apiKey: env.dailyImageApiKey,
-    },
-    region: "us-east-1",
-    url: env.dailyImageApiUrl,
-    disableOffline: true,
-  });
-
-  return {
-    dailyImageRepo: new AppSyncDailyImageRepo(appSyncClient),
-    eventConverter: new DailyImageEventConverter(() => new Date(), env.baseBucketUrl),
-  };
+const awsDependencies = ({ env }: { env: EnvDependencies }) => {
+  AWSXRay.captureHTTPsGlobal(https);
+  return { sqs: AWSXRay.captureAWSClient(new AWS.SQS({ region: env.REGION })) };
 };
 
-export const adapter = (app: any) => (event: S3CreateEvent, dependencies: AppDependencies): DailyImage[] => {
-  console.log(JSON.stringify(event));
+export const appDependencies = async ({
+  sqs,
+  env,
+}: {
+  sqs: AWS.SQS;
+  env: EnvDependencies;
+}): Promise<AppDependencies> => {
+  const getQueueUrlResponse = await sqs.getQueueUrl({ QueueName: env.DAILY_IMAGE_SQS_QUEUE_NAME }).promise();
+  if (!getQueueUrlResponse.QueueUrl) {
+    throw new Error(`Queue URL for ${env.DAILY_IMAGE_SQS_QUEUE_NAME} is undefined`);
+  }
 
-  const converter = dependencies.eventConverter;
-  return app(converter.convert(event), dependencies);
+  return {
+    dailyImageRepo: new SqsDailyImageRepo(sqs, getQueueUrlResponse.QueueUrl),
+    dateGenerator: () => new Date(),
+  };
 };
 
 export const app = async (input: DailyImage[], { dailyImageRepo }: AppDependencies) => {
   await dailyImageRepo.saveAll(input);
 };
 
-export const saveDailyImages: S3Handler = laconia(adapter(app)).register(instances);
+export const saveDailyImages: S3Handler = laconia(s3CreateEventToDailyImage(app))
+  .register(awsDependencies)
+  .register(appDependencies);

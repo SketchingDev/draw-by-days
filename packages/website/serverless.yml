@@ -3,19 +3,26 @@ service:
 
 plugins:
   - serverless-finch
+  - serverless-stage-manager
 
 provider:
   name: aws
   runtime: nodejs8.10
 
 custom:
-  siteName: dev.drawbydays.com
+  stages:
+    - dev
+    - prod
+  siteName:
+    dev: dev.drawbydays.com
+    prod: drawbydays.com
   client:
-    bucketName: ${self:custom.siteName}
+    bucketName: ${self:custom.siteName.${self:provider.stage}}
     distributionFolder: build/
   domain:
-    name: ${self:custom.siteName}
+    name: ${self:custom.siteName.${self:provider.stage}}
     hostedZoneName: drawbydays.com.
+    usEastOneZoneId: Z3AQBSTGFYJSTF
 
 resources:
   Resources:
@@ -27,4 +34,4 @@ resources:
         Type: A
         AliasTarget:
           DNSName: s3-website-us-east-1.amazonaws.com
-          HostedZoneId: Z3AQBSTGFYJSTF # us-east-1
+          HostedZoneId: ${self:custom.domain.usEastOneZoneId}

@@ -1,68 +1,79 @@
-# Interesting article with Default filename conventions for mapping templates and public/private APIs
-# https://hackernoon.com/serverless-appsync-plugin-top-10-new-features-3faaf6789480
-
-# GitHub repo showing how to configure with tests
-# https://github.com/serverless/serverless-graphql/tree/master/app-backend/appsync/dynamo
-
-# serverless-appsync-offline doesn't support AWS scalars
 service:
   name: daily-image-api
 
 plugins:
-  - serverless-appsync-plugin
+  - serverless-stage-manager
+  - serverless-webpack
+  - '@anttiviljami/serverless-stack-output'
   - serverless-dynamodb-local
-  - serverless-appsync-offline
-  - serverless-offline
 
 provider:
   name: aws
+  stage: ${opt:stage, 'dev'}
   runtime: nodejs8.10
+  tracing:
+    apiGateway: true
+    lambda: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:BatchWriteItem
+      Resource: { Fn::GetAtt: [ DailyImageTable, Arn ] }
+    - Effect: Allow
+      Action:
+        - sqs:DeleteMessage
+        - sqs:ReceiveMessage
+      Resource: { Fn::GetAtt: [ CreateImageMessages, Arn ] }
 
 custom:
-  appsync-offline:
-    port: 62222
-    dynamodb:
-      client:
-        endpoint: "http://localhost:8000"
-        region: localhost
+  stages:
+    - dev
+    - component
+    - prod
+  tableName: draw-by-days-${self:provider.stage}-daily-images
+  queueName: draw-by-days-${self:provider.stage}-daily-images
   dynamodb:
+    stages:
+      - dev
     start:
-      port: 8000
-      inMemory: true
+      port: 4569
       migrate: true
-      seed: false
+      inMemory: true
+      noStart: true
+  output:
+    file: ./.serverless/outputs.json
 
-  appSync:
-    name: draw-by-days-serverless-${opt:stage, 'dev'}-daily-images
-    authenticationType: API_KEY
-    mappingTemplates:
-      - dataSource: DailyImages
-        type: Query
-        field: getDailyImage
-        request: "getDailyImage-request-mapping-template.vtl"
-        response: "getDailyImage-response-mapping-template.vtl"
-      - dataSource: DailyImages
-        type: Mutation
-        field: createDailyImage
-        request: "createDailyImage-request-mapping-template.vtl"
-        response: "createDailyImage-response-mapping-template.vtl"
-    dataSources:
-      - type: AMAZON_DYNAMODB
-        name: DailyImages
-        description: 'Daily images table'
-        config:
-          tableName: 'DailyImages'
-          iamRoleStatements:
-            - Effect: "Allow"
-              Action:
-                - "dynamodb:Scan"
-                - "dynamodb:PutItem"
-              Resource:
-                - "arn:aws:dynamodb:${self:provider.region}:*:table/DailyImages"
-                - "arn:aws:dynamodb:${self:provider.region}:*:table/DailyImages/*"
+functions:
+  getDailyImage:
+    handler: handlerGet.getDailyImage
+    environment:
+      TABLE_NAME: ${self:custom.tableName}
+    events:
+      - http:
+          method: GET
+          path: dailyImage
+        Resource: arn:aws:dynamodb:*:*:table/${self:custom.tableName}
+  createDailyImage:
+    handler: handlerCreate.createDailyImage
+    environment:
+      TABLE_NAME: ${self:custom.tableName}
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - CreateImageMessages
+              - Arn
 
 resources:
   Resources:
+    CreateImageMessages:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.queueName}
+        MessageRetentionPeriod: 120
+        VisibilityTimeout: 60
+
     DailyImageTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -75,4 +86,9 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: "DailyImages"
+        TableName: ${self:custom.tableName}
+
+  Outputs:
+    QueueName:
+      Description: "Name of queue"
+      Value: ${self:custom.queueName}

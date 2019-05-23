@@ -3,35 +3,60 @@ service:
 
 plugins:
   - serverless-webpack
+  - serverless-stage-manager
+  - serverless-pseudo-parameters
+  - '@anttiviljami/serverless-stack-output'
 
 provider:
   name: aws
   runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
   tracing:
     lambda: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:GetQueueUrl
+        - sqs:SendMessage
+      Resource: "arn:aws:sqs:*:#{AWS::AccountId}:${self:custom.dailyImageApiQueueName.${self:provider.stage}}"
 
 custom:
-  bucketName: draw-by-days-${opt:stage, 'dev'}-images
+  stages:
+    - dev
+    - component
+    - prod
+  bucketName:
+    dev:  draw-by-days-dev-images
+    component: "draw-by-days-${self:service.name}-component-bucket-${sls:instanceId}"
+#    prod: draw-by-days-images
+  dailyImageApiQueueName:
+    dev: ${cf:daily-image-api-dev.QueueName}
+    component: "draw-by-days-${self:service.name}-component-queue-${sls:instanceId}"
+#    prod: ${cf:daily-image-api-prod.QueueName}
+  output:
+    file: ./.serverless/outputs.json
 
 functions:
   saveDailyImages:
     handler: handler.saveDailyImages
     environment:
-      baseBucketUrl: https://s3.amazonaws.com/${self:custom.bucketName}/
-      dailyImageApiUrl: ${cf:daily-image-api-dev.GraphQlApiUrl}
-      dailyImageApiKey: ${cf:daily-image-api-dev.GraphQlApiKeyDefault}
-    events:
-      - s3:
-          bucket: photos
-          event: s3:ObjectCreated:*
+      BASE_BUCKET_URL: https://s3.amazonaws.com/${self:custom.bucketName.${self:provider.stage}}/
+      DAILY_IMAGE_SQS_QUEUE_NAME: ${self:custom.dailyImageApiQueueName.${self:provider.stage}}
 
 resources:
   Resources:
     S3BucketPhotos:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucketName}
+        BucketName: ${self:custom.bucketName.${self:provider.stage}}
         AccessControl: PublicRead
+        NotificationConfiguration:
+          LambdaConfigurations:
+            - Event: 's3:ObjectCreated:*'
+              Function:
+                "Fn::GetAtt":
+                  - SaveDailyImagesLambdaFunction
+                  - Arn
     S3BucketPhotosAllowPublicReadPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -56,12 +81,13 @@ resources:
         Action: "lambda:InvokeFunction"
         SourceAccount:
           Ref: AWS::AccountId
-        SourceArn: "arn:aws:s3:::${self:custom.bucketName}"
+        SourceArn: "arn:aws:s3:::${self:custom.bucketName.${self:provider.stage}}"
 
   Outputs:
     ImagesBucketName:
-      Value: ${self:custom.bucketName}
-
+      Value: ${self:custom.bucketName.${self:provider.stage}}
+    DailyImageApiQueueName:
+      Value: ${self:custom.dailyImageApiQueueName.${self:provider.stage}}
     ImagesBucketUrl:
       Value:
         "Fn::GetAtt": [ S3BucketPhotos, WebsiteURL ]

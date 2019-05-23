@@ -8,9 +8,10 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "lerna run test --stream",
+    "test": "lerna run test --stream --parallel",
     "build": "lerna run build --stream",
-    "deploy:all": "lerna run deploy --stream",
+    "test:component": "lerna run test:component --stream --parallel",
+    "deploy:dev": "lerna run deploy:dev --stream",
     "deploy:website": "lerna run deploy --include-filtered-dependencies --scope website",
     "deploy:image-storage": "lerna run deploy --include-filtered-dependencies --scope image-storage",
     "deploy:image-ingest": "lerna run deploy --include-filtered-dependencies --scope image-ingest",
