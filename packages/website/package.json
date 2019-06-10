@@ -5,7 +5,6 @@
   "description": "Draw By Days website",
   "main": "handler.js",
   "scripts": {
-
     "deploy:s3": "serverless client deploy --no-confirm",
     "deploy:domain": "serverless deploy -v",
     "remove": "yarn remove:domain && yarn remove:s3",
@@ -15,7 +14,8 @@
     "start": "react-scripts-ts start",
     "build": "yarn clean && source ./scripts/setup-build-env.sh && yarn react-scripts-ts build",
     "test": "CI=true react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "test:daily-image-mock:start": "json-server mock/dailyImageApi.json --static ./mock/public"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -37,6 +37,7 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-router-dom": "^4.3.1",
     "daily-image-api": "^1.0.0",
+    "json-server": "^0.15.0",
     "typescript": "^3.3.3333"
   }
 }
