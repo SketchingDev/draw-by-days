@@ -2,6 +2,7 @@ service:
   name: daily-image-api
 
 plugins:
+  - serverless-domain-manager
   - serverless-stage-manager
   - serverless-webpack
   - '@anttiviljami/serverless-stack-output'
@@ -33,6 +34,10 @@ custom:
     - prod
   tableName: draw-by-days-${self:provider.stage}-daily-images
   queueName: draw-by-days-${self:provider.stage}-daily-images
+  apiDomain:
+    dev: api-dev.drawbydays.com
+    component: api-component.drawbydays.com
+    prod: api.drawbydays.com
   dynamodb:
     stages:
       - dev
@@ -43,6 +48,12 @@ custom:
       noStart: true
   output:
     file: ./.serverless/outputs.json
+  customDomain:
+    domainName: ${self:custom.apiDomain.${self:provider.stage}}
+    certificateName: '*.drawbydays.com'
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
 
 functions:
   getDailyImage:
@@ -53,6 +64,9 @@ functions:
       - http:
           method: GET
           path: dailyImage
+#          cors:
+#            origins:
+#              - https://*.drawbydays.com
         Resource: arn:aws:dynamodb:*:*:table/${self:custom.tableName}
   createDailyImage:
     handler: handlerCreate.createDailyImage
@@ -92,3 +106,5 @@ resources:
     QueueName:
       Description: "Name of queue"
       Value: ${self:custom.queueName}
+    DomainName:
+      Value: https://${self:custom.apiDomain.${self:provider.stage}}

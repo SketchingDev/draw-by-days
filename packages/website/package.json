@@ -5,17 +5,18 @@
   "description": "Draw By Days website",
   "main": "handler.js",
   "scripts": {
-    "deploy:s3": "serverless client deploy --no-confirm",
-    "deploy:domain": "serverless deploy -v",
-    "remove": "yarn remove:domain && yarn remove:s3",
-    "remove:s3": "serverless client remove --no-confirm",
-    "remove:domain": "serverless remove -v",
+    "deploy:dev": "REACT_APP_DAILY_IMAGE_API_URL=https://api-dev.drawbydays.com yarn build && yarn deploy:domain --stage dev && yarn deploy:s3 --stage dev",
+    "deploy:s3": "sls client deploy --no-confirm",
+    "deploy:domain": "sls deploy -v",
+    "remove:dev": "yarn remove:domain --stage dev && yarn remove:s3 --stage dev",
+    "remove:s3": "sls client remove --no-confirm",
+    "remove:domain": "sls remove -v",
     "clean": "rimraf build/*",
     "start": "react-scripts-ts start",
-    "build": "yarn clean && source ./scripts/setup-build-env.sh && yarn react-scripts-ts build",
+    "build": "yarn clean && yarn react-scripts-ts build",
     "test": "CI=true react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "test:daily-image-mock:start": "json-server mock/dailyImageApi.json --static ./mock/public"
+    "start:mock": "json-server mock/dailyImageApi.json --port=3001 --static ./mock/public"
   },
   "dependencies": {
     "axios": "^0.19.0",
