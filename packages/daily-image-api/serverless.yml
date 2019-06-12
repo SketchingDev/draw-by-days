@@ -64,9 +64,6 @@ functions:
       - http:
           method: GET
           path: dailyImage
-#          cors:
-#            origins:
-#              - https://*.drawbydays.com
         Resource: arn:aws:dynamodb:*:*:table/${self:custom.tableName}
   createDailyImage:
     handler: handlerCreate.createDailyImage
