@@ -1,9 +1,9 @@
 import AWS from "aws-sdk";
 import uuidv4 from "uuid/v4";
-import { DailyImageAddedMessage } from "../../storage/domain/dailyImageAddedMessage";
 import AsyncRetry = require("async-retry");
 import * as serverlessOutput from "../../.serverless/outputs.json";
 import axios from "axios";
+import { IAddDailyImageCommand } from "daily-image-api-command/lib";
 
 jest.setTimeout(60 * 1000);
 
@@ -56,7 +56,7 @@ describe("Service tests", () => {
       return Messages![0];
     }, retryEverySecond(20, "Waiting to receive message..."));
 
-    const imageAddedMessage = JSON.parse(message.Body!) as DailyImageAddedMessage;
+    const imageAddedMessage = JSON.parse(message.Body!) as IAddDailyImageCommand;
     expect(imageAddedMessage).toMatchObject({
       id: testObject.name,
       date: todaysDate,

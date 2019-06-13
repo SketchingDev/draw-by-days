@@ -23,7 +23,8 @@
     "aws-xray-sdk": "^2.3.3",
     "serverless": "^1.44.1",
     "serverless-pseudo-parameters": "^2.4.0",
-    "serverless-stage-manager": "^1.0.5"
+    "serverless-stage-manager": "^1.0.5",
+    "daily-image-api-command": "^1.0.0"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.1",

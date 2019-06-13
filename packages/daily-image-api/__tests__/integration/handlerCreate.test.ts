@@ -2,12 +2,13 @@ import * as config from "./dynamodb-config.json";
 import { app } from "../../app/creation/app";
 import { appDependencies } from "../../handlerCreate";
 import { SQSEvent, SQSRecord } from "aws-lambda";
-import { validateDailyImageAddedMessage } from "../../app/creation/validateDailyImageAddedMessage";
+import { validateAddDailyImageCommand } from "../../app/creation/validateAddDailyImageCommand";
 import uuidv4 from "uuid/v4";
 import AWS from "aws-sdk";
 import { DynamoDbFixture } from "../DynamoDbFixture";
 import lambdaTester = require("lambda-tester");
 import laconia = require("@laconia/core");
+import { IAddDailyImageCommand } from "daily-image-api-command/lib";
 
 const sqs = require("@laconia/adapter").sqs();
 
@@ -43,7 +44,7 @@ describe("Test creating daily image", () => {
           id,
           url: "http://www.google.com/",
           date: "2019-01-20",
-        }),
+        } as IAddDailyImageCommand),
       ],
     };
 
@@ -80,12 +81,12 @@ describe("Test creating daily image", () => {
           id: id1,
           url: "http://drawbydays.test/image1.png",
           date: "2019-01-20",
-        }),
+        } as IAddDailyImageCommand),
         createSqsRecord({
           id: id2,
           url: "http://drawbydays.test/image2.png",
           date: "2019-01-16",
-        }),
+        } as IAddDailyImageCommand),
       ],
     };
 
@@ -124,7 +125,7 @@ describe("Test creating daily image", () => {
   });
 
   const createHandler = (dynamoDb: AWS.DynamoDB, tableName: string) =>
-    laconia(sqs(validateDailyImageAddedMessage(app)))
+    laconia(sqs(validateAddDailyImageCommand(app)))
       .register(() => ({
         env: {
           TABLE_NAME: tableName,

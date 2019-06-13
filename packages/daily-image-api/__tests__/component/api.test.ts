@@ -1,9 +1,9 @@
 import * as serverlessOutput from "../../.serverless/outputs.json";
 import axios, { AxiosInstance } from "axios";
 import AWS from "aws-sdk";
-import { DailyImageAddedMessage } from "../../app/creation/validateDailyImageAddedMessage";
 import uuidv4 from "uuid/v4";
 import AsyncRetry from "async-retry";
+import { IAddDailyImageCommand } from "daily-image-api-command/lib";
 
 jest.setTimeout(10 * 1000);
 
@@ -28,7 +28,7 @@ describe("Test Daily Image API", () => {
   });
 
   test("Single image added message saved and returned via query", async () => {
-    const imageAdded: Readonly<DailyImageAddedMessage> = {
+    const imageAdded: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       date: new Date().toISOString().split("T")[0],
       url: "http://www.drawbydays.com/test-1",
@@ -55,13 +55,13 @@ describe("Test Daily Image API", () => {
   });
 
   test("Multiple image added message saved and returned via query", async () => {
-    const imageAddedMessage1: Readonly<DailyImageAddedMessage> = {
+    const imageAddedMessage1: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       date: new Date().toISOString().split("T")[0],
       url: "http://www.drawbydays.com/test-2",
     };
 
-    const imageAddedMessage2: Readonly<DailyImageAddedMessage> = {
+    const imageAddedMessage2: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       date: new Date().toISOString().split("T")[0],
       url: "http://www.drawbydays.com/test-3",

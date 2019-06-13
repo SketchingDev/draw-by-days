@@ -3,10 +3,10 @@ import AWS from "aws-sdk";
 import laconia from "@laconia/core";
 import { app, appDependencies } from "../../handler";
 import lambdaTester = require("lambda-tester");
-import { DailyImageAddedMessage } from "../../storage/domain/dailyImageAddedMessage";
 import { s3CreateEventToDailyImage } from "../../storage/s3CreateEventToDailyImage";
 import uuidv4 from "uuid/v4";
 import AsyncRetry = require("async-retry");
+import { IAddDailyImageCommand } from "daily-image-api-command/lib";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
@@ -63,7 +63,7 @@ describe("Handler tests", () => {
           .promise();
         expect(message.Messages).toBeDefined();
 
-        const messages = message.Messages!.map(({ Body }) => JSON.parse(Body!) as DailyImageAddedMessage);
+        const messages = message.Messages!.map(({ Body }) => JSON.parse(Body!) as IAddDailyImageCommand);
         expect(messages).toEqual(
           expect.arrayContaining([
             { id: "image-1-created.png", date: todaysDate, url: "http://drawbydays.test/image-1-created.png" },

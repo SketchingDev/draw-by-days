@@ -1,11 +1,11 @@
 import laconia from "@laconia/core";
-import { APIGatewayProxyHandler } from "aws-lambda";
+import { SQSHandler } from "aws-lambda";
 import AWS from "aws-sdk";
 import { EnvDependencies } from "./app/EnvDependencies";
 import { AppDependencies } from "./app/creation/AppDependencies";
 import { app } from "./app/creation/app";
 import { SaveDynamoDbDailyImages } from "./app/creation/storage/SaveDynamoDbDailyImage";
-import { validateDailyImageAddedMessage } from "./app/creation/validateDailyImageAddedMessage";
+import { validateAddDailyImageCommand } from "./app/creation/validateAddDailyImageCommand";
 
 const sqs = require("@laconia/adapter").sqs();
 
@@ -23,6 +23,6 @@ export const appDependencies = ({
   saveDailyImages: new SaveDynamoDbDailyImages(dynamoDb, env.TABLE_NAME),
 });
 
-export const createDailyImage: APIGatewayProxyHandler = laconia(sqs(validateDailyImageAddedMessage(app)))
+export const createDailyImage: SQSHandler = laconia(sqs(validateAddDailyImageCommand(app)))
   .register(awsDependencies)
   .register(appDependencies);

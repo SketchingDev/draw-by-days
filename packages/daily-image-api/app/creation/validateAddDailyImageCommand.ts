@@ -1,17 +1,12 @@
 import { URL } from "url";
 import { DailyImage } from "../DailyImage";
-
-export interface DailyImageAddedMessage {
-  id?: string;
-  url?: string;
-  date?: string;
-}
+import { IAddDailyImageCommand } from "daily-image-api-command/lib";
 
 type App<T> = (dailyImages: DailyImage[], context: { [key: string]: any }) => T;
 type Context = { [key: string]: any };
 
-export const validateDailyImageAddedMessage = <T>(app: App<T>) => async (
-  messages: DailyImageAddedMessage[],
+export const validateAddDailyImageCommand = <T>(app: App<T>) => async (
+  messages: IAddDailyImageCommand[],
   context: Context,
 ): Promise<T> => {
   const dailyImages: DailyImage[] = [];
@@ -21,21 +16,21 @@ export const validateDailyImageAddedMessage = <T>(app: App<T>) => async (
   messages.forEach(message => {
     const id = message.id;
     if (!id) {
-      throw new Error("Message must contain an ID");
+      throw new Error("Command must contain an ID");
     }
 
     let date;
     try {
       date = new Date(message.date!);
     } catch (err) {
-      throw new Error(`Message contains the invalid date '${message.date}': ${err.message}`);
+      throw new Error(`Command contains the invalid date '${message.date}': ${err.message}`);
     }
 
     let url;
     try {
       url = new URL(message.url!);
     } catch (err) {
-      throw new Error(`Message contains the invalid url '${message.url}': ${err.message}`);
+      throw new Error(`Command contains the invalid url '${message.url}': ${err.message}`);
     }
 
     dailyImages.push({ id, date, url });
