@@ -14,19 +14,20 @@ commands:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-  yarn-build-then-test:
-    parameters:
-      package_name:
-        type: string
-    steps:
-      - run:
-          name: Build
-          command: yarn build --scope << parameters.package_name >> --include-filtered-dependencies
-      - run:
-          name: Test
-          command: yarn test --scope << parameters.package_name >>
-      - store_test_results:
-          path: ./packages/<< parameters.package_name >>/reports/
+#  yarn-build-then-test:
+#  yarn-build:
+#    parameters:
+#      package_name:
+#        type: string
+#    steps:
+#      - run:
+#          name: Build
+#          command: yarn build
+#      - run:
+#          name: Test
+#          command: yarn test --scope << parameters.package_name >>
+#      - store_test_results:
+#          path: ./packages/<< parameters.package_name >>/reports/
 
 executors:
   node-build-environment:
@@ -39,27 +40,16 @@ executors:
 #    working_directory: ~/repo
 
 jobs:
-
-  ## Daily Image API
-
-#  test_daily_image_api:
-#    executor: node-build-environment
-#    steps:
-#      - checkout
-#      - yarn-install-with-cache
-#      - yarn-build-then-test:
-#          package_name: daily-image-api
+  build:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - run: yarn build
 
 workflows:
   version: 2
 
-#  commit_jobs:
-#    jobs:
-
-      ## Website
-
-#      - test_daily_image_api
-#      - build_website
-#      - deploy_website:
-#          requires:
-#            - build_website
+  commit_jobs:
+    jobs:
+      - build

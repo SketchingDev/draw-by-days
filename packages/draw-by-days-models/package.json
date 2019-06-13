@@ -1,5 +1,5 @@
 {
-  "name": "daily-image-api-command",
+  "name": "draw-by-days-models",
   "version": "1.0.0",
   "types": "lib/index.d.ts",
   "private": true,

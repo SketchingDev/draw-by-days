@@ -1,5 +1,5 @@
 import { AppDependencies } from "./AppDependencies";
-import { DailyImage } from "../DailyImage";
+import { DailyImage } from "draw-by-days-models/lib";
 
 export type App = (date: Date, dependencies: AppDependencies) => Promise<DailyImage[]>;
 

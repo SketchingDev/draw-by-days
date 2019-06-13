@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from "axios";
 import AWS from "aws-sdk";
 import uuidv4 from "uuid/v4";
 import AsyncRetry from "async-retry";
-import { IAddDailyImageCommand } from "daily-image-api-command/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 jest.setTimeout(10 * 1000);
 

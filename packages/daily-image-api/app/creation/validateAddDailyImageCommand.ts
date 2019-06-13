@@ -1,6 +1,6 @@
 import { URL } from "url";
-import { DailyImage } from "../DailyImage";
-import { IAddDailyImageCommand } from "daily-image-api-command/lib";
+import { DailyImage } from "draw-by-days-models/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 type App<T> = (dailyImages: DailyImage[], context: { [key: string]: any }) => T;
 type Context = { [key: string]: any };

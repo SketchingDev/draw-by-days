@@ -3,7 +3,7 @@ import uuidv4 from "uuid/v4";
 import AsyncRetry = require("async-retry");
 import * as serverlessOutput from "../../.serverless/outputs.json";
 import axios from "axios";
-import { IAddDailyImageCommand } from "daily-image-api-command/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 jest.setTimeout(60 * 1000);
 

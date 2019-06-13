@@ -1,13 +1,15 @@
 import AWS, { DynamoDB } from "aws-sdk";
-import { DailyImage } from "../../DailyImage";
+import { DailyImage } from "draw-by-days-models/lib";
 import { SaveDailyImages } from "./SaveDailyImages";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
 
-// TODO Investigate how to perform these operations when applying CQRS
-// Is a query an event (image added?)
 export class SaveDynamoDbDailyImages implements SaveDailyImages {
   private static readonly timeDelimiter = "T";
 
+  /**
+   * Creates a valid extended ISO 8601 Date string. In other words, date strings of the
+   * form YYYY-MM-DD.
+   */
   private static convertToIsoDate(date: Date) {
     return date.toISOString().split(SaveDynamoDbDailyImages.timeDelimiter)[0];
   }

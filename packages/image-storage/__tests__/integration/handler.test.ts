@@ -6,7 +6,7 @@ import lambdaTester = require("lambda-tester");
 import { s3CreateEventToDailyImage } from "../../storage/s3CreateEventToDailyImage";
 import uuidv4 from "uuid/v4";
 import AsyncRetry = require("async-retry");
-import { IAddDailyImageCommand } from "daily-image-api-command/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();

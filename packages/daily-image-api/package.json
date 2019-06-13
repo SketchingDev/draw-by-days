@@ -25,7 +25,7 @@
     "serverless": "^1.44.1",
     "serverless-dynamodb-local": "^0.2.38",
     "serverless-stage-manager": "^1.0.5",
-    "daily-image-api-command": "^1.0.0"
+    "draw-by-days-models": "^1.0.0"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.1",

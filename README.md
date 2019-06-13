@@ -19,3 +19,24 @@ more days you complete the better you'll get - or at least I'm hoping!
  * [Daily Image API](packages/daily-image-api) - Provides an API for creating new daily images
  * [Image Storage](packages/image-storage) - Publicly accessible S3 which updates the Daily Image API with the images added to the bucket
  * [Image Ingest](packages/image-ingest) - Scheduled service that ingests an image from external providers and provides it to the Image Storage service 
+
+
+## Commands
+
+Run integration tests (tests scoped from Lambda to dependency)
+
+```
+yarn test
+```
+
+Run component tests (test deployed service)
+
+```
+yarn test:component
+``` 
+
+Deploy to development environment
+
+```
+yarn deploy:dev
+```

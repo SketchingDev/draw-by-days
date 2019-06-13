@@ -2,7 +2,7 @@ import AWSXRay from "aws-xray-sdk";
 import { S3Handler } from "aws-lambda";
 import { SqsDailyImageRepo } from "./storage/SqsDailyImageRepo";
 import laconia from "@laconia/core";
-import { DailyImage } from "./storage/domain/dailyImage";
+import { DailyImage } from "draw-by-days-models/lib";
 import AWS from "aws-sdk";
 import https from "https";
 import { s3CreateEventToDailyImage } from "./storage/s3CreateEventToDailyImage";

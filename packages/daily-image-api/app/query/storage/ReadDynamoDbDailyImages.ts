@@ -1,11 +1,9 @@
 import AWS from "aws-sdk";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
 import { ReadDailyImages } from "./ReadDailyImages";
-import { DailyImage } from "../../DailyImage";
+import { DailyImage } from "draw-by-days-models/lib";
 import { URL } from "url";
 
-// TODO Investigate how to perform these operations when applying CQRS
-// Is a query an event (image added?)
 export class ReadDynamoDbDailyImages implements ReadDailyImages {
   private static readonly timeDelimiter = "T";
 

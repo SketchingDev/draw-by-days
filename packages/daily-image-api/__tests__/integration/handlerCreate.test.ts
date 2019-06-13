@@ -8,7 +8,7 @@ import AWS from "aws-sdk";
 import { DynamoDbFixture } from "../DynamoDbFixture";
 import lambdaTester = require("lambda-tester");
 import laconia = require("@laconia/core");
-import { IAddDailyImageCommand } from "daily-image-api-command/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 const sqs = require("@laconia/adapter").sqs();
 
