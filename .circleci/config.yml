@@ -40,16 +40,48 @@ executors:
 #    working_directory: ~/repo
 
 jobs:
-  build:
+  build-all:
     executor: node-build-environment
     steps:
       - checkout
       - yarn-install-with-cache
-      - run: yarn build
+      - run:
+          name: Build Services
+          command: yarn build
+
+  test-all:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+      - image: localstack/localstack
+        environment:
+          SERVICES: dynamodb:4569,s3:5000,sqs
+    steps:
+      - setup_remote_docker
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Test Services
+          command: yarn test
+
+  component-test-all:
+    executor: node-build-environment
+    steps:
+      - setup_remote_docker
+      - checkout
+      - yarn-install-with-cache
+      - run:
+          name: Component Test Services
+          command: yarn test:component
 
 workflows:
   version: 2
 
   commit_jobs:
     jobs:
-      - build
+      - build-all
+      - test-all
+      - component-test-all:
+          requires:
+            - build-all
+            - test-all
