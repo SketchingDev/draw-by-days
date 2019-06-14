@@ -5,15 +5,17 @@
   "description": "Provides read/write of daily images",
   "scripts": {
     "build": "sls package -v",
-    "deploy:dev": "sls create_domain --stage dev && sls deploy -v",
-    "remove:dev": "sls remove -v && sls delete_domain --stage dev",
-    "deploy:component": "sls create_domain --stage component && sls deploy -v --stage component",
-    "remove:component": "sls remove -v --stage component && sls delete_domain --stage component",
     "test:dynamodb:start": "docker-compose up -d",
     "test:dynamodb:stop": "docker-compose down",
-    "test:dynamodb:deploy-table": "serverless dynamodb migrate",
+    "test:dynamodb:deploy-table": "sls dynamodb migrate",
     "test": "yarn test:dynamodb:start && yarn test:dynamodb:deploy-table && jest __tests__/integration --runInBand; eval \"yarn test:dynamodb:stop && exit $?\"",
-    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\""
+    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:dev": "sls create_domain --stage dev && sls deploy -v --stage dev",
+    "remove:dev": "sls remove -v --stage dev && sls delete_domain --stage dev",
+    "deploy:ci": "sls create_domain --stage ci && sls deploy -v --stage ci",
+    "remove:ci": "sls remove -v --stage ci && sls delete_domain --stage ci",
+    "deploy:component": "sls create_domain --stage component && sls deploy -v --stage component",
+    "remove:component": "sls remove -v --stage component && sls delete_domain --stage component"
   },
   "dependencies": {
     "@anttiviljami/serverless-stack-output": "^0.3.1",

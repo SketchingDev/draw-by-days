@@ -5,18 +5,19 @@
   "description": "Draw By Days website",
   "main": "handler.js",
   "scripts": {
-    "deploy:dev": "REACT_APP_DAILY_IMAGE_API_URL=https://api-dev.drawbydays.com yarn build && yarn deploy:domain --stage dev && yarn deploy:s3 --stage dev",
-    "deploy:s3": "sls client deploy --no-confirm",
-    "deploy:domain": "sls deploy -v",
-    "remove:dev": "yarn remove:domain --stage dev && yarn remove:s3 --stage dev",
-    "remove:s3": "sls client remove --no-confirm",
-    "remove:domain": "sls remove -v",
     "clean": "rimraf build/*",
     "start": "react-scripts-ts start",
-    "build": "yarn clean && yarn react-scripts-ts build",
-    "test": "CI=true react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "start:mock": "json-server mock/dailyImageApi.json --port=3001 --static ./mock/public"
+    "build": "yarn clean && yarn react-scripts-ts build",
+    "start:mock": "json-server mock/dailyImageApi.json --port=3001 --static ./mock/public",
+    "test": "CI=true react-scripts-ts test --env=jsdom",
+    "build:dev": "yarn clean && REACT_APP_DAILY_IMAGE_API_URL=https://api-dev.drawbydays.com yarn react-scripts-ts build",
+    "deploy:dev": "yarn build:dev && yarn deploy:dev:domain && yarn deploy:dev:s3",
+    "deploy:dev:s3": "sls client deploy --no-confirm --stage dev",
+    "deploy:dev:domain": "sls deploy -v --stage dev",
+    "remove:dev": "yarn remove:dev:domain && yarn remove:dev:s3",
+    "remove:dev:s3": "sls client remove --no-confirm --stage dev",
+    "remove:dev:domain": "sls remove -v --stage dev"
   },
   "dependencies": {
     "axios": "^0.19.0",

@@ -24,14 +24,17 @@ custom:
   stages:
     - dev
     - component
+    - ci
     - prod
   bucketName:
-    dev:  draw-by-days-dev-images
+    dev:  draw-by-days-${self:service.name}-dev-bucket
     component: "draw-by-days-${self:service.name}-component-bucket-${sls:instanceId}"
+    ci: "draw-by-days-${self:service.name}-ci-bucket"
 #    prod: draw-by-days-images
   dailyImageApiQueueName:
-    dev: ${cf:daily-image-api-dev.QueueName}
+    dev: draw-by-days-dev-daily-images
     component: "draw-by-days-${self:service.name}-component-queue-${sls:instanceId}"
+    ci: "draw-by-days-${self:service.name}-ci-bucket"
 #    prod: ${cf:daily-image-api-prod.QueueName}
   output:
     file: ./.serverless/outputs.json

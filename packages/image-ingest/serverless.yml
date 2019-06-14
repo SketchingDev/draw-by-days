@@ -9,10 +9,12 @@ custom:
   stages:
     - dev
     - component
+    - ci
     - prod
   bucketName:
-    dev: ${cf:image-storage-dev.ImagesBucketName}
+    dev: "draw-by-days-image-storage-dev-bucket"
     component: "${self:service.name}-component-${sls:instanceId}"
+    ci: "draw-by-days-image-storage-ci-bucket"
   output:
     file: ./.serverless/outputs.json
 

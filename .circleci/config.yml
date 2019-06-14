@@ -1,6 +1,10 @@
 version: 2.1
 
 commands:
+  prepare-scripts:
+    steps:
+      - run: chmod +x .circleci/scripts/redact.sh
+
   yarn-install-with-cache:
     steps:
       - restore_cache:
@@ -14,40 +18,26 @@ commands:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-#  yarn-build-then-test:
-#  yarn-build:
-#    parameters:
-#      package_name:
-#        type: string
-#    steps:
-#      - run:
-#          name: Build
-#          command: yarn build
-#      - run:
-#          name: Test
-#          command: yarn test --scope << parameters.package_name >>
-#      - store_test_results:
-#          path: ./packages/<< parameters.package_name >>/reports/
 
 executors:
   node-build-environment:
     docker:
       - image: circleci/node:8-browsers
+    environment:
+      # Forces yarn to preserve colour output (https://github.com/yarnpkg/yarn/issues/5733)
+      FORCE_COLOR: true
     working_directory: ~/repo
-#  serverless-deploy-environment:
-#    docker:
-#      - image: amaysim/serverless:1.36.3
-#    working_directory: ~/repo
 
 jobs:
   build-all:
     executor: node-build-environment
     steps:
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
       - run:
           name: Build Services
-          command: yarn build
+          command: yarn build | .circleci/scripts/redact.sh
 
   test-all:
     working_directory: ~/repo
@@ -59,20 +49,31 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
       - run:
           name: Test Services
-          command: yarn test
+          command: yarn test | .circleci/scripts/redact.sh
 
   component-test-all:
     executor: node-build-environment
     steps:
-      - setup_remote_docker
       - checkout
       - yarn-install-with-cache
+      - prepare-scripts
       - run:
           name: Component Test Services
-          command: yarn test:component
+          command: yarn test:component | .circleci/scripts/redact.sh
+
+  deploy-ci:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - prepare-scripts
+      - run:
+          name: Deploy CI
+          command: yarn test:component | .circleci/scripts/redact.sh
 
 workflows:
   version: 2

@@ -5,15 +5,17 @@
   "description": "Stores publicly accessible images and sends a command to create a daily image of them",
   "main": "handler.js",
   "scripts": {
-    "build": "serverless package -v",
-    "deploy:dev": "serverless deploy -v",
-    "remove:dev": "serverless remove -v",
-    "deploy:component": "serverless deploy -v --stage component",
-    "remove:component": "serverless remove -v --stage component",
+    "build": "sls package -v",
     "test:s3:start": "docker-compose up -d",
     "test:s3:stop": "docker-compose down",
     "test": "yarn test:s3:start && jest __tests__/integration --runInBand; eval \"yarn test:s3:stop && exit $?\"",
-    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\""
+    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:dev": "sls deploy -v --stage dev",
+    "remove:dev": "sls remove -v --stage dev",
+    "deploy:ci": "sls deploy -v --stage ci",
+    "remove:ci": "sls remove -v --stage ci",
+    "deploy:component": "sls deploy -v --stage component",
+    "remove:component": "sls remove -v --stage component"
   },
   "dependencies": {
     "@laconia/core": "^1.2.0",

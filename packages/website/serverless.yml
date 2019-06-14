@@ -12,9 +12,11 @@ provider:
 custom:
   stages:
     - dev
+    - ci
     - prod
   siteName:
     dev: dev.drawbydays.com
+    ci: ci.drawbydays.com
     prod: drawbydays.com
   client:
     bucketName: ${self:custom.siteName.${self:provider.stage}}

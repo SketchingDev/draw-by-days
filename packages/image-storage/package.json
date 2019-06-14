@@ -5,16 +5,18 @@
   "description": "Stores publicly accessible images and sends a command to create a daily image of them",
   "main": "handler.js",
   "scripts": {
-    "build": "serverless package -v",
-    "deploy:dev": "serverless deploy -v",
-    "remove:dev": "yarn remove:dev-s3-objects && serverless deploy -v",
-    "remove:dev-s3-objects": "aws s3 rm s3://draw-by-days-dev-images --recursive",
-    "deploy:component": "serverless deploy -v --stage component",
-    "remove:component": "serverless remove -v --stage component",
+    "build": "sls package -v",
     "test:sqs:start": "docker-compose up -d",
     "test:sqs:stop": "docker-compose down",
     "test": "yarn test:sqs:start && jest __tests__/integration --runInBand; eval \"yarn test:sqs:stop && exit $?\"",
-    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\""
+    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:dev": "sls deploy -v --stage dev",
+    "remove:dev": "yarn remove:dev-s3-objects && sls deploy -v --stage dev",
+    "remove:dev-s3-objects": "aws s3 rm s3://draw-by-days-dev-images --recursive",
+    "deploy:ci": "sls deploy -v --stage ci",
+    "remove:ci": "sls remove -v --stage ci",
+    "deploy:component": "sls deploy -v --stage component",
+    "remove:component": "sls remove -v --stage component"
   },
   "dependencies": {
     "@anttiviljami/serverless-stack-output": "^0.3.1",

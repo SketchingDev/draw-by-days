@@ -8,18 +8,12 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "lerna run test --stream --parallel",
     "build": "lerna run build --stream",
+    "test": "lerna run test --stream --parallel",
     "test:component": "lerna run test:component --stream --parallel",
     "deploy:dev": "lerna run deploy:dev --stream",
-    "deploy:website": "lerna run deploy --include-filtered-dependencies --scope website",
-    "deploy:image-storage": "lerna run deploy --include-filtered-dependencies --scope image-storage",
-    "deploy:image-ingest": "lerna run deploy --include-filtered-dependencies --scope image-ingest",
-    "deploy:daily-image-api": "lerna run deploy --include-filtered-dependencies --scope daily-image-api",
-    "remove:website": "lerna run remove --scope website",
-    "remove:image-storage": "lerna run remove --scope image-storage",
-    "remove:image-ingest": "lerna run remove --scope image-ingest",
-    "remove:daily-image-api": "lerna run remove --scope daily-image-api",
-    "remove:all": "yarn remove:website && yarn remove:image-ingest && yarn remove:image-storage && yarn remove:daily-image-api"
+    "remove:dev": "lerna run remove:dev --stream",
+    "deploy:ci": "lerna run deploy:ci --stream",
+    "remove:ci": "lerna run remove:ci --stream"
   }
 }

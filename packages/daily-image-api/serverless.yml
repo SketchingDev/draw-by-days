@@ -31,12 +31,14 @@ custom:
   stages:
     - dev
     - component
+    - ci
     - prod
   tableName: draw-by-days-${self:provider.stage}-daily-images
   queueName: draw-by-days-${self:provider.stage}-daily-images
   apiDomain:
     dev: api-dev.drawbydays.com
     component: api-component.drawbydays.com
+    ci: api-ci.drawbydays.com
     prod: api.drawbydays.com
   dynamodb:
     stages:
