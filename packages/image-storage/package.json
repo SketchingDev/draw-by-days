@@ -11,8 +11,7 @@
     "test": "yarn test:sqs:start && jest __tests__/integration --runInBand; eval \"yarn test:sqs:stop && exit $?\"",
     "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
     "deploy:dev": "sls deploy -v --stage dev",
-    "remove:dev": "yarn remove:dev-s3-objects && sls deploy -v --stage dev",
-    "remove:dev-s3-objects": "aws s3 rm s3://draw-by-days-dev-images --recursive",
+    "remove:dev": "sls deploy -v --stage dev",
     "deploy:ci": "sls deploy -v --stage ci",
     "remove:ci": "sls remove -v --stage ci",
     "deploy:component": "sls deploy -v --stage component",
@@ -23,10 +22,11 @@
     "@laconia/core": "^1.2.0",
     "aws-sdk": "^2.471.0",
     "aws-xray-sdk": "^2.3.3",
+    "draw-by-days-models": "^1.0.0",
     "serverless": "^1.44.1",
     "serverless-pseudo-parameters": "^2.4.0",
-    "serverless-stage-manager": "^1.0.5",
-    "draw-by-days-models": "^1.0.0"
+    "serverless-s3-remover": "^0.6.0",
+    "serverless-stage-manager": "^1.0.5"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.1",

@@ -5,6 +5,7 @@ plugins:
   - serverless-webpack
   - serverless-stage-manager
   - serverless-pseudo-parameters
+  - serverless-s3-remover
   - '@anttiviljami/serverless-stack-output'
 
 provider:
@@ -26,6 +27,9 @@ custom:
     - component
     - ci
     - prod
+  remover:
+    buckets:
+      - ${self:custom.bucketName.${self:provider.stage}}
   bucketName:
     dev:  draw-by-days-${self:service.name}-dev-bucket
     component: "draw-by-days-${self:service.name}-component-bucket-${sls:instanceId}"
@@ -34,7 +38,7 @@ custom:
   dailyImageApiQueueName:
     dev: draw-by-days-dev-daily-images
     component: "draw-by-days-${self:service.name}-component-queue-${sls:instanceId}"
-    ci: "draw-by-days-${self:service.name}-ci-bucket"
+    ci: "draw-by-days-ci-daily-images"
 #    prod: ${cf:daily-image-api-prod.QueueName}
   output:
     file: ./.serverless/outputs.json
