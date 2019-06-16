@@ -75,19 +75,6 @@ jobs:
           name: E2E Test Services
           command: yarn test:e2e | .circleci/scripts/redact.sh
 
-#  deploy-stage:
-#    parameters:
-#      stage_name:
-#        type: string
-#    executor: node-build-environment
-#    steps:
-#      - checkout
-#      - yarn-install-with-cache
-#      - prepare-scripts
-#      - run:
-#          name: Deploy << parameters.stage_name >>
-#          command: yarn test:<< parameters.stage_name >> | .circleci/scripts/redact.sh
-
 workflows:
   version: 2
 
