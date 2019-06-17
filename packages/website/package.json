@@ -9,8 +9,10 @@
     "start": "react-scripts-ts start",
     "eject": "react-scripts-ts eject",
     "build": "yarn clean && yarn react-scripts-ts build",
-    "start:mock": "json-server mock/dailyImageApi.json --port=3001 --static ./mock/public",
+    "start:mock:with-image": "json-server mock/dailyImageApi-with-image.json --port=3001 --static ./mock/public",
+    "start:mock:without-image": "json-server mock/dailyImageApi-without-image.json --port=3001",
     "test": "CI=true react-scripts-ts test --env=jsdom",
+    "test:integration": "yarn cypress run",
     "build:dev": "yarn clean && REACT_APP_DAILY_IMAGE_API_URL=https://api-dev.drawbydays.com yarn react-scripts-ts build",
     "deploy:dev": "yarn build:dev && yarn deploy:dev:domain && yarn deploy:dev:s3",
     "deploy:dev:s3": "sls client deploy --no-confirm --stage dev",
@@ -47,6 +49,7 @@
     "@types/react-router-dom": "^4.3.1",
     "daily-image-api": "^1.0.0",
     "json-server": "^0.15.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "cypress": "^3.3.1"
   }
 }
