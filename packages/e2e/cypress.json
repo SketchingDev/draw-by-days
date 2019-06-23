@@ -1,4 +1,7 @@
 {
   "baseUrl": "http://ci.drawbydays.com",
-  "video": false
+  "video": false,
+  "env": {
+    "ingestLambdaName": "image-ingest-ci-pixabayImageIngester"
+  }
 }
