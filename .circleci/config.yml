@@ -72,6 +72,9 @@ jobs:
       - yarn-install-with-cache
       - prepare-scripts
       - run:
+          name: Deploy CI environment
+          command: yarn deploy:ci
+      - run:
           name: E2E Test Services
           command: yarn test:e2e | .circleci/scripts/redact.sh
       - store_artifacts:

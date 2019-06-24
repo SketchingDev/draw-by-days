@@ -1,5 +1,5 @@
 describe("Draw by Days", () => {
-  const oneSecondInMs = 2000;
+  const fiveSecondsInMs = 5000;
 
   it("Page displays message if image not available", () => {
     cy.visit("/");
@@ -9,7 +9,7 @@ describe("Draw by Days", () => {
   it("Page displays image if image available", () => {
     cy.invokeLambda(Cypress.env("ingestLambdaName"));
 
-    cy.wait(oneSecondInMs);
+    cy.wait(fiveSecondsInMs);
     cy.visit("/");
 
     cy.get("img").should("be.visible");
