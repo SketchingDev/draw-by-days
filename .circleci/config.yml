@@ -105,6 +105,10 @@ workflows:
       - e2e-test:
           requires:
             - component-test-all
+          filters:
+            branches:
+              ignore:
+                - master
   nightly-ci-teardown:
     triggers:
       - schedule:
