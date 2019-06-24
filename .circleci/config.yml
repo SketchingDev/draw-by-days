@@ -82,6 +82,15 @@ jobs:
       - store_artifacts:
           path: e2e/cypress/videos
 
+  e2e-test-cleanup:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - prepare-scripts
+      - run:
+          name: Remove CI environment
+          command: yarn remove:ci
+
 workflows:
   version: 2
 
@@ -96,3 +105,13 @@ workflows:
       - e2e-test:
           requires:
             - component-test-all
+  nightly-ci-teardown:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - rewrite-with-serverless
+    jobs:
+      - e2e-test-cleanup
