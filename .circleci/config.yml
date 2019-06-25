@@ -3,7 +3,7 @@ version: 2.1
 commands:
   prepare-scripts:
     steps:
-      - run: chmod +x .circleci/scripts/redact.sh
+      - run: SCRIPT=".circleci/scripts/redact.sh" && chmod +x $SCRIPT && alias redact=$SCRIPT
 
   yarn-install-with-cache:
     steps:
@@ -37,7 +37,7 @@ jobs:
       - yarn-install-with-cache
       - run:
           name: Build Services
-          command: yarn build | .circleci/scripts/redact.sh
+          command: yarn build | redact
 
   test-all:
     working_directory: ~/repo
@@ -53,30 +53,30 @@ jobs:
       - yarn-install-with-cache
       - run:
           name: Test Services
-          command: yarn test | .circleci/scripts/redact.sh
+          command: yarn test | redact
 
   component-test-all:
     executor: node-build-environment
     steps:
       - checkout
-      - yarn-install-with-cache
       - prepare-scripts
+      - yarn-install-with-cache
       - run:
           name: Component Test Services
-          command: yarn test:component | .circleci/scripts/redact.sh
+          command: yarn test:component | redact
 
   e2e-test:
     executor: node-build-environment
     steps:
       - checkout
-      - yarn-install-with-cache
       - prepare-scripts
+      - yarn-install-with-cache
       - run:
           name: Deploy CI environment
           command: yarn deploy:ci
       - run:
           name: E2E Test Services
-          command: yarn test:e2e | .circleci/scripts/redact.sh
+          command: yarn test:e2e | redact
       - store_artifacts:
           path: e2e/cypress/screenshots
       - store_artifacts:
@@ -87,9 +87,10 @@ jobs:
     steps:
       - checkout
       - prepare-scripts
+      - yarn-install-with-cache
       - run:
           name: Remove CI environment
-          command: yarn remove:ci
+          command: yarn remove:ci | redact
 
 workflows:
   version: 2
