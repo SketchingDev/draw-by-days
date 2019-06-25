@@ -74,7 +74,7 @@ jobs:
       - yarn-install-with-cache
       - run:
           name: Deploy CI environment
-          command: yarn deploy:ci
+          command: yarn deploy:ci | .circleci/scripts/redact.sh
       - run:
           name: E2E Test Services
           command: yarn test:e2e | .circleci/scripts/redact.sh
@@ -93,24 +93,54 @@ jobs:
           name: Remove CI environment
           command: yarn remove:ci | .circleci/scripts/redact.sh
 
+  deploy-prod:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - prepare-scripts
+      - yarn-install-with-cache
+      - run:
+          name: Deploy production environment
+          command: yarn deploy:prod | .circleci/scripts/redact.sh
+
 workflows:
   version: 2
 
   commit_jobs:
     jobs:
-      - build-all
-      - test-all
-      - component-test-all:
-          requires:
-            - build-all
-            - test-all
-      - e2e-test:
-          requires:
-            - component-test-all
+      - build-all:
           filters:
             branches:
               ignore:
                 - master
+      - test-all:
+          filters:
+            branches:
+              ignore:
+                - master
+      - component-test-all:
+          requires:
+            - build-all
+            - test-all
+          filters:
+            branches:
+              ignore:
+                - master
+      - e2e-test:
+          requires:
+            - component-test-all
+
+  master:
+    jobs:
+      - build-all:
+          filters:
+            branches:
+              only:
+                master
+      - deploy-prod:
+          requires:
+            - build-all
+
   nightly-ci-teardown:
     triggers:
       - schedule:

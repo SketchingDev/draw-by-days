@@ -10,6 +10,7 @@
     "test:sqs:stop": "docker-compose down",
     "test": "yarn test:sqs:start && jest __tests__/integration --runInBand; eval \"yarn test:sqs:stop && exit $?\"",
     "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:prod": "sls deploy -v --stage prod",
     "deploy:dev": "sls deploy -v --stage dev",
     "remove:dev": "sls deploy -v --stage dev",
     "deploy:ci": "sls deploy -v --stage ci",

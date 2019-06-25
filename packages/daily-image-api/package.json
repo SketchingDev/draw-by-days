@@ -10,6 +10,7 @@
     "test:dynamodb:deploy-table": "sls dynamodb migrate",
     "test": "yarn test:dynamodb:start && yarn test:dynamodb:deploy-table && jest __tests__/integration --runInBand; eval \"yarn test:dynamodb:stop && exit $?\"",
     "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:prod": "sls create_domain --stage prod && sls deploy -v --stage prod",
     "deploy:dev": "sls create_domain --stage dev && sls deploy -v --stage dev",
     "remove:dev": "sls remove -v --stage dev && sls delete_domain --stage dev",
     "deploy:ci": "sls create_domain --stage ci && sls deploy -v --stage ci",
