@@ -11,11 +11,11 @@ custom:
     - component
     - ci
     - prod
-  bucketName:
-    dev: "draw-by-days-image-storage-dev-bucket"
+  imageStorageBucketName:
+    dev: ${file(../image-storage/serverless.yml):custom.bucketName.dev}
     component: "${self:service.name}-component-${sls:instanceId}"
-    ci: "draw-by-days-image-storage-ci-bucket"
-    prod: "draw-by-days-images"
+    ci: ${file(../image-storage/serverless.yml):custom.bucketName.ci}
+    prod: ${file(../image-storage/serverless.yml):custom.bucketName.prod}
   output:
     file: ./.serverless/outputs.json
 
@@ -29,14 +29,14 @@ provider:
     - Effect: Allow
       Action:
         - s3:PutObject
-      Resource: "arn:aws:s3:::${self:custom.bucketName.${self:provider.stage}}/*"
+      Resource: "arn:aws:s3:::${self:custom.imageStorageBucketName.${self:provider.stage}}/*"
 
 functions:
   pixabayImageIngester:
     handler: handler.pixabayImageIngester
     timeout: 10
     environment:
-      IMAGE_STORAGE_BUCKET_NAME: ${self:custom.bucketName.${self:provider.stage}}
+      IMAGE_STORAGE_BUCKET_NAME: ${self:custom.imageStorageBucketName.${self:provider.stage}}
       PIXABAY_API_KEY: ${ssm:/drawbydays/pixabay/apiKey~true}
     events:
       - schedule: rate(24 hours)
@@ -44,4 +44,4 @@ functions:
 resources:
   Outputs:
     ImagesBucketName:
-      Value: ${self:custom.bucketName.${self:provider.stage}}
+      Value: ${self:custom.imageStorageBucketName.${self:provider.stage}}

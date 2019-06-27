@@ -31,10 +31,10 @@ custom:
     buckets:
       - ${self:custom.bucketName.${self:provider.stage}}
   bucketName:
-    dev:  draw-by-days-${self:service.name}-dev-bucket
-    component: "draw-by-days-${self:service.name}-component-bucket-${sls:instanceId}"
-    ci: "draw-by-days-${self:service.name}-ci-bucket"
-    prod: draw-by-days-images
+    dev: "draw-by-days-image-storage-dev-bucket"
+    component: "draw-by-days-image-storage-component-bucket-${sls:instanceId}"
+    ci: "draw-by-days-image-storage-ci-bucket"
+    prod: "draw-by-days-images"
   dailyImageApiQueueName:
     dev: draw-by-days-dev-daily-images
     component: "draw-by-days-${self:service.name}-component-queue-${sls:instanceId}"
