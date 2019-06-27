@@ -34,12 +34,12 @@ custom:
     dev:  draw-by-days-${self:service.name}-dev-bucket
     component: "draw-by-days-${self:service.name}-component-bucket-${sls:instanceId}"
     ci: "draw-by-days-${self:service.name}-ci-bucket"
-#    prod: draw-by-days-images
+    prod: draw-by-days-images
   dailyImageApiQueueName:
     dev: draw-by-days-dev-daily-images
     component: "draw-by-days-${self:service.name}-component-queue-${sls:instanceId}"
     ci: "draw-by-days-ci-daily-images"
-#    prod: ${cf:daily-image-api-prod.QueueName}
+    prod: "draw-by-days-prod-daily-images"
   output:
     file: ./.serverless/outputs.json
 

@@ -15,6 +15,7 @@ custom:
     dev: "draw-by-days-image-storage-dev-bucket"
     component: "${self:service.name}-component-${sls:instanceId}"
     ci: "draw-by-days-image-storage-ci-bucket"
+    prod: "draw-by-days-images"
   output:
     file: ./.serverless/outputs.json
 
