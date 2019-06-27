@@ -79,9 +79,9 @@ jobs:
           name: E2E Test Services
           command: yarn test:e2e | .circleci/scripts/redact.sh
       - store_artifacts:
-          path: e2e/cypress/screenshots
+          path: packages/e2e/cypress/screenshots
       - store_artifacts:
-          path: e2e/cypress/videos
+          path: packages/e2e/cypress/videos
 
   e2e-test-cleanup:
     executor: node-build-environment
