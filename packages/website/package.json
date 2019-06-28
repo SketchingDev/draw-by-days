@@ -22,14 +22,14 @@
     "deploy:dev:s3": "sls client deploy --no-confirm --stage dev",
     "deploy:dev:domain": "sls deploy -v --stage dev",
     "remove:dev": "yarn remove:dev:domain && yarn remove:dev:s3",
-    "remove:dev:s3": "sls client remove --no-confirm --stage dev",
+    "remove:dev:s3": "mkdir -p build && sls client remove --no-confirm --stage dev",
     "remove:dev:domain": "sls remove -v --stage dev",
     "build:ci": "yarn clean && REACT_APP_DAILY_IMAGE_API_URL=https://api-ci.drawbydays.com yarn react-scripts-ts build",
     "deploy:ci": "yarn build:ci && yarn deploy:ci:domain && yarn deploy:ci:s3",
     "deploy:ci:s3": "sls client deploy --no-confirm --stage ci",
     "deploy:ci:domain": "sls deploy -v --stage ci",
     "remove:ci": "yarn remove:ci:domain && yarn remove:ci:s3",
-    "remove:ci:s3": "sls client remove --no-confirm --stage ci",
+    "remove:ci:s3": "mkdir -p build && sls client remove --no-confirm --stage ci",
     "remove:ci:domain": "sls remove -v --stage ci"
   },
   "dependencies": {
