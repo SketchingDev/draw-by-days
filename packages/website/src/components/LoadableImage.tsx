@@ -28,7 +28,7 @@ export class LoadableImage extends React.PureComponent<ILoadableImage> {
       case RequestState.Ok:
         return <div>
           <Image src={image!.url} fluid={true} />
-          <div style={{textAlign: "right"}}>With thanks to <a href={"https://pixabay.com/"}>Pixabay</a> for the image</div>
+          <div style={{textAlign: "right"}}>Image provided by <a href={"https://pixabay.com/"}>Pixabay</a></div>
         </div>;
       case RequestState.Unavailable:
         return <p style={{ textAlign: "center"}}>Image isn't available yet, please try again later</p>;

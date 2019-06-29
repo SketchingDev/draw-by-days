@@ -148,6 +148,6 @@ workflows:
           filters:
             branches:
               only:
-                - rewrite-with-serverless
+                - master
     jobs:
       - e2e-test-cleanup
