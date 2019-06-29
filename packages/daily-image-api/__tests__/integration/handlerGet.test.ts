@@ -13,8 +13,8 @@ import { DynamoDbFixture } from "../DynamoDbFixture";
 require("lambda-tester").noVersionCheck();
 
 describe("Test querying daily image", () => {
-  const tableName = (<any>config).tableName;
-  const dbEndpoint = (<any>config).localDynamoDbEndpoint;
+  const tableName: string = (<any>config).tableName;
+  const dbEndpoint: string = (<any>config).localDynamoDbEndpoint;
 
   const todaysDate = new Date().toISOString().split("T")[0];
 
