@@ -16,7 +16,6 @@ export class TodaysImage extends React.Component<IProps, {}> {
   private client = new ImageApiClient(process.env.REACT_APP_DAILY_IMAGE_API_URL!);
 
   public async componentDidMount() {
-    console.log(`Environment variable value is: ${process.env.REACT_APP_DAILY_IMAGE_API_URL}`);
     let images;
 
     try{
