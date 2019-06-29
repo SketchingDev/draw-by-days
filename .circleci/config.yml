@@ -1,6 +1,11 @@
 version: 2.1
 
 commands:
+  # TODO Build custom image that chmod's and creates an alias
+  prepare-scripts:
+    steps:
+      - run: chmod +x .circleci/scripts/redact.sh
+
   yarn-install-with-cache:
     steps:
       - restore_cache:
@@ -14,322 +19,135 @@ commands:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-  yarn-build-then-test:
-    parameters:
-      package_name:
-        type: string
-    steps:
-      - run:
-          name: Build
-          command: yarn build --scope << parameters.package_name >> --include-filtered-dependencies
-      - run:
-          name: Test
-          command: yarn test --scope << parameters.package_name >>
-      - store_test_results:
-          path: ./packages/<< parameters.package_name >>/reports/
 
 executors:
   node-build-environment:
     docker:
       - image: circleci/node:8-browsers
-    working_directory: ~/repo
-  terragrunt-deploy-environment:
-    docker:
-      - image: sketchingdev/terraform-terragrunt:0.11.11-0.17.3-4
+    environment:
+      # Forces yarn to preserve colour output (https://github.com/yarnpkg/yarn/issues/5733)
+      FORCE_COLOR: true
     working_directory: ~/repo
 
 jobs:
-
-  ## Website
-
-  test_website:
+  build-all:
     executor: node-build-environment
     steps:
       - checkout
-      - yarn-install-with-cache
-      - yarn-build-then-test:
-          package_name: website
-
-  build_website:
-    executor: node-build-environment
-    steps:
-      - checkout
+      - prepare-scripts
       - yarn-install-with-cache
       - run:
-          name: Build
-          command: |
-            if [[ $CIRCLE_BRANCH = "master" ]]; then
-              export REACT_APP_IMAGE_API_URL=https://images.drawbydays.com/
-            else
-              export REACT_APP_IMAGE_API_URL=https://images-ci.drawbydays.com/
-            fi
+          name: Build Services
+          command: yarn build | .circleci/scripts/redact.sh
 
-            yarn build --scope website --include-filtered-dependencies
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - packages/website/build
-
-  deploy_website:
-    executor: terragrunt-deploy-environment
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/workspace
-      - deploy:
-          name: Deploy
-          command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/website
-
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
-            aws s3 sync /tmp/workspace/packages/website/build s3://$(terragrunt output bucket_name)/ --delete
-          working_directory: terraform/environments/
-
-  ## Image Details
-
-  test_image_details:
+  test-all:
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
       - image: localstack/localstack
         environment:
-          SERVICES: dynamodb
+          SERVICES: dynamodb:4569,s3:5000,sqs
     steps:
       - setup_remote_docker
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
-      - yarn-build-then-test:
-          package_name: image-details-service
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - packages/image-details-service/coverage/lcov.info
+      - run:
+          name: Test Services
+          command: yarn test | .circleci/scripts/redact.sh
 
-  build_image_details:
+  component-test-all:
     executor: node-build-environment
     steps:
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
       - run:
-          name: Build
-          command: yarn build --scope image-details-service --include-filtered-dependencies
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - packages/image-details-service/dist/save-image-details.zip
-            - packages/image-details-service/dist/save-image-source.zip
+          name: Component Test Services
+          command: yarn test:component | .circleci/scripts/redact.sh
 
-  deploy_image_details:
-    executor: terragrunt-deploy-environment
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/workspace
-      - deploy:
-          name: Deploy
-          command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/image-details-service
-
-            export TF_VAR_save_image_details_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-details.zip
-            export TF_VAR_save_image_source_lambda_filename=/tmp/workspace/packages/image-details-service/dist/save-image-source.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
-
-            terragrunt-output-to-env.sh aws_region private_url subscribed_topic_arn >> ../../env.image_details_service.outputs
-          working_directory: terraform/environments/
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - terraform/environments/env.image_details_service.outputs
-
-  it_image_details:
+  e2e-test:
     executor: node-build-environment
     steps:
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
-          name: Integration tests
-          command: |
-            source /tmp/workspace/terraform/environments/env.image_details_service.outputs
-            cat /tmp/workspace/terraform/environments/env.image_details_service.outputs
+          name: Deploy CI environment
+          command: yarn deploy:ci | .circleci/scripts/redact.sh
+      - run:
+          name: E2E Test Services
+          command: yarn test:e2e | .circleci/scripts/redact.sh
+      - store_artifacts:
+          path: packages/e2e/cypress/screenshots
+      - store_artifacts:
+          path: packages/e2e/cypress/videos
 
-            yarn test:integration --scope image-details-service
-
-  ## Image Store
-
-  test_image_store:
-    working_directory: ~/repo
-    docker:
-      - image: circleci/node:8-browsers
-      - image: localstack/localstack
-        environment:
-          SERVICES: sns,sqs
-    steps:
-      - checkout
-      - yarn-install-with-cache
-      - setup_remote_docker
-      - yarn-build-then-test:
-          package_name: image-store-service
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - packages/image-store-service/coverage/lcov.info
-
-  build_image_store:
+  e2e-test-cleanup:
     executor: node-build-environment
     steps:
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
       - run:
-          name: Build
-          command: yarn build --scope image-store-service --include-filtered-dependencies
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - packages/image-store-service/dist/image-store.zip
+          name: Remove CI environment
+          command: yarn remove:ci | .circleci/scripts/redact.sh
 
-  deploy_image_store:
-    executor: terragrunt-deploy-environment
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/workspace
-      - deploy:
-          name: Deploy
-          command: |
-            [[ $CIRCLE_BRANCH = "master" ]] && export ENV="prod" || export ENV="ci"
-            cd $ENV/image-store-service
-
-            export TF_VAR_new_image_event_producer_lambda_filename=/tmp/workspace/packages/image-store-service/dist/image-store.zip
-            terragrunt apply-all --terragrunt-non-interactive -auto-approve | redact.sh
-
-            terragrunt-output-to-env.sh aws_region subscribed_topic_arn bucket_name >> ../../env.image_store_service.outputs
-          working_directory: terraform/environments/
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - terraform/environments/env.image_store_service.outputs
-
-  it_image_store:
+  deploy-prod:
     executor: node-build-environment
     steps:
       - checkout
+      - prepare-scripts
       - yarn-install-with-cache
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
-          name: Integration tests
-          command: |
-            source /tmp/workspace/terraform/environments/env.image_store_service.outputs
-            cat /tmp/workspace/terraform/environments/env.image_store_service.outputs
-
-            yarn test:integration --scope image-store-service
-
-  ## Test Coverage
-
-  collate_test_coverage:
-    executor: node-build-environment
-    steps:
-      - checkout
-      - yarn-install-with-cache
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: Collate
-          command: yarn test:merge-coverage
-      - run:
-          name: Upload
-          command: yarn test:upload-coverage
-
-  ## End to End Tests
-
-  end_to_end_test:
-    executor: node-build-environment
-    steps:
-      - checkout
-      - yarn-install-with-cache
-      - attach_workspace:
-          at: /tmp/workspace
-      - run:
-          name: Test
-          command: |
-            source /tmp/workspace/terraform/environments/env.image_details_service.outputs
-            cat /tmp/workspace/terraform/environments/env.image_details_service.outputs
-
-            source /tmp/workspace/terraform/environments/env.image_store_service.outputs
-            cat /tmp/workspace/terraform/environments/env.image_store_service.outputs
-
-            yarn test:e2e
+          name: Deploy production environment
+          command: yarn deploy:prod | .circleci/scripts/redact.sh
 
 workflows:
   version: 2
 
   commit_jobs:
     jobs:
-
-      ## Website
-
-      - test_website
-      - build_website:
-          requires:
-            - test_website
-      - deploy_website:
-          requires:
-            - build_website
-
-      ## Image Details
-
-      - test_image_details
-      - build_image_details:
-          requires:
-            - test_image_details
-      - deploy_image_details:
-          requires:
-            - build_image_details
-      - it_image_details:
-          requires:
-            - deploy_image_details
+      - build-all:
           filters:
             branches:
               ignore:
                 - master
-
-      ## Image Store
-
-      - test_image_store
-      - build_image_store:
-          requires:
-            - test_image_store
-      - deploy_image_store:
-          requires:
-            - build_image_store
-      - it_image_store:
-          requires:
-            - deploy_image_store
+      - test-all:
           filters:
             branches:
               ignore:
                 - master
-
-      ## Collage coverage
-
-      - collate_test_coverage:
+      - component-test-all:
           requires:
-            - test_website
-            - test_image_details
-            - test_image_store
-
-      ## End to End Tests
-
-      - end_to_end_test:
-          requires:
-            - deploy_website
-            - it_image_details
-            - it_image_store
+            - build-all
+            - test-all
           filters:
             branches:
               ignore:
                 - master
+      - e2e-test:
+          requires:
+            - component-test-all
+
+  master:
+    jobs:
+      - build-all:
+          filters:
+            branches:
+              only:
+                master
+      - deploy-prod:
+          requires:
+            - build-all
+
+  nightly-ci-teardown:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - rewrite-with-serverless
+    jobs:
+      - e2e-test-cleanup

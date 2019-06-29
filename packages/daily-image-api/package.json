@@ -1,0 +1,52 @@
+{
+  "name": "daily-image-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Provides read/write of daily images",
+  "scripts": {
+    "build": "sls package -v",
+    "test:dynamodb:start": "docker-compose up -d",
+    "test:dynamodb:stop": "docker-compose down",
+    "test:dynamodb:deploy-table": "sls dynamodb migrate",
+    "test": "yarn test:dynamodb:start && yarn test:dynamodb:deploy-table && jest __tests__/integration --runInBand; eval \"yarn test:dynamodb:stop && exit $?\"",
+    "test:component": "yarn deploy:component && jest __tests__/component --runInBand; eval \"yarn remove:component && exit $?\"",
+    "deploy:prod": "sls create_domain --stage prod && sls deploy -v --stage prod",
+    "deploy:dev": "sls create_domain --stage dev && sls deploy -v --stage dev",
+    "remove:dev": "sls remove -v --stage dev && sls delete_domain --stage dev",
+    "deploy:ci": "sls create_domain --stage ci && sls deploy -v --stage ci",
+    "remove:ci": "sls remove -v --stage ci && sls delete_domain --stage ci",
+    "deploy:component": "sls create_domain --stage component && sls deploy -v --stage component",
+    "remove:component": "sls remove -v --stage component && sls delete_domain --stage component"
+  },
+  "dependencies": {
+    "@anttiviljami/serverless-stack-output": "^0.3.1",
+    "@laconia/adapter": "^1.1.0",
+    "@laconia/core": "^1.2.0",
+    "@laconia/event": "^1.1.0",
+    "aws-sdk": "^2.471.0",
+    "aws-xray-sdk": "^2.3.3",
+    "serverless": "^1.44.1",
+    "serverless-dynamodb-local": "^0.2.38",
+    "serverless-stage-manager": "^1.0.5",
+    "draw-by-days-models": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/async-retry": "^1.4.1",
+    "@types/aws-lambda": "^8.10.17",
+    "@types/axios": "^0.14.0",
+    "@types/node": "^8.0.57",
+    "@types/uuid": "^3.4.4",
+    "@types/lambda-tester": "^3.5.1",
+    "async-retry": "^1.2.3",
+    "lambda-tester": "^3.5.0",
+    "axios": "^0.18.0",
+    "prettier": "^1.18.2",
+    "serverless-domain-manager": "^3.2.2",
+    "serverless-webpack": "^5.3.0",
+    "source-map-support": "^0.5.6",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.9.2",
+    "uuid": "^3.3.2",
+    "webpack": "^4.5.0"
+  }
+}

@@ -3,62 +3,40 @@
 [![Build Status](https://img.shields.io/circleci/project/github/SketchingDev/draw-by-days/master.svg)](https://circleci.com/gh/SketchingDev/draw-by-days/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/SketchingDev/draw-by-days/badge.svg?branch=master)](https://coveralls.io/github/SketchingDev/draw-by-days?branch=master)
 
-Draw by Days is project that I've been using to explore the emerging serverless offerings of AWS. Take a look around,
-you'll find:
-
-  * Event-driven architecture with SNS as the backbone
-  * Serverless microservices (deployed independently)
-  * Wiki pages explaining my findings
-
-Besides a learning exercise I'm hoping this project will provide artists (amateur or professional) with an image a day
-to reproduce in their particular medium. The more days you complete the better you'll get - or at least I'm hoping!
+Draw by Days provides artists (amateur or professional) with an image a day to reproduce in their particular medium. The 
+more days you complete the better you'll get - or at least I'm hoping!
 
 ## Technologies
 
- * AWS Lambda / DynamoDB / SNS / API Gateway / S3
- * Terraform / Terragrunt / Terratest
+ * AWS Lambda / API Gateway / DynamoDB / S3 / SQS
+ * Serverless Framework
  * NodeJS / TypeScript / Lerna / Yarn
  * CircleCI
 
 ## Overview
 
-<p align="center">
-  <img src="docs/architecture.png">
-</p>
+ * [Website](packages/website) - Website that displays the images for each day
+ * [Daily Image API](packages/daily-image-api) - Provides an API for creating new daily images
+ * [Image Storage](packages/image-storage) - Publicly accessible S3 which updates the Daily Image API with the images added to the bucket
+ * [Image Ingest](packages/image-ingest) - Scheduled service that ingests an image from external providers and provides it to the Image Storage service 
 
- * [Image Details Service](packages/image-details-service) - Exposes url and details of all stored images
- * [Image Store Service](packages/image-store-service) - Publicly accessible S3 bucket of images
- * [Website](packages/website) - An unloved website that will present the images
 
-### Project structure
+## Commands
 
-I'll start by explaining how each microservice is separated by its code and infrastructure:
+Run integration tests (tests scoped from Lambda to dependency)
 
- * `packages/` - Code and [component tests](https://microservices.io/patterns/testing/service-component-test.html) for services
- * `terraform/` - Infrastructure for services 
-   * `modules/` - Module per service *(sub-modules common between services are stored in a [separate repo][terraform-modules])*
-   * `environments/` - Variables for each service per environment
-     * `<environment>/<service>/terraform.tfvars`
+```
+yarn test
+```
 
-*This split is due to the convention of node projects living under a `packages` directory and
-[Terraform best practises][terraform-best-practises] advising that infrastructure lives under `modules` and
-`environments` directories.*
+Run component tests (test deployed service)
 
-### Continuous delivery pipeline
+```
+yarn test:component
+``` 
 
-Next take a look at the CI/CD pipeline which should hopefully show the process of testing, building, deploying each
-service independently. Those who think in code can view the [config.yml](./.circleci/config.yml) and for the rest of us
-here's an image of the [CI/CD workflow from CircleCI](https://circleci.com/gh/SketchingDev/workflows/draw-by-days/).
+Deploy to development environment
 
-![CI Pipleline](./docs/ci-pipeline.png)
-
-*The image has been doctored a little to re-order the jobs, since CircleCI seems to enjoy
-[jumbling them up](https://discuss.circleci.com/t/properly-sort-jobs-in-workflows/16258).*
-
-[terraform]: https://www.terraform.io/
-[terraform-best-practises]: https://www.terraform.io/docs/enterprise/workspaces/repo-structure.html
-[terragrunt]: https://github.com/gruntwork-io/terragrunt
-[terratest]: https://github.com/gruntwork-io/terratest
-
-[terraform-modules]: https://github.com/SketchingDev/draw-by-days-terraform-modules
-[sns-subscribed-lambda]: https://github.com/SketchingDev/draw-by-days-terraform-modules/tree/master/sns_subscribed_lambda
+```
+yarn deploy:dev
+```

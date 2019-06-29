@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import Index from "./pages/index";
+import "semantic-ui-css/semantic.min.css";
+import { App } from "./App";
+import registerServiceWorker from "./registerServiceWorker";
 
-ReactDOM.render(<Index />, document.querySelector("#root"));
+ReactDOM.render(<App />, document.getElementById("root") as HTMLElement);
+
+registerServiceWorker();

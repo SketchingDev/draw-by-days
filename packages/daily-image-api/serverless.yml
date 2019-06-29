@@ -1,0 +1,109 @@
+service:
+  name: daily-image-api
+
+plugins:
+  - serverless-domain-manager
+  - serverless-stage-manager
+  - serverless-webpack
+  - '@anttiviljami/serverless-stack-output'
+  - serverless-dynamodb-local
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs8.10
+  tracing:
+    apiGateway: true
+    lambda: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:BatchWriteItem
+      Resource: { Fn::GetAtt: [ DailyImageTable, Arn ] }
+    - Effect: Allow
+      Action:
+        - sqs:DeleteMessage
+        - sqs:ReceiveMessage
+      Resource: { Fn::GetAtt: [ CreateImageMessages, Arn ] }
+
+custom:
+  stages:
+    - dev
+    - component
+    - ci
+    - prod
+  tableName: draw-by-days-${self:provider.stage}-daily-images
+  queueName: draw-by-days-${self:provider.stage}-daily-images
+  apiDomain:
+    dev: api-dev.drawbydays.com
+    component: api-component.drawbydays.com
+    ci: api-ci.drawbydays.com
+    prod: api.drawbydays.com
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 4569
+      migrate: true
+      inMemory: true
+      noStart: true
+  output:
+    file: ./.serverless/outputs.json
+  customDomain:
+    domainName: ${self:custom.apiDomain.${self:provider.stage}}
+    certificateName: '*.drawbydays.com'
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+
+functions:
+  getDailyImage:
+    handler: handlerGet.getDailyImage
+    environment:
+      TABLE_NAME: ${self:custom.tableName}
+    events:
+      - http:
+          method: GET
+          path: dailyImage
+        Resource: arn:aws:dynamodb:*:*:table/${self:custom.tableName}
+  createDailyImage:
+    handler: handlerCreate.createDailyImage
+    environment:
+      TABLE_NAME: ${self:custom.tableName}
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - CreateImageMessages
+              - Arn
+
+resources:
+  Resources:
+    CreateImageMessages:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.queueName}
+        MessageRetentionPeriod: 120
+        VisibilityTimeout: 60
+
+    DailyImageTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
+
+  Outputs:
+    QueueName:
+      Description: "Name of queue"
+      Value: ${self:custom.queueName}
+    DomainName:
+      Value: https://${self:custom.apiDomain.${self:provider.stage}}

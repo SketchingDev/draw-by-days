@@ -1,28 +1,39 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
 import * as React from "react";
-import { IImage } from "../image/DummyImageApiClient";
+import { Image, Loader } from "semantic-ui-react";
+import { URL } from "url";
+
+export interface IAbcImage {
+  url: URL;
+}
 
 export interface ILoadableImage {
-    requestState: RequestState;
-    image: IImage | null;
+  requestState: RequestState;
+  image: IAbcImage | null;
 }
 
 export enum RequestState {
-    Loading,
-    Ok,
-    Error,
+  Loading,
+  Ok,
+  Error,
+  Unavailable
 }
 
 export class LoadableImage extends React.PureComponent<ILoadableImage> {
-    public render() {
-        const { requestState, image } = this.props;
-        switch (requestState) {
-            case RequestState.Loading:
-                return <CircularProgress id="image-loading" />;
-            case RequestState.Ok:
-                return <img src={image!.path} alt={image!.description} />;
-            default:
-                return <div id="image-error">Error loading image</div>;
-        }
+  public render() {
+    const { requestState, image } = this.props;
+
+    switch (requestState) {
+      case RequestState.Loading:
+        return <Loader />;
+      case RequestState.Ok:
+        return <div>
+          <Image src={image!.url} fluid={true} />
+          <div style={{textAlign: "right"}}>With thanks to <a href={"https://pixabay.com/"}>Pixabay</a> for the image</div>
+        </div>;
+      case RequestState.Unavailable:
+        return <p style={{ textAlign: "center"}}>Image isn't available yet, please try again later</p>;
+      default:
+        return <div id="image-error">Error loading image</div>;
     }
+  }
 }
