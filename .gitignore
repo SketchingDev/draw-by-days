@@ -1,2 +1,12 @@
 # package directories
 node_modules
+
+# Yarn
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+lib-cov
+coverage
+lcov-merged.info
+reports

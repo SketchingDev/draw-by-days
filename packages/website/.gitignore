@@ -1,19 +1,5 @@
-# package directories
-node_modules
-jspm_packages
-
 # Serverless directories
 .serverless
 
-# dependencies
-/node_modules
-
-# testing
-/coverage
-
 # production
 /build
-
-# Yarn
-yarn-debug.log*
-yarn-error.log*
