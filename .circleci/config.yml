@@ -69,10 +69,10 @@ jobs:
           at: ~/repo
       - run:
           name: Collate
-          command: yarn test:merge-coverage
+          command: yarn test:coverage:merge
       - run:
           name: Upload
-          command: yarn test:upload-coverage
+          command: yarn test:coverage:upload
 
   component-test-all:
     executor: node-build-environment
