@@ -55,6 +55,24 @@ jobs:
       - run:
           name: Test Services
           command: yarn test | .circleci/scripts/redact.sh
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - packages/*/coverage/lcov.info
+
+  report-test-coverage:
+    executor: node-build-environment
+    steps:
+      - checkout
+      - yarn-install-with-cache
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Collate
+          command: yarn test:coverage:merge
+      - run:
+          name: Upload
+          command: yarn test:coverage:upload
 
   component-test-all:
     executor: node-build-environment
@@ -118,6 +136,9 @@ workflows:
             branches:
               ignore:
                 - master
+      - report-test-coverage:
+          requires:
+            - test-all
       - component-test-all:
           requires:
             - build-all
