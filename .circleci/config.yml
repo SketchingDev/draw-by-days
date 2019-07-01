@@ -158,6 +158,14 @@ workflows:
             branches:
               only:
                 master
+      - test-all:
+          filters:
+            branches:
+              only:
+                master
+      - report-test-coverage:
+          requires:
+            - test-all
       - deploy-prod:
           requires:
             - build-all
