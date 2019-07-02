@@ -39,7 +39,7 @@ functions:
       IMAGE_STORAGE_BUCKET_NAME: ${self:custom.imageStorageBucketName.${self:provider.stage}}
       PIXABAY_API_KEY: ${ssm:/drawbydays/pixabay/apiKey~true}
     events:
-      - schedule: rate(24 hours)
+      - schedule: cron(0 0 * * ? *)
 
 resources:
   Outputs:
