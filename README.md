@@ -6,6 +6,13 @@
 Draw by Days provides artists (amateur or professional) with an image a day to reproduce in their particular medium. The 
 more days you complete the better you'll get - or at least I'm hoping!
 
+
+## Features
+
+ - [X] Display random image each day
+ - [ ] Display random image suitable for drawing practise
+ - [ ] Ability for users to upload their drawings
+
 ## Technologies
 
  * AWS Lambda / API Gateway / DynamoDB / S3 / SQS
