@@ -1,3 +1,5 @@
 ## Image Storage
 
-![Serverless architecture for service](docs/architecture.png)
+<p align="center">
+  <img src="docs/architecture.png">
+</p>
