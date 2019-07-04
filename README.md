@@ -10,7 +10,7 @@ more days you complete the better you'll get - or at least I'm hoping!
 ## Features
 
  - [X] Display random image each day
- - [ ] Display random image suitable for drawing practise
+ - [ ] Only display random images that are actually suitable for drawing
  - [ ] Ability for users to upload their drawings
 
 ## Technologies
@@ -22,10 +22,15 @@ more days you complete the better you'll get - or at least I'm hoping!
 
 ## Overview
 
+<p align="center">
+  <img src="docs/architecture.png">
+</p>
+
+
  * [Website](packages/website) - Website that displays the images for each day
- * [Daily Image API](packages/daily-image-api) - Provides an API for creating new daily images
- * [Image Storage](packages/image-storage) - Publicly accessible S3 which updates the Daily Image API with the images added to the bucket
- * [Image Ingest](packages/image-ingest) - Scheduled service that ingests an image from external providers and provides it to the Image Storage service 
+ * [Daily Image API](packages/daily-image-api) - Public API for the 'daily image'
+ * [Image Storage](packages/image-storage) - Public S3 bucket that hosts image files. Each new image added invokes a command for the Daily Image API to create a new 'daily image'
+ * [Image Ingest](packages/image-ingest) - Scheduled service that ingests an image from external providers and saves directly to the Image Storage's S3 bucket
 
 
 ## Commands
