@@ -10,7 +10,7 @@ more days you complete the better you'll get - or at least I'm hoping!
 ## Features
 
  - [X] Display random image each day
- - [ ] Display random image suitable for drawing practise
+ - [ ] Only display random images that are actually suitable for drawing
  - [ ] Ability for users to upload their drawings
 
 ## Technologies
