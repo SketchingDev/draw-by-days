@@ -29,7 +29,7 @@ more days you complete the better you'll get - or at least I'm hoping!
 
  * [Website](packages/website) - Website that displays the images for each day
  * [Daily Image API](packages/daily-image-api) - Public API for the 'daily image'
- * [Image Storage](packages/image-storage) - Public S3 bucket that hosts image files. New images invokes a command to Daily Image API to create a new 'daily image'
+ * [Image Storage](packages/image-storage) - Public S3 bucket that hosts image files. Each new image added invokes a command for the Daily Image API to create a new 'daily image'
  * [Image Ingest](packages/image-ingest) - Scheduled service that ingests an image from external providers and saves directly to the Image Storage's S3 bucket
 
 
