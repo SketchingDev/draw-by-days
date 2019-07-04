@@ -22,6 +22,11 @@ more days you complete the better you'll get - or at least I'm hoping!
 
 ## Overview
 
+<p align="center">
+  <img src="docs/architecture.png">
+</p>
+
+
  * [Website](packages/website) - Website that displays the images for each day
  * [Daily Image API](packages/daily-image-api) - Provides an API for creating new daily images
  * [Image Storage](packages/image-storage) - Publicly accessible S3 which updates the Daily Image API with the images added to the bucket
