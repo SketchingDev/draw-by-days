@@ -6,9 +6,10 @@ import { validateAddDailyImageCommand } from "../../app/creation/validateAddDail
 import uuidv4 from "uuid/v4";
 import AWS from "aws-sdk";
 import { DynamoDbFixture } from "../DynamoDbFixture";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
+import { DateIncrementer, SaveDynamoDbDailyImages } from "../../app/creation/storage/SaveDynamoDbDailyImage";
 import lambdaTester = require("lambda-tester");
 import laconia = require("@laconia/core");
-import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 
 const sqs = require("@laconia/adapter").sqs();
 
@@ -16,7 +17,8 @@ const sqs = require("@laconia/adapter").sqs();
 require("lambda-tester").noVersionCheck();
 
 describe("Test creating daily image", () => {
-  const tableName = (<any>config).tableName;
+  const dailyImageTableName = (<any>config).dailyImageTableName;
+  const dateTableName = (<any>config).dateTableName;
   const dbEndpoint = (<any>config).localDynamoDbEndpoint;
 
   let dynamoDbFixture: DynamoDbFixture;
@@ -27,15 +29,13 @@ describe("Test creating daily image", () => {
     await dynamoDbFixture.waitForDynamoDb();
   });
 
-  beforeEach(() => {
-    handler = createHandler(dynamoDbFixture.client, tableName);
+  beforeEach(async () => {
+    handler = createHandler(dynamoDbFixture.client, dailyImageTableName, dateTableName, appDependencies);
+    await dynamoDbFixture.purgeTable(dailyImageTableName);
+    await dynamoDbFixture.purgeTable(dateTableName);
   });
 
-  afterEach(async () => {
-    await dynamoDbFixture.purgeTable(tableName);
-  });
-
-  test("Daily Image returned with 200 status", async () => {
+  test("Single Daily Image saved with today's date and returned with 200 status", async () => {
     const id = uuidv4();
 
     const sqsEvent: SQSEvent = {
@@ -43,7 +43,7 @@ describe("Test creating daily image", () => {
         createSqsRecord({
           id,
           url: "http://www.google.com/",
-          date: "2019-01-20",
+          date: "-REMOVE ME-",
         } as IAddDailyImageCommand),
       ],
     };
@@ -51,18 +51,18 @@ describe("Test creating daily image", () => {
     return lambdaTester(handler)
       .event(sqsEvent)
       .expectResult(async () => {
-        const response = await dynamoDbFixture.client.scan({ TableName: tableName }).promise();
+        const response = await dynamoDbFixture.client.scan({ TableName: dailyImageTableName }).promise();
 
         expect(response).toMatchObject({
           Items: expect.arrayContaining([
             {
-              id: {
+              Id: {
                 S: id,
               },
-              date: {
-                S: "2019-01-20",
+              Date: {
+                S: extractDateOnly(new Date()),
               },
-              url: {
+              Url: {
                 S: "http://www.google.com/",
               },
             },
@@ -71,7 +71,11 @@ describe("Test creating daily image", () => {
       });
   });
 
-  test("Daily Images returned with 200 status", async () => {
+  test("Multiple Daily Image saved with incrementing date and returned with 200 status", async () => {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     const id1 = uuidv4();
     const id2 = uuidv4();
 
@@ -80,12 +84,12 @@ describe("Test creating daily image", () => {
         createSqsRecord({
           id: id1,
           url: "http://drawbydays.test/image1.png",
-          date: "2019-01-20",
+          date: "-REMOVE ME-",
         } as IAddDailyImageCommand),
         createSqsRecord({
           id: id2,
           url: "http://drawbydays.test/image2.png",
-          date: "2019-01-16",
+          date: "-REMOVE ME-",
         } as IAddDailyImageCommand),
       ],
     };
@@ -93,29 +97,29 @@ describe("Test creating daily image", () => {
     return lambdaTester(handler)
       .event(sqsEvent)
       .expectResult(async () => {
-        const response = await dynamoDbFixture.client.scan({ TableName: tableName }).promise();
+        const response = await dynamoDbFixture.client.scan({ TableName: dailyImageTableName }).promise();
 
         expect(response).toMatchObject({
           Items: expect.arrayContaining([
             {
-              id: {
+              Id: {
                 S: id1,
               },
-              date: {
-                S: "2019-01-20",
+              Date: {
+                S: extractDateOnly(today),
               },
-              url: {
+              Url: {
                 S: "http://drawbydays.test/image1.png",
               },
             },
             {
-              id: {
+              Id: {
                 S: id2,
               },
-              date: {
-                S: "2019-01-16",
+              Date: {
+                S: extractDateOnly(tomorrow),
               },
-              url: {
+              Url: {
                 S: "http://drawbydays.test/image2.png",
               },
             },
@@ -124,11 +128,77 @@ describe("Test creating daily image", () => {
       });
   });
 
-  const createHandler = (dynamoDb: AWS.DynamoDB, tableName: string) =>
+  test("Save only first item when duplicate dates provided as IDs", async () => {
+    const today = new Date();
+
+    const dependencies = () => {
+      const mockDailyImageDate: DateIncrementer = {
+        getDate(): Promise<Date> {
+          return Promise.resolve(today);
+        },
+        increaseDate(): Promise<void> {
+          return Promise.resolve();
+        },
+      };
+
+      return {
+        saveDailyImages: new SaveDynamoDbDailyImages(dynamoDbFixture.client, mockDailyImageDate, dailyImageTableName),
+      };
+    };
+    const overwritingHandler = createHandler(dynamoDbFixture.client, dailyImageTableName, dateTableName, dependencies);
+
+    const id1 = uuidv4();
+    const id2 = uuidv4();
+
+    const sqsEvent: SQSEvent = {
+      Records: [
+        createSqsRecord({
+          id: id1,
+          url: "http://drawbydays.test/image1.png",
+          date: "-REMOVE ME-",
+        } as IAddDailyImageCommand),
+        createSqsRecord({
+          id: id2,
+          url: "http://drawbydays.test/image2.png",
+          date: "-REMOVE ME-",
+        } as IAddDailyImageCommand),
+      ],
+    };
+
+    return lambdaTester(overwritingHandler)
+      .event(sqsEvent)
+      .expectResult(async () => {
+        const response = await dynamoDbFixture.client.scan({ TableName: dailyImageTableName }).promise();
+
+        expect(response).toMatchObject({
+          Items: expect.arrayContaining([
+            {
+              Id: {
+                S: id1,
+              },
+              Date: {
+                S: extractDateOnly(today),
+              },
+              Url: {
+                S: "http://drawbydays.test/image1.png",
+              },
+            },
+          ]),
+        });
+      });
+  });
+
+  const createHandler = (
+    dynamoDb: AWS.DynamoDB,
+    dailyImageTableName: string,
+    dateTableName: string,
+    appDependencies: any,
+  ) =>
     laconia(sqs(validateAddDailyImageCommand(app)))
       .register(() => ({
         env: {
-          TABLE_NAME: tableName,
+          DAILY_IMAGE_TABLE_NAME: dailyImageTableName,
+          DATE_TABLE_NAME: dateTableName,
         },
       }))
       .register(() => ({ dynamoDb }))
@@ -150,4 +220,6 @@ describe("Test creating daily image", () => {
     receiptHandle: "",
     body: JSON.stringify(body),
   });
+
+  const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 });

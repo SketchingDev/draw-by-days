@@ -13,9 +13,9 @@ export class ReadDynamoDbDailyImages implements ReadDailyImages {
 
   private static convertToDailyImage(item: AttributeMap): DailyImage {
     return {
-      id: item.id.S!,
-      url: new URL(item.url.S!),
-      date: new Date(item.date.S!),
+      id: item.Id.S!,
+      url: new URL(item.Url.S!),
+      date: new Date(item.Date.S!),
     };
   }
 
@@ -24,14 +24,14 @@ export class ReadDynamoDbDailyImages implements ReadDailyImages {
   async getByDate(date: Date): Promise<DailyImage[]> {
     const params = {
       ExpressionAttributeNames: {
-        "#date": "date",
+        "#Date": "Date", // TODO See if this is necessary since capitilising the D in Date
       },
       ExpressionAttributeValues: {
-        ":date": {
+        ":Date": {
           S: ReadDynamoDbDailyImages.convertToIsoDate(date),
         },
       },
-      FilterExpression: "#date = :date",
+      FilterExpression: "#Date = :Date",
       TableName: this.tableName,
     };
 

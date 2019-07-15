@@ -19,7 +19,7 @@ export const appDependencies = ({
   dynamoDb: AWS.DynamoDB;
   env: EnvDependencies;
 }): AppDependencies => ({
-  dailyImageRepository: new ReadDynamoDbDailyImages(dynamoDb, env.TABLE_NAME),
+  dailyImageRepository: new ReadDynamoDbDailyImages(dynamoDb, env.DAILY_IMAGE_TABLE_NAME),
 });
 
 export const getDailyImage: APIGatewayProxyHandler = laconia(apiGatewayAdapter(app))
