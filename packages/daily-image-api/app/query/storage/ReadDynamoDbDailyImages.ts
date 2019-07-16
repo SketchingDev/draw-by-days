@@ -1,8 +1,8 @@
 import AWS from "aws-sdk";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
 import { ReadDailyImages } from "./ReadDailyImages";
-import { DailyImage } from "draw-by-days-models/lib";
 import { URL } from "url";
+import { DailyImage } from "../../domain/DailyImage";
 
 export class ReadDynamoDbDailyImages implements ReadDailyImages {
   private static readonly timeDelimiter = "T";
@@ -24,7 +24,7 @@ export class ReadDynamoDbDailyImages implements ReadDailyImages {
   async getByDate(date: Date): Promise<DailyImage[]> {
     const params = {
       ExpressionAttributeNames: {
-        "#Date": "Date", // TODO See if this is necessary since capitilising the D in Date
+        "#Date": "Date",
       },
       ExpressionAttributeValues: {
         ":Date": {

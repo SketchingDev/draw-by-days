@@ -7,9 +7,10 @@ import uuidv4 from "uuid/v4";
 import AWS from "aws-sdk";
 import { DynamoDbFixture } from "../DynamoDbFixture";
 import { IAddDailyImageCommand } from "draw-by-days-models/lib";
-import { DateIncrementer, SaveDynamoDbDailyImages } from "../../app/creation/storage/SaveDynamoDbDailyImage";
+import { SaveDynamoDbDailyImages } from "../../app/creation/storage/SaveDynamoDbDailyImage";
 import lambdaTester = require("lambda-tester");
 import laconia = require("@laconia/core");
+import { DateIncrementer } from "../../app/creation/storage/DateIncrementer";
 
 const sqs = require("@laconia/adapter").sqs();
 

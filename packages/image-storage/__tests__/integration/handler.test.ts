@@ -3,7 +3,7 @@ import AWS from "aws-sdk";
 import laconia from "@laconia/core";
 import { app, appDependencies } from "../../handler";
 import lambdaTester = require("lambda-tester");
-import { s3CreateEventToDailyImage } from "../../storage/s3CreateEventToDailyImage";
+import { s3CreateEventToImage } from "../../storage/s3CreateEventToImage";
 import uuidv4 from "uuid/v4";
 import AsyncRetry = require("async-retry");
 import { IAddDailyImageCommand } from "draw-by-days-models/lib";
@@ -14,7 +14,6 @@ require("lambda-tester").noVersionCheck();
 jest.setTimeout(30 * 1000);
 
 describe("Handler tests", () => {
-  const todaysDate = new Date().toISOString().split("T")[0];
   const localSqsConfig = {
     region: "us-east-1",
     apiVersion: "2012-11-05",
@@ -66,9 +65,9 @@ describe("Handler tests", () => {
         const messages = message.Messages!.map(({ Body }) => JSON.parse(Body!) as IAddDailyImageCommand);
         expect(messages).toEqual(
           expect.arrayContaining([
-            { id: "image-1-created.png", date: todaysDate, url: "http://drawbydays.test/image-1-created.png" },
-            { id: "image-2-created.png", date: todaysDate, url: "http://drawbydays.test/image-2-created.png" },
-            { id: "image-3-created.png", date: todaysDate, url: "http://drawbydays.test/image-3-created.png" },
+            { id: "image-1-created.png", url: "http://drawbydays.test/image-1-created.png" },
+            { id: "image-2-created.png", url: "http://drawbydays.test/image-2-created.png" },
+            { id: "image-3-created.png", url: "http://drawbydays.test/image-3-created.png" },
           ]),
         );
       });
@@ -95,7 +94,7 @@ describe("Handler tests", () => {
   });
 
   const createHandler = (sqs: AWS.SQS, sqsName: string) =>
-    laconia(s3CreateEventToDailyImage(app))
+    laconia(s3CreateEventToImage(app))
       .register(() => ({
         env: {
           REGION: "",

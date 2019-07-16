@@ -23,6 +23,11 @@ provider:
       Resource: { Fn::GetAtt: [ DailyImageTable, Arn ] }
     - Effect: Allow
       Action:
+        - dynamodb:Query
+        - dynamodb:PutItem
+      Resource: { Fn::GetAtt: [ DailyImageDateTable, Arn ] }
+    - Effect: Allow
+      Action:
         - sqs:DeleteMessage
         - sqs:ReceiveMessage
       Resource: { Fn::GetAtt: [ CreateImageMessages, Arn ] }
@@ -67,6 +72,10 @@ functions:
       - http:
           method: GET
           path: dailyImage
+          request:
+            parameters:
+              querystrings:
+                url: true
         Resource: arn:aws:dynamodb:*:*:table/${self:custom.dailyImageTableName}
   createDailyImage:
     handler: handlerCreate.createDailyImage
@@ -123,3 +132,9 @@ resources:
       Value: ${self:custom.queueName}
     DomainName:
       Value: https://${self:custom.apiDomain.${self:provider.stage}}
+    DailyImageTable:
+      Description: "Name of the table for storing daily images"
+      Value: ${self:custom.dailyImageTableName}
+    DailyImageDateTable:
+      Description: "Name of the table for storing the incrementing date for daily images"
+      Value: ${self:custom.dateTableName}

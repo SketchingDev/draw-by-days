@@ -5,5 +5,5 @@ export interface DailyImage {
 
   url: URL;
 
-  date: Date;
+  date?: Date;
 }

@@ -4,8 +4,9 @@ import AWS from "aws-sdk";
 import { EnvDependencies } from "./app/EnvDependencies";
 import { AppDependencies } from "./app/creation/AppDependencies";
 import { app } from "./app/creation/app";
-import { DynamoDbDailyImageDate, SaveDynamoDbDailyImages } from "./app/creation/storage/SaveDynamoDbDailyImage";
+import { SaveDynamoDbDailyImages } from "./app/creation/storage/SaveDynamoDbDailyImage";
 import { validateAddDailyImageCommand } from "./app/creation/validateAddDailyImageCommand";
+import { DynamoDbDateIncrementer } from "./app/creation/storage/DynamoDbDailyImageDate";
 
 const sqs = require("@laconia/adapter").sqs();
 
@@ -20,10 +21,10 @@ export const appDependencies = ({
   dynamoDb: AWS.DynamoDB;
   env: EnvDependencies;
 }): AppDependencies => {
-  const dailyImageDate = new DynamoDbDailyImageDate(dynamoDb, env.DATE_TABLE_NAME);
+  const dateIncrementer = new DynamoDbDateIncrementer(dynamoDb, env.DATE_TABLE_NAME);
 
   return {
-    saveDailyImages: new SaveDynamoDbDailyImages(dynamoDb, dailyImageDate, env.DAILY_IMAGE_TABLE_NAME),
+    saveDailyImages: new SaveDynamoDbDailyImages(dynamoDb, dateIncrementer, env.DAILY_IMAGE_TABLE_NAME),
   };
 };
 
