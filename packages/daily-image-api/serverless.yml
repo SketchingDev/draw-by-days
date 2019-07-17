@@ -72,10 +72,6 @@ functions:
       - http:
           method: GET
           path: dailyImage
-          request:
-            parameters:
-              querystrings:
-                url: true
         Resource: arn:aws:dynamodb:*:*:table/${self:custom.dailyImageTableName}
   createDailyImage:
     handler: handlerCreate.createDailyImage
