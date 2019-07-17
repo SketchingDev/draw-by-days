@@ -1,4 +1,5 @@
 export interface EnvDependencies {
   REGION: string;
-  TABLE_NAME: string;
+  DAILY_IMAGE_TABLE_NAME: string;
+  DATE_TABLE_NAME: string;
 }

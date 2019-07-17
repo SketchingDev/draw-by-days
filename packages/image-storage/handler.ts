@@ -2,11 +2,11 @@ import AWSXRay from "aws-xray-sdk";
 import { S3Handler } from "aws-lambda";
 import { SqsDailyImageRepo } from "./storage/SqsDailyImageRepo";
 import laconia from "@laconia/core";
-import { DailyImage } from "draw-by-days-models/lib";
 import AWS from "aws-sdk";
 import https from "https";
-import { s3CreateEventToDailyImage } from "./storage/s3CreateEventToDailyImage";
+import { s3CreateEventToImage } from "./storage/s3CreateEventToImage";
 import { DailyImageRepository } from "./storage/DailyImageRepository";
+import { Image } from "./storage/domain/image";
 
 export interface EnvDependencies {
   REGION: string;
@@ -14,11 +14,8 @@ export interface EnvDependencies {
   DAILY_IMAGE_SQS_QUEUE_NAME: string;
 }
 
-export type DateGenerator = () => Date;
-
 export interface AppDependencies {
   dailyImageRepo: DailyImageRepository;
-  dateGenerator: DateGenerator;
 }
 
 const awsDependencies = ({ env }: { env: EnvDependencies }) => {
@@ -40,14 +37,13 @@ export const appDependencies = async ({
 
   return {
     dailyImageRepo: new SqsDailyImageRepo(sqs, getQueueUrlResponse.QueueUrl),
-    dateGenerator: () => new Date(),
   };
 };
 
-export const app = async (input: DailyImage[], { dailyImageRepo }: AppDependencies) => {
+export const app = async (input: Image[], { dailyImageRepo }: AppDependencies) => {
   await dailyImageRepo.saveAll(input);
 };
 
-export const saveDailyImages: S3Handler = laconia(s3CreateEventToDailyImage(app))
+export const saveDailyImages: S3Handler = laconia(s3CreateEventToImage(app))
   .register(awsDependencies)
   .register(appDependencies);

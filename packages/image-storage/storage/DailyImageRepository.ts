@@ -1,5 +1,5 @@
-import { DailyImage } from "draw-by-days-models/lib";
+import { Image } from "./domain/image";
 
 export interface DailyImageRepository {
-  saveAll(dailyImages: DailyImage[]): Promise<Array<DailyImage>>;
+  saveAll(images: Image[]): Promise<Array<Image>>;
 }

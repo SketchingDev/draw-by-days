@@ -23,6 +23,11 @@ provider:
       Resource: { Fn::GetAtt: [ DailyImageTable, Arn ] }
     - Effect: Allow
       Action:
+        - dynamodb:Query
+        - dynamodb:PutItem
+      Resource: { Fn::GetAtt: [ DailyImageDateTable, Arn ] }
+    - Effect: Allow
+      Action:
         - sqs:DeleteMessage
         - sqs:ReceiveMessage
       Resource: { Fn::GetAtt: [ CreateImageMessages, Arn ] }
@@ -33,7 +38,8 @@ custom:
     - component
     - ci
     - prod
-  tableName: draw-by-days-${self:provider.stage}-daily-images
+  dailyImageTableName: draw-by-days-${self:provider.stage}-daily-images
+  dateTableName: draw-by-days-${self:provider.stage}-daily-images-date
   queueName: draw-by-days-${self:provider.stage}-daily-images
   apiDomain:
     dev: api-dev.drawbydays.com
@@ -61,16 +67,17 @@ functions:
   getDailyImage:
     handler: handlerGet.getDailyImage
     environment:
-      TABLE_NAME: ${self:custom.tableName}
+      DAILY_IMAGE_TABLE_NAME: ${self:custom.dailyImageTableName}
     events:
       - http:
           method: GET
           path: dailyImage
-        Resource: arn:aws:dynamodb:*:*:table/${self:custom.tableName}
+        Resource: arn:aws:dynamodb:*:*:table/${self:custom.dailyImageTableName}
   createDailyImage:
     handler: handlerCreate.createDailyImage
     environment:
-      TABLE_NAME: ${self:custom.tableName}
+      DAILY_IMAGE_TABLE_NAME: ${self:custom.dailyImageTableName}
+      DATE_TABLE_NAME: ${self:custom.dateTableName}
     events:
       - sqs:
           arn:
@@ -91,15 +98,29 @@ resources:
       Type: "AWS::DynamoDB::Table"
       Properties:
         KeySchema:
-          - AttributeName: id
+          - AttributeName: Id
             KeyType: HASH
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: Id
             AttributeType: S
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.dailyImageTableName}
+
+    DailyImageDateTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        KeySchema:
+          - AttributeName: Id
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: Id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.dateTableName}
 
   Outputs:
     QueueName:
@@ -107,3 +128,9 @@ resources:
       Value: ${self:custom.queueName}
     DomainName:
       Value: https://${self:custom.apiDomain.${self:provider.stage}}
+    DailyImageTable:
+      Description: "Name of the table for storing daily images"
+      Value: ${self:custom.dailyImageTableName}
+    DailyImageDateTable:
+      Description: "Name of the table for storing the incrementing date for daily images"
+      Value: ${self:custom.dateTableName}

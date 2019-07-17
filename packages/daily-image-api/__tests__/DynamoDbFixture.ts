@@ -25,14 +25,14 @@ export class DynamoDbFixture {
 
   private async deleteByIds(ids: string[], tableName: string) {
     for (const id of ids) {
-      await this.dynamoDb.deleteItem({ Key: { id: { S: id } }, TableName: tableName }).promise();
+      await this.dynamoDb.deleteItem({ Key: { Id: { S: id } }, TableName: tableName }).promise();
     }
   }
 
   private async getIds(tableName: string) {
     const results = await this.dynamoDb.scan({ TableName: tableName }).promise();
     if (results.Items) {
-      return results.Items.filter(item => "id" in item && item.id.S).map(item => item.id.S!);
+      return results.Items.filter(item => "Id" in item && item.Id.S).map(item => item.Id.S!);
     }
     return [];
   }

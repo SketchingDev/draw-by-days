@@ -1,7 +1,8 @@
 import AWS, { DynamoDB } from "aws-sdk";
-import { DailyImage } from "draw-by-days-models/lib";
 import { SaveDailyImages } from "./SaveDailyImages";
-import { AttributeMap } from "aws-sdk/clients/dynamodb";
+import { AttributeMap, WriteRequests } from "aws-sdk/clients/dynamodb";
+import { DailyImage } from "../../domain/DailyImage";
+import { DateIncrementer } from "./DateIncrementer";
 
 export class SaveDynamoDbDailyImages implements SaveDailyImages {
   private static readonly timeDelimiter = "T";
@@ -14,28 +15,41 @@ export class SaveDynamoDbDailyImages implements SaveDailyImages {
     return date.toISOString().split(SaveDynamoDbDailyImages.timeDelimiter)[0];
   }
 
-  public constructor(private dynamoDb: AWS.DynamoDB, private tableName: string) {}
+  public constructor(
+    private dynamoDb: AWS.DynamoDB,
+    private dateIncrementer: DateIncrementer,
+    private dailyImagesTableName: string,
+  ) {}
 
-  private static convertToAttributeMap({ id, url, date }: DailyImage): AttributeMap {
+  private static convertToAttributeMap(date: Date, { id, url }: DailyImage): AttributeMap {
     return {
-      id: {
+      Id: {
         S: id,
       },
-      url: {
+      Url: {
         S: url.toString(),
       },
-      date: {
+      Date: {
         S: SaveDynamoDbDailyImages.convertToIsoDate(date),
       },
     };
   }
 
-  async saveAll(dailyImages: DailyImage[]): Promise<void> {
-    const params: DynamoDB.Types.BatchWriteItemInput = { RequestItems: {} };
+  public async saveAll(dailyImages: DailyImage[]): Promise<void> {
+    const tablePutItems: WriteRequests = [];
 
-    params.RequestItems[this.tableName] = dailyImages.map(image => ({
-      PutRequest: { Item: SaveDynamoDbDailyImages.convertToAttributeMap(image) },
-    }));
+    for (const image of dailyImages) {
+      let date = await this.dateIncrementer.getDate();
+
+      tablePutItems.push({
+        PutRequest: { Item: SaveDynamoDbDailyImages.convertToAttributeMap(date, image) },
+      });
+
+      await this.dateIncrementer.increaseDate(date);
+    }
+
+    const params: DynamoDB.Types.BatchWriteItemInput = { RequestItems: {} };
+    params.RequestItems[this.dailyImagesTableName] = tablePutItems;
 
     await this.dynamoDb.batchWriteItem(params).promise();
   }

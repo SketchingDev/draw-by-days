@@ -1,25 +1,24 @@
-import { DailyImage } from "draw-by-days-models/lib";
+import { IAddDailyImageCommand } from "draw-by-days-models/lib";
 import { SendMessageBatchRequest } from "aws-sdk/clients/sqs";
 import { DailyImageRepository } from "./DailyImageRepository";
 import AWS from "aws-sdk";
 import uuidv5 from "uuid/v5";
-import { IAddDailyImageCommand } from "draw-by-days-models/lib";
+import { Image } from "./domain/image";
 
 export class SqsDailyImageRepo implements DailyImageRepository {
   private static readonly ID_NAMESPACE = "1b671a61-40d5-491e-99b0-da02ff1f3341";
 
   public constructor(private sqs: AWS.SQS, private queueUrl: string) {}
 
-  private static convert(dailyImage: DailyImage): IAddDailyImageCommand {
+  private static convert(image: Image): IAddDailyImageCommand {
     return {
-      id: dailyImage.id,
-      url: dailyImage.url.toString(),
-      date: dailyImage.date.toISOString().split("T")[0],
+      id: image.id!,
+      url: image.url.toString(),
     };
   }
 
-  public async saveAll(dailyImages: DailyImage[]): Promise<DailyImage[]> {
-    const records = dailyImages.map(image => SqsDailyImageRepo.convert(image));
+  public async saveAll(images: Image[]): Promise<Image[]> {
+    const records = images.map(image => SqsDailyImageRepo.convert(image));
 
     const batch: SendMessageBatchRequest = {
       QueueUrl: this.queueUrl,
@@ -31,6 +30,6 @@ export class SqsDailyImageRepo implements DailyImageRepository {
 
     await this.sqs.sendMessageBatch(batch).promise();
 
-    return dailyImages;
+    return images;
   }
 }

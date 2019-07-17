@@ -13,7 +13,7 @@ import { DynamoDbFixture } from "../DynamoDbFixture";
 require("lambda-tester").noVersionCheck();
 
 describe("Test querying daily image", () => {
-  const tableName: string = (<any>config).tableName;
+  const dailyImageTableName: string = (<any>config).dailyImageTableName;
   const dbEndpoint: string = (<any>config).localDynamoDbEndpoint;
 
   const todaysDate = new Date().toISOString().split("T")[0];
@@ -26,24 +26,24 @@ describe("Test querying daily image", () => {
   });
 
   afterEach(async () => {
-    await dynamoDbFixture.purgeTable(tableName);
+    await dynamoDbFixture.purgeTable(dailyImageTableName);
   });
 
   test("Daily Image returned with 200 status", async () => {
     const id = uuidv4();
-    await dynamoDbFixture.insertTestData(tableName, {
-      id: {
+    await dynamoDbFixture.insertTestData(dailyImageTableName, {
+      Id: {
         S: id,
       },
-      url: {
+      Url: {
         S: "http://drawbydays.test/image.png",
       },
-      date: {
+      Date: {
         S: todaysDate,
       },
     });
 
-    const handler = createHandler(dynamoDbFixture.client, tableName);
+    const handler = createHandler(dynamoDbFixture.client, dailyImageTableName);
 
     return lambdaTester(handler)
       .event({})
@@ -80,7 +80,7 @@ describe("Test querying daily image", () => {
     laconia(apiGatewayAdapter(app))
       .register(() => ({
         env: {
-          TABLE_NAME: tableName,
+          DAILY_IMAGE_TABLE_NAME: tableName,
         },
       }))
       .register(() => ({ dynamoDb }))

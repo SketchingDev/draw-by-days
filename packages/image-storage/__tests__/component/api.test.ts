@@ -13,7 +13,6 @@ describe("Service tests", () => {
     factor: 1,
     onRetry: () => console.log(retryMessage),
   });
-  const todaysDate = new Date().toISOString().split("T")[0];
   const region = "us-east-1";
 
   let s3: AWS.S3;
@@ -59,7 +58,6 @@ describe("Service tests", () => {
     const imageAddedMessage = JSON.parse(message.Body!) as IAddDailyImageCommand;
     expect(imageAddedMessage).toMatchObject({
       id: testObject.name,
-      date: todaysDate,
     });
     expect(axios.get(imageAddedMessage.url!)).resolves.toMatchObject({
       statusText: "OK",

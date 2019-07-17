@@ -1,8 +1,8 @@
 import AWS from "aws-sdk";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
 import { ReadDailyImages } from "./ReadDailyImages";
-import { DailyImage } from "draw-by-days-models/lib";
 import { URL } from "url";
+import { DailyImage } from "../../domain/DailyImage";
 
 export class ReadDynamoDbDailyImages implements ReadDailyImages {
   private static readonly timeDelimiter = "T";
@@ -13,9 +13,9 @@ export class ReadDynamoDbDailyImages implements ReadDailyImages {
 
   private static convertToDailyImage(item: AttributeMap): DailyImage {
     return {
-      id: item.id.S!,
-      url: new URL(item.url.S!),
-      date: new Date(item.date.S!),
+      id: item.Id.S!,
+      url: new URL(item.Url.S!),
+      date: new Date(item.Date.S!),
     };
   }
 
@@ -24,14 +24,14 @@ export class ReadDynamoDbDailyImages implements ReadDailyImages {
   async getByDate(date: Date): Promise<DailyImage[]> {
     const params = {
       ExpressionAttributeNames: {
-        "#date": "date",
+        "#Date": "Date",
       },
       ExpressionAttributeValues: {
-        ":date": {
+        ":Date": {
           S: ReadDynamoDbDailyImages.convertToIsoDate(date),
         },
       },
-      FilterExpression: "#date = :date",
+      FilterExpression: "#Date = :Date",
       TableName: this.tableName,
     };
 
