@@ -22,6 +22,11 @@ export const appDependencies = ({
   dailyImageRepository: new ReadDynamoDbDailyImages(dynamoDb, env.DAILY_IMAGE_TABLE_NAME),
 });
 
-export const getDailyImage: APIGatewayProxyHandler = laconia(apiGatewayAdapter(app))
+const logEvent = (next: any) => async (event: any, ...args: any[]) => {
+  console.log(event);
+  return await next(event, ...args);
+};
+
+export const getDailyImage: APIGatewayProxyHandler = laconia(logEvent(apiGatewayAdapter(app)))
   .register(awsDependencies)
   .register(appDependencies);

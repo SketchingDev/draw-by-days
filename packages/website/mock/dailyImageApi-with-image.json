@@ -1,9 +1,9 @@
 {
   "dailyImage": [
     {
-      "id": "pixabay.jpg",
+      "id": "52e3d2404252ac14f6da8c7dda793f7b103ed6e45b",
       "url": "http://localhost:3001/pixabay.jpg",
-      "date": "2019-06-09T00:00:00.000Z"
+      "date": "2019-06-09"
     }
   ]
 }

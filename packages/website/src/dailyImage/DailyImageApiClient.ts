@@ -20,7 +20,8 @@ export class ImageApiClient {
   }
 
   public async getImages(): Promise<IDailyImage[]> {
-    const url = `/dailyImage`;
+    const date = new Date().toISOString().split("T")[0];
+    const url = `/dailyImage/${date}`;
 
     const { data } = await this.client.get<IImageResponse[]>(url);
 
