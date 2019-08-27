@@ -32,6 +32,7 @@ export class DynamoDbDateIncrementer implements DateIncrementer {
       return new Date(nextDate.NextDate.S!);
     }
 
+    console.log(`No previous date stored in ${this.tableName}, returned ${defaultDate}`);
     return defaultDate;
   }
 

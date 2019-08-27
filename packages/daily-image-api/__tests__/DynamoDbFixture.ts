@@ -42,6 +42,7 @@ export class DynamoDbFixture {
   }
 
   public async insertTestData(tableName: string, item: PutItemInputAttributeMap) {
+    console.log("Attempting to insert test data into DynamoDB...");
     const params = {
       Item: item,
       ReturnConsumedCapacity: "TOTAL",
@@ -49,5 +50,6 @@ export class DynamoDbFixture {
     };
 
     await this.dynamoDb.putItem(params).promise();
+    console.log("Data inserted successfully");
   }
 }

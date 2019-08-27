@@ -39,25 +39,25 @@ describe("Test Daily Image API", () => {
   test("Single image added message saved and returned via query", async () => {
     const today = new Date(extractDateOnly(new Date()));
 
-    const imageAdded: Readonly<IAddDailyImageCommand> = {
+    const addImage: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       url: "http://www.drawbydays.com/test-1",
     };
 
     await sqs
       .sendMessage({
-        MessageBody: JSON.stringify({ ...imageAdded }),
+        MessageBody: JSON.stringify({ ...addImage }),
         QueueUrl: queueUrl,
       })
       .promise();
 
     await AsyncRetry(async () => {
-      const response = await apiClient.get("/dailyImage");
+      const response = await apiClient.get(`/dailyImage/${extractDateOnly(new Date())}`);
 
       console.log(response);
       expect(response).toMatchObject({
         status: 200,
-        data: expect.arrayContaining([{ id: imageAdded.id, date: today.toISOString(), url: imageAdded.url }]),
+        data: expect.arrayContaining([{ id: addImage.id, date: today.toISOString(), url: addImage.url }]),
       });
     }, retryFiveTimes);
   });
@@ -67,12 +67,12 @@ describe("Test Daily Image API", () => {
     const tomorrow = new Date(extractDateOnly(new Date()));
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const imageAddedMessage1: Readonly<IAddDailyImageCommand> = {
+    const addImageMessage1: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       url: "http://www.drawbydays.com/test-2",
     };
 
-    const imageAddedMessage2: Readonly<IAddDailyImageCommand> = {
+    const addImagMessage2: Readonly<IAddDailyImageCommand> = {
       id: uuidv4(),
       url: "http://www.drawbydays.com/test-3",
     };
@@ -82,11 +82,11 @@ describe("Test Daily Image API", () => {
       Entries: [
         {
           Id: uuidv4(),
-          MessageBody: JSON.stringify({ ...imageAddedMessage1 }),
+          MessageBody: JSON.stringify({ ...addImageMessage1 }),
         },
         {
           Id: uuidv4(),
-          MessageBody: JSON.stringify({ ...imageAddedMessage2 }),
+          MessageBody: JSON.stringify({ ...addImagMessage2 }),
         },
       ],
     };
@@ -94,36 +94,42 @@ describe("Test Daily Image API", () => {
     await sqs.sendMessageBatch(params).promise();
 
     await AsyncRetry(async () => {
-      const response = await apiClient.get("/dailyImage");
+      const responseForToday = await apiClient.get(`/dailyImage/${extractDateOnly(today)}`);
+      expect(responseForToday).toMatchObject({
+        status: 200,
+        data: expect.toIncludeAnyMembers([
+          // SQS isn't ordered, so we cannot determine what date will be used
+          {
+            date: today.toISOString(),
+            id: addImageMessage1.id,
+            url: addImageMessage1.url,
+          },
+          {
+            date: today.toISOString(),
+            id: addImagMessage2.id,
+            url: addImagMessage2.url,
+          },
+        ]),
+      });
 
-      console.log(response);
+      const responseForTomorrow = await apiClient.get(`/dailyImage/${extractDateOnly(tomorrow)}`);
 
-      expect(response).toMatchObject({
+      console.log(responseForTomorrow);
+
+      expect(responseForTomorrow).toMatchObject({
         status: 200,
       });
-      expect(response.data).toIncludeAnyMembers([
+      expect(responseForTomorrow.data).toIncludeAnyMembers([
         // SQS isn't ordered, so we cannot determine what date will be used
         {
-          date: today.toISOString(),
-          id: imageAddedMessage1.id,
-          url: imageAddedMessage1.url,
+          date: tomorrow.toISOString(),
+          id: addImageMessage1.id,
+          url: addImageMessage1.url,
         },
         {
           date: tomorrow.toISOString(),
-          id: imageAddedMessage1.id,
-          url: imageAddedMessage1.url,
-        },
-
-        // SQS isn't ordered, so we cannot determine what date will be used
-        {
-          date: today.toISOString(),
-          id: imageAddedMessage2.id,
-          url: imageAddedMessage2.url,
-        },
-        {
-          date: tomorrow.toISOString(),
-          id: imageAddedMessage2.id,
-          url: imageAddedMessage2.url,
+          id: addImagMessage2.id,
+          url: addImagMessage2.url,
         },
       ]);
     }, retryFiveTimes);

@@ -9,7 +9,7 @@
     "start": "react-scripts-ts start",
     "eject": "react-scripts-ts eject",
     "build": "yarn clean && yarn react-scripts-ts build",
-    "start:mock:with-image": "json-server mock/dailyImageApi-with-image.json --port=3001 --static ./mock/public",
+    "start:mock:with-image": "json-server mock/dailyImageApi-with-image.json --routes mock/routes.json --port=3001 --static ./mock/public",
     "start:mock:without-image": "json-server mock/dailyImageApi-without-image.json --port=3001",
     "test": "CI=true react-scripts-ts test --env=jsdom",
     "test:integration": "yarn cypress run",

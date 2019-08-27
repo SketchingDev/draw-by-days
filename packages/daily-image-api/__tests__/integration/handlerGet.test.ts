@@ -17,6 +17,7 @@ describe("Test querying daily image", () => {
   const dbEndpoint: string = (<any>config).localDynamoDbEndpoint;
 
   const todaysDate = new Date().toISOString().split("T")[0];
+  const tomorrowsDate = new Date(new Date().setHours(24)).toISOString().split("T")[0];
 
   let dynamoDbFixture: DynamoDbFixture;
 
@@ -29,24 +30,37 @@ describe("Test querying daily image", () => {
     await dynamoDbFixture.purgeTable(dailyImageTableName);
   });
 
-  test("Daily Image returned with 200 status", async () => {
+  test("Daily Image for valid date returns 200 status", async () => {
     const id = uuidv4();
     await dynamoDbFixture.insertTestData(dailyImageTableName, {
       Id: {
         S: id,
       },
       Url: {
-        S: "http://drawbydays.test/image.png",
+        S: "http://drawbydays.test/image1.png",
       },
       Date: {
         S: todaysDate,
+      },
+    });
+    await dynamoDbFixture.insertTestData(dailyImageTableName, {
+      Id: {
+        S: uuidv4(),
+      },
+      Url: {
+        S: "http://drawbydays.test/image2.png",
+      },
+      Date: {
+        S: tomorrowsDate,
       },
     });
 
     const handler = createHandler(dynamoDbFixture.client, dailyImageTableName);
 
     return lambdaTester(handler)
-      .event({})
+      .event({
+        pathParameters: { date: todaysDate },
+      })
       .expectResult(async (result: APIGatewayProxyResult) => {
         expect(result).toMatchObject({
           statusCode: 200,
@@ -55,7 +69,7 @@ describe("Test querying daily image", () => {
           expect.arrayContaining([
             {
               id,
-              url: "http://drawbydays.test/image.png",
+              url: "http://drawbydays.test/image1.png",
               date: new Date(todaysDate).toISOString(),
             },
           ]),
@@ -67,11 +81,24 @@ describe("Test querying daily image", () => {
     const misconfiguredHandler = createHandler(dynamoDbFixture.client, "non-existent-images-table");
 
     return lambdaTester(misconfiguredHandler)
-      .event({})
+      .event({ pathParameters: { date: todaysDate } })
       .expectResult(async (result: APIGatewayProxyResult) => {
         expect(result).toMatchObject({
           statusCode: 500,
-          body: "Unknown error",
+          body: JSON.stringify({ error: { message: "Unknown error" } }),
+        });
+      });
+  });
+
+  test("Invalid date returns 500 status", async () => {
+    const misconfiguredHandler = createHandler(dynamoDbFixture.client, "non-existent-images-table");
+
+    return lambdaTester(misconfiguredHandler)
+      .event({ pathParameters: { date: "invalid-date" } })
+      .expectResult(async (result: APIGatewayProxyResult) => {
+        expect(result).toMatchObject({
+          statusCode: 500,
+          body: JSON.stringify({ error: { message: "Invalid date" } }),
         });
       });
   });

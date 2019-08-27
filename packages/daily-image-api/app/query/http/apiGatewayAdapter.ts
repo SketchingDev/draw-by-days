@@ -19,12 +19,23 @@ const withCors = (next: any) => async (event: APIGatewayProxyEvent, ...args: any
 };
 
 export const apiGatewayAdapter = (app: App) =>
-  withCors(async (_: APIGatewayProxyEvent, dependencies: AppDependencies) => {
+  withCors(async (event: APIGatewayProxyEvent, dependencies: AppDependencies) => {
+    if (!event.pathParameters || !("date" in event.pathParameters)) {
+      // TODO Implement error handling https://laconiajs.io/docs/guides/creating-api-endpoints
+      return res({ error: { message: "Date is missing from path" } }, 500);
+    }
+
+    const date = Date.parse(event.pathParameters["date"]);
+
+    if (Number.isNaN(date)) {
+      return res({ error: { message: "Invalid date" } }, 500);
+    }
+
     try {
-      const output = await app(new Date(), dependencies);
+      const output = await app(new Date(date), dependencies);
       return res(output);
     } catch (err) {
       console.log(err);
-      return res("Unknown error", 500);
+      return res({ error: { message: "Unknown error" } }, 500);
     }
   });

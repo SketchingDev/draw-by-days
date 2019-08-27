@@ -15,25 +15,33 @@ Cypress.Commands.add("invokeLambda", functionName => {
   return lambda.invoke({ FunctionName: functionName }).promise();
 });
 
-Cypress.Commands.add("clearDailyImages", async tableName => {
+const clearDailyImage = async tableName => {
+  await clearTableById(tableName);
+};
+
+const clearDailyImageDate = async tableName => {
+  await clearTableById(tableName);
+};
+
+const clearTableById = async tableName => {
   const ids = new Set();
 
   const scanResult = await dynamodb
     .scan({
-      ProjectionExpression: "id",
+      ProjectionExpression: "Id",
       TableName: tableName,
     })
     .promise();
 
   if (scanResult.Items) {
-    scanResult.Items.map(item => item.id.S).forEach(id => ids.add(id));
+    scanResult.Items.map(item => item.Id.S).forEach(id => ids.add(id));
   }
 
   for (const id of ids.values()) {
     await dynamodb
       .deleteItem({
         Key: {
-          id: {
+          Id: {
             S: id,
           },
         },
@@ -41,4 +49,9 @@ Cypress.Commands.add("clearDailyImages", async tableName => {
       })
       .promise();
   }
+};
+
+Cypress.Commands.add("clearDailyImages", async (dailyImageTableName, dailyImageDateTableName) => {
+  await clearDailyImage(dailyImageTableName);
+  await clearDailyImageDate(dailyImageDateTableName);
 });
