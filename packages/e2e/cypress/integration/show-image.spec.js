@@ -2,7 +2,7 @@ describe("Draw by Days", () => {
   const fiveSecondsInMs = 5000;
 
   beforeEach(() => {
-    cy.clearDailyImages(Cypress.env("dailyImageDynamoDbTable"));
+    cy.clearDailyImages(Cypress.env("dailyImageDynamoDbTable"), Cypress.env("dailyImageDateDynamoDbTable"));
   });
 
   it("Page displays message if image not available", () => {
