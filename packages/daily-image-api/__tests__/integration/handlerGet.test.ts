@@ -85,7 +85,7 @@ describe("Test querying daily image", () => {
       .expectResult(async (result: APIGatewayProxyResult) => {
         expect(result).toMatchObject({
           statusCode: 500,
-          body: "Unknown error",
+          body: JSON.stringify({ error: { message: "Unknown error" } }),
         });
       });
   });
