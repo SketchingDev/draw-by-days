@@ -1,4 +1,4 @@
-## Image Ingest
+## Website
 
 <p align="center">
   <img src="docs/architecture.png">
