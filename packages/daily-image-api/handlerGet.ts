@@ -22,7 +22,7 @@ export const appDependencies = ({
   dailyImageRepository: new ReadDynamoDbDailyImages(dynamoDb, env.DAILY_IMAGE_TABLE_NAME),
 });
 
-const logEvent = (next: any) => async (event: any, ...args: any[]) => {
+export const logEvent = (next: any) => async (event: any, ...args: any[]) => {
   console.log(event);
   return await next(event, ...args);
 };
