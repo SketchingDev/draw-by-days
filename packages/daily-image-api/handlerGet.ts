@@ -23,8 +23,8 @@ export const appDependencies = ({
   logger: console,
 });
 
-const logEvent = (next: any) => async (event: any, deps: AppDependencies) => {
-  console.log(event);
+export const logEvent = (next: any) => async (event: any, deps: AppDependencies) => {
+  deps.logger.log(event);
   return await next(event, deps);
 };
 

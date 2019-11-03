@@ -8,6 +8,8 @@ import { appDependencies, logEvent } from "../../handlerGet";
 import AWS from "aws-sdk";
 import uuidv4 from "uuid/v4";
 import { DynamoDbFixture } from "../DynamoDbFixture";
+import { AppDependencies } from "../../app/query/AppDependencies.js";
+import { ReadDailyImages } from "../../app/query/storage/ReadDailyImages.js";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
@@ -116,19 +118,20 @@ describe("Test querying daily image", () => {
 
 describe("logEvent", () => {
   test("Event is logged then next callback is called with event", async () => {
-    const originalConsoleLog = console.log;
-    console.log = jest.fn();
-
     const expectedResolvedValue = "success";
     const nextCallback = jest.fn().mockResolvedValue(expectedResolvedValue);
     const expectedEvent = { test: "event" };
-    const expectedArgs = [1, 2, 3];
+    const dependencies: AppDependencies = {
+      logger: {
+        log: jest.fn()
+      },
+      dailyImageRepository: {} as ReadDailyImages
+    };
 
-    const result = await logEvent(nextCallback)(expectedEvent, ...expectedArgs);
+    const result = await logEvent(nextCallback)(expectedEvent, dependencies);
 
     expect(result).toEqual(expectedResolvedValue);
-    expect(console.log).toHaveBeenCalledWith(expectedEvent);
-    expect(nextCallback).toHaveBeenCalledWith(expectedEvent, ...expectedArgs);
-    console.log = originalConsoleLog;
+    expect(dependencies.logger.log).toHaveBeenCalledWith(expectedEvent);
+    expect(nextCallback).toHaveBeenCalledWith(expectedEvent, dependencies);
   });
 });
