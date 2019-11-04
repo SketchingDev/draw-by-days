@@ -4,10 +4,12 @@ import laconia = require("@laconia/core");
 import { APIGatewayProxyResult } from "aws-lambda";
 import { apiGatewayAdapter } from "../../app/query/http/apiGatewayAdapter";
 import { app } from "../../app/query/app";
-import { appDependencies } from "../../handlerGet";
+import { appDependencies, logEvent } from "../../handlerGet";
 import AWS from "aws-sdk";
 import uuidv4 from "uuid/v4";
 import { DynamoDbFixture } from "../DynamoDbFixture";
+import { AppDependencies } from "../../app/query/AppDependencies.js";
+import { ReadDailyImages } from "../../app/query/storage/ReadDailyImages.js";
 
 // tslint:disable-next-line:no-var-requires
 require("lambda-tester").noVersionCheck();
@@ -112,4 +114,24 @@ describe("Test querying daily image", () => {
       }))
       .register(() => ({ dynamoDb }))
       .register(appDependencies);
+});
+
+describe("logEvent", () => {
+  test("Event is logged then next callback is called with event", async () => {
+    const expectedResolvedValue = "success";
+    const nextCallback = jest.fn().mockResolvedValue(expectedResolvedValue);
+    const expectedEvent = { test: "event" };
+    const dependencies: AppDependencies = {
+      logger: {
+        log: jest.fn()
+      },
+      dailyImageRepository: {} as ReadDailyImages
+    };
+
+    const result = await logEvent(nextCallback)(expectedEvent, dependencies);
+
+    expect(result).toEqual(expectedResolvedValue);
+    expect(dependencies.logger.log).toHaveBeenCalledWith(expectedEvent);
+    expect(nextCallback).toHaveBeenCalledWith(expectedEvent, dependencies);
+  });
 });
