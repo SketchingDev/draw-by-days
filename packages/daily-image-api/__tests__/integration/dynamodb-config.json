@@ -1,5 +1,0 @@
-{
-  "localDynamoDbEndpoint": "http://localhost:4569",
-  "dailyImageTableName": "draw-by-days-dev-daily-images",
-  "dateTableName": "draw-by-days-dev-daily-images-date"
-}

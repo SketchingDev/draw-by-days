@@ -1,8 +1,0 @@
-{
-  "baseUrl": "http://ci.drawbydays.com",
-  "env": {
-    "ingestLambdaName": "image-ingest-ci-pixabayImageIngester",
-    "dailyImageDynamoDbTable": "draw-by-days-ci-daily-images",
-    "dailyImageDateDynamoDbTable": "draw-by-days-ci-daily-images-date"
-  }
-}

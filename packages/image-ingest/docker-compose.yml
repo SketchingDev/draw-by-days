@@ -1,9 +1,0 @@
-version: '2.1'
-
-services:
-  localstack:
-    image: localstack/localstack
-    ports:
-      - '5000:5000'
-    environment:
-      SERVICES: s3:5000

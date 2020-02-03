@@ -5,8 +5,9 @@ node_modules
 yarn-debug.log*
 yarn-error.log*
 
-# Coverage
-lib-cov
-coverage
-lcov-merged.info
-reports
+# dotenv
+.env
+.env*
+
+# serverless
+.serverless

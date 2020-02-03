@@ -1,6 +1,0 @@
-{
-  "resource": "/v1/account/close/{accountId}",
-  "path": "/v1/account/close/test-account-id",
-  "httpMethod": "POST",
-  "pathParameters": { "date": "2019-07-16" }
-}
