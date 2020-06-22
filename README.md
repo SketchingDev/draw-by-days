@@ -28,7 +28,7 @@ This iteration will allow me to choose a collection of photos that I want Tweete
 
 1. I will hand-pick the images and store them in an S3 bucket with the date to Tweet and attribution stored in the filename.
 2. Each day a scheduled Lambda will:
-  1. Find the day's photo
-  2. Store the date, filename and attribution to a database
-  3. Tweet the image with the attribution
-  4. Log the ID of the Tweet into the database
+    1. Find the day's photo
+    2. Store the date, filename and attribution to a database
+    3. Tweet the image with the attribution
+    4. Log the ID of the Tweet into the database
